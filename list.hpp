@@ -4,6 +4,12 @@
 # include <iostream>
 # include <string>
 
+namespace ft
+{
+	template <class T>
+	class list;
+}
+
 template <class T>
 class ft::list
 {
@@ -11,7 +17,6 @@ protected:
 //  NODE ######################################################################
 	struct Node
 	{
-	// public:
 		Node(T value = T()):next(0), prev(0), value(value){}
 		Node(Node *prev, Node *next, T value):prev(prev), next(next), value(value){}
 		Node(Node const &cpy):prev(cpy.prev), next(cpy.next), value(cpy.value){}
@@ -81,6 +86,7 @@ public:
 	};
 	typedef const reverse_iterator const_reverse_iterator;
 	typedef const iterator const_iterator;
+
 // LIST FUNCTIONS ##############################################################
 
 // ############################ CONSTRUCTORS ###################################
@@ -98,13 +104,13 @@ public:
 		last = toAdd;
 		lsize = n;
 	}
-	template <class InputIterator>
-	list (InputIterator o_first, InputIterator o_last)
+	// template <class InputIterator>
+	list (iterator o_first, iterator o_last)
 	{
+		lsize = 1;
 		first = new Node(0, 0, *o_first);
 		Node *toAdd;
 		Node *prev = first;
-		lsize++;
 		for (o_first = ++o_first; o_first != o_last; o_first++)
 		{
 			toAdd = new Node(prev, 0, *o_first);
@@ -119,7 +125,7 @@ public:
 		Node *toAdd;
 		Node *prev = first;
 		Node *ctrav = cpy.first->next;
-		for (int i = 0; i < lsize; i++)
+		while (ctrav)
 		{
 			toAdd = new Node(prev, 0, ctrav->value);
 			prev->next = toAdd;
@@ -130,7 +136,7 @@ public:
 	}
 	~list(){
 		Node *prev;
-		while (first)
+		while (first && lsize)
 		{
 			prev = first;
 			first = first->next;
@@ -139,27 +145,50 @@ public:
 		first = last = 0;
 	}
 
+	// list &operator=(list const &cpy){ //deep ??
+	// 	if (lsize && first)
+	// 		this->clear();
+	// 	first = cpy.first;
+	// 	last = cpy.last;
+	// 	lsize = cpy.lsize;
+	// 	return *this;
+	// }
+
 	list &operator=(list const &cpy){ //deep ??
-		if (first)
+		if (lsize && first)
 			this->clear();
-		first = cpy.first; last = cpy.last; lsize= cpy.size;
-		return *this;
+		list *ret = new list(cpy);
+		return *ret;
 	}
 //############################# MEMBER FUNCTIONS ###############################
 	size_t			size() const {return lsize;}
 	size_t			max_size() const {return 768614336404564650;} // ?
 	bool			empty() const {return lsize ? false : true;}// return first == 0}
-	void 			resize(size_t n, T val = T()) // if empty
+	void 			resize(size_t n, T val = T())
 	{
 		Node *trav = first;
-		if (this->empty())
-			*this = list(n, val);
-		else if (n < lsize)
+		if (this->empty()){
+			list ret(n, val);
+			first = ret.first;
+			last = ret.last;
+			lsize = ret.lsize;
+			ret.first = 0;
+		}else if (n < lsize)
 		{
-			for (lsize = 0; lsize < n; lsize++) // <= ?
+			lsize = n;
+			while (--n > 0)
 				trav = trav->next;
-			this->erase(trav->next, last);
 			last = trav;
+			if (trav && trav->next){
+			trav = trav->next;
+			Node *del = trav;
+			while (trav != 0)
+			{
+				trav = trav->next;
+				delete del;
+				del = trav;
+			}}
+			last->next = 0;
 		}
 		else if (n > lsize)
 		{
@@ -169,8 +198,8 @@ public:
 				last = new Node(last, 0, val);
 				trav->next = last;
 			}
+			lsize = n;
 		}
-		lsize = n;
 	}
 //############################## FOR ITERATOR ##################################
 	T&				front() {return first->value;} //Calling this function on an empty container causes undefined behavior.
@@ -200,13 +229,12 @@ public:
 //################################ INSERT ######################################
 	void			insert(int index, T val){
 		Node *toAdd;
-		if (index >= lsize)
-			return ;
-		if (this->empty())
-		{
+		if (this->empty()) {
 			toAdd = new Node(0, 0, val);
 			first = last = toAdd;
 		}
+		else if (index >= lsize)
+			return ;
 		else if (index == 0){
 			toAdd = new Node(0, first, val);
 			first->prev = toAdd;
@@ -229,7 +257,7 @@ public:
 	}
 	iterator		insert (iterator position, const T& val){
 		Node *toAdd;
-		if (this->empty())
+		if (this->empty()) // EVEN POSSIBLE ?
 		{
 			toAdd = new Node(0, 0, val);
 			first = last = toAdd;
@@ -239,18 +267,15 @@ public:
 			first->prev = toAdd;
 			first = toAdd;
 		}
-		else if (position.curr == last){
+		else if (!position.curr){
 			toAdd = new Node(last, 0, val);
 			last->next = toAdd;
 			last = toAdd;
 		}
 		else {
-			Node *trav = first;
-			for (int i = 0; i < index; i++)
-				trav = trav->next;
-			toAdd = new Node(trav->prev, trav, val);
-			toAdd->prev->next = toAdd;
-			trav->prev = toAdd;
+			toAdd = new Node(position.curr->prev, position.curr, val);
+			position.curr->prev->next = toAdd;
+			position.curr->prev = toAdd;
 		}
 		lsize++;
 	}
@@ -266,7 +291,7 @@ public:
 		else
 			prev = position.curr->prev;
 		Node *toAdd;
-		while (i++ <= n)
+		while (i++ < n)
 		{
 			toAdd = new Node(prev, 0, val);
 			prev->next = toAdd;
@@ -382,7 +407,8 @@ public:
 							first = first->next;
 							delete prev;
 						}
-						first = last = 0;
+						first = 0;
+						last = 0;
 						lsize = 0;
 					} // ~
 //################################ SPLICE ######################################
@@ -405,11 +431,14 @@ public:
 	}
 	void	splice (iterator position, list& x, iterator i){ // remove from x
 		//--- CHECK IF i IS PLACED IN CRITICAL POSITION ---
-		if (i.curr = x.last){
+		if (i.curr == 0 && i.curr == x.first){
+			x.last = x.last->prev;
+			x.last->next = 0;
+		}else if (i.curr == 0){
 			x.last = x.last->prev;
 			x.last->next = 0;
 		}
-		else if (i.curr = x.first){
+		else if (i.curr == x.first){
 			x.first = x.first->next;
 			x.first->prev = 0;
 		}
@@ -441,19 +470,19 @@ public:
 		//--- CHECK IF i IS PLACED IN CRITICAL POSITION ---
 		for (iterator it = ifirst; it != ilast; it++)
 			change++;
-		if (ilast.curr = x.last && ifirst.curr = x.first)
+		if (ilast.curr == 0 && ifirst.curr == x.first)
 			x.first = x.last = 0;
-		else if (ilast.curr = x.last){
+		else if (ilast.curr == 0){
 			x.last = ifirst.curr->prev;
 			x.last->next = 0;
 		}
-		else if (ifirst.curr = x.first){
+		else if (ifirst.curr == x.first){
 			x.first = ilast.curr;
 			x.first->prev = 0;
 		}
 		else {
-			i.curr->prev->next = i.curr->next;
-			i.curr->next->prev = i.curr->prev;
+			ifirst.curr->prev->next = ilast.curr;
+			ilast.curr->prev = ifirst.curr->prev;
 		}
 		//--------- INSERT-----------
 		if(position.curr == first){
@@ -462,7 +491,7 @@ public:
 			first->prev = 0;
 		}else if (position.curr){
 			position.curr->next->prev = ilast.curr;
-			ilast.curr->next = p
+			ilast.curr->next = position.curr;
 		}else {
 			last->next = ifirst.curr;
 			ifirst.curr->prev = last;
@@ -474,7 +503,8 @@ public:
 	}
 //################################ REMOVE ######################################
 	void	remove (const T& val){
-		Node *it = first->next;
+		Node *it = first;
+		Node *toDel;
 		while (it != 0)
 		{
 			if (it->value == val)
@@ -490,7 +520,7 @@ public:
 					last = it->prev;
 					last->next = 0;
 				}
-				it = it->next
+				it = it->next;
 				delete toDel;
 			}
 			else
@@ -499,10 +529,11 @@ public:
 	}
 	template <class Predicate>
 	void	remove_if (Predicate pred){
-		Node *it = first->next;
+		Node *it = first;
+		Node *toDel;
 		while (it != 0)
 		{
-			if (pred(val))
+			if (pred(it->value))
 			{
 				toDel = it;
 				lsize--;
@@ -515,7 +546,7 @@ public:
 					last = it->prev;
 					last->next = 0;
 				}
-				it = it->next
+				it = it->next;
 				delete toDel;
 			}
 			else
@@ -546,7 +577,7 @@ public:
 						last = it2->prev;
 						last->next = 0;
 					}
-					it2 = it2->next
+					it2 = it2->next;
 					delete toDel;
 				}
 				else
@@ -554,38 +585,38 @@ public:
 			}
 		}
 	}
-	template <class BinaryPredicate>
-	void	unique (BinaryPredicate binary_pred){
-		T val;
-		Node *it2;
-		Node *toDel = 0;
-		for (Node *it1 = first; it1 != 0; it1 = it1->next)
-		{
-			val = it1->value;
-			Node *it2 = first->next;
-			while (it2 != 0)
-			{
-				if (it2->value == val)
-				{
-					toDel = it2;
-					lsize--;
-					if (lsize == 0)
-						first = last = 0;
-					else if (it2 == first){
-						first = it2->next;
-						first->prev = 0;
-					}if (it2 == last){
-						last = it2->prev;
-						last->next = 0;
-					}
-					it2 = it2->next
-					delete toDel;
-				}
-				else
-					it2 = it2->next;
-			}
-		}
-	}
+	// template <class BinaryPredicate>
+	// void	unique (BinaryPredicate binary_pred){
+	// 	T val;
+	// 	Node *it2;
+	// 	Node *toDel = 0;
+	// 	for (Node *it1 = first; it1 != 0; it1 = it1->next)
+	// 	{
+	// 		val = it1->value;
+	// 		Node *it2 = first->next;
+	// 		while (it2 != 0)
+	// 		{
+	// 			if (it2->value == val)
+	// 			{
+	// 				toDel = it2;
+	// 				lsize--;
+	// 				if (lsize == 0)
+	// 					first = last = 0;
+	// 				else if (it2 == first){
+	// 					first = it2->next;
+	// 					first->prev = 0;
+	// 				}if (it2 == last){
+	// 					last = it2->prev;
+	// 					last->next = 0;
+	// 				}
+	// 				it2 = it2->next;
+	// 				delete toDel;
+	// 			}
+	// 			else
+	// 				it2 = it2->next;
+	// 		}
+	// 	}
+	// }
 //################################ MERGE ######################################
 	void	merge (list& x){ //sorted merge
 		iterator it1 = first;
@@ -627,42 +658,31 @@ public:
 		}
 	}
 	//############################## SORT #####################################
-	Node *getMiddle(Node *n, size_t s){
-		Node *trav = n;
-		for (size_t i = 0; i < s; i++)
-			trav = trav->next;
-		return trav;
-	}
-	void ft_mergesort(Node **n, size_t s){
-		Node *a;
-		Node *b;
-		if (!*n || !*n->next)
-			return ;
-		a = *n;
-		b = getMiddle(*n, s / 2);
-		ft_mergesort(&a);
-		ft_mergesort(&b);
-		*n = mergeList(a, b);
-	}
-
 	void	sort(){
 		if (lsize < 2)
 			return ;
-		ft_mergesort(first, lsize);
+		for (Node *out = first; out != 0; out = out->next)
+		{
+			for (Node *in = first; in != 0; in = in->next)
+			{
+				if (out->value < in->value)
+					std::swap(out->value, in->value);
+			}
+		}
 	}
-	// void ft_quicksort(Node *l, Node *h){
-	// 	if (h && h != l && l != h->next)
-	// }
-	// void	sort(){
-	// 	if (lsize < 2)
-	// 		return ;
-	// 	// T pivot = last->value;
-	// 	ft_quicksort(first, last);
-	// }
 
 	template <class Compare>
 	void	sort (Compare comp){
-
+		if (lsize < 2)
+			return ;
+		for (Node *out = first; out != 0; out = out->next)
+		{
+			for (Node *in = first; in != 0; in = in->next)
+			{
+				if (comp(out->value, in->value))
+					std::swap(out->value, in->value);
+			}
+		}
 	}
 	//############################## REVERSE ##################################
 	void	reverse(){
@@ -671,13 +691,22 @@ public:
 		if (lsize > 1){
 			while (front != back)
 			{
-				swap(*front, *back);
+				std::swap(*front, *back);
 				front++;
 				if (front == back)
 					break;
 				back--;
 			}
 		}
+	}
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	void print(){
+		Node *it = first;
+		while (lsize && it != 0){
+			std::cout << it->value << ' ';
+			it = it->next;
+		}
+		std::cout << '\n';
 	}
 };
 

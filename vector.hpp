@@ -3,6 +3,12 @@
 
 # include <iostream>
 
+namespace ft
+{
+	template <class T>
+	class vector;
+}
+
 template <class T>
 class ft::vector
 {
@@ -11,13 +17,57 @@ protected:
 	size_t	vsize;
 	size_t	maxsize;
 public:
-	explicit vector (const allocator_type& alloc = allocator_type());
-	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type());
+	class iterator
+	{
+		T* curr;
+		T* last; // ? size - 1
+	public:
+		iterator();
+
+		virtual iterator& operator++(int){}
+		virtual iterator& operator++(){}
+		virtual iterator& operator--(int){}
+		virtual iterator& operator--(){}
+		bool operator==(iterator const &);
+		bool operator!=(iterator const &);
+	};
+	class reverse_iterator : public iterator
+	{
+		iterator& operator++(int){}
+		iterator& operator++(){}
+		iterator& operator--(int){}
+		iterator& operator--(){}
+	};
+
+	using size_type = size_t;
+	using value_type = T;
+	using iterator = iterator;
+	// using iterator = iterator;
+	using const_iterator = iterator const;
+	// using reverse_iterator = reverse_iterator;
+	using const_reverse_iterator = reverse_iterator const;
+	using difference_type = ptrdiff_t;
+
+
+	// explicit vector (const allocator_type& alloc = allocator_type()){}
+	// explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type());
+	// template <class InputIterator>
+	// vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
+	explicit vector ()vsize(0), maxsize(0){} // maxsize ??
+	explicit vector (size_type n, const value_type& val = value_type()):vsize(n){
+		arr = new T[n](val);
+	}
 	template <class InputIterator>
-	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
-	vector (const vector& x);
+	vector (InputIterator first, InputIterator last){
+
+	}
+	vector (const vector& x){
+
+	}
 	~vector(){delete []arr;}
-	vector& operator= (const vector& x);
+	vector& operator= (const vector& x){
+
+	}
 
 	iterator begin();
 	const_iterator begin() const;
@@ -28,7 +78,7 @@ public:
 	reverse_iterator rend();
 	const_reverse_iterator rend() const;
 	size_type size() const;
-	size_type max_size() const;
+	size_type max_size() const;// 4611686018427387903
 	void resize (size_type n, value_type val = value_type());
 	size_type capacity() const;
 	bool empty() const;

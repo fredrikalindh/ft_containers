@@ -5,15 +5,25 @@ int main()
 {
 	ft::list<int> my;
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 3; i++)
 	 my.push_back(i);
-	for (int i = 30; i > 20; i--)
+	for (int i = 30; i > 27; i--)
 	 my.push_front(i);
 
 	std::cout << "SIZE = " << my.size() << std::endl;
 
 	ft::list<int>::iterator start = my.begin();
 	ft::list<int>::iterator end = my.end();
+	while (start != end)
+		std::cout << *start++ << ' ';
+	my.reverse();
+	std::cout << "\nAFTER REVERSE:" << '\n';
+	start = my.begin();
+	while (start != end)
+		std::cout << *start++ << ' ';
+	my.sort();
+	std::cout << "\nAFTER SORT:" << '\n';
+	start = my.begin();
 	while (start != end)
 		std::cout << *start++ << ' ';
 	my.clear();
@@ -25,9 +35,19 @@ int main()
 	strmy.push_front("hej ");
 	strmy.push_back("jag ");
 	strmy.push_back("heter ");
-	strmy.push_back("fredrika\n");
+	strmy.push_back("fredrika ");
 	ft::list<std::string>::iterator b = strmy.begin();
 	ft::list<std::string>::iterator e = strmy.end();
+	while (b != e)
+		std::cout << *b++;
+	strmy.sort();
+	std::cout << "\nAFTER SORT:" << '\n';
+	b = strmy.begin();
+	while (b != e)
+		std::cout << *b++ << ' ';
+	strmy.reverse();
+	std::cout << "\nAFTER REVERSE:" << '\n';
+	b = strmy.begin();
 	while (b != e)
 		std::cout << *b++;
 	return 0;
