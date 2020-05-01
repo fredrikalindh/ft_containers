@@ -286,10 +286,12 @@ public:
 		return ret;
 	}
 	iterator 		erase(iterator first, iterator last){
+		iterator toDel;
 		unlink_range(first.base(), last.base());
-		while (first != last){
-			delete first.base();
+		while (first != 0 && first != last){
+			toDel = first;
 			first++;
+			delete toDel.base();
 		}
 		return last;
 	}
@@ -440,34 +442,7 @@ public:
 				it2 = erase(it2);
 		}
 	}
-	// void	unique(){
-	// 	iterator it2;
-	// 	for (Node *it1 = d_first; it1->next != 0; it1 = it1->next)
-	// 	{
-	// 		it2 = it1->next;
-	// 		while (it2 != 0){
-	// 			if (*it2 == it1->value){
-	// 				it2 = erase(it2);
-	// 			}else
-	// 				it2++;
-	// 		}
-	// 	}
-	// }
-	// template <class BinaryPredicate>
-	// void	unique (BinaryPredicate binary_pred){
-	// 	iterator it2;
-	// 	for (Node *it1 = d_first; it1 != 0; it1 = it1->next)
-	// 	{
-	// 		it2 = it1->next;
-	// 		while (it2 != 0)
-	// 		{
-	// 			if (binary_pred(*it2, it1->value)){
-	// 				it2 = erase(it2);
-	// 			}else
-	// 				it2++;
-	// 		}
-	// 	}
-	// }
+
 //################################ MERGE ######################################
 // A subtlety is that merge doesn't alter the list if the list itself is used as
 //argument: object.merge(object) won't change the list `object'. !!!!!!!
@@ -513,32 +488,20 @@ public:
 		x.d_first = x.d_last = 0;
 		x.d_size = 0;
 	}
-//############################## SORT #####################################
+//############################## SORT ##########################################
 	void	sort(){
 		if (d_size < 2)
 			return ;
-		quicksort(d_first, 0);
+		mergesort(&d_first, std::less<value_type>());
 	}
-	// void	sort(){
-	// 	if (d_size < 2)
-	// 		return ;
-	// 	for (Node *out = d_first; out != 0; out = out->next)
-	// 	{
-	// 		for (Node *in = d_first; in != 0; in = in->next)
-	// 		{
-	// 			if (out->value < in->value)
-	// 				std::swap(out->value, in->value);
-	// 		}
-	// 	}
-	// }
 
 	template <class Compare>
 	void	sort (Compare comp){
 		if (d_size < 2)
 			return ;
-
+		mergesort(&d_first, comp);
 	}
-	//############################## REVERSE ##################################
+//############################## REVERSE #######################################
 	void	reverse(){
 		iterator front = d_first;
 		iterator back = d_last;
@@ -553,7 +516,7 @@ public:
 //  ITERATOR ##################################################################
 	class bidirectional_iterator
 	{
-	// protected:
+	protected:
 		Node* d_node;
 		Node* d_tail;
 	public:
@@ -661,8 +624,8 @@ protected:
 		}
 		else if (first == d_first){
 			d_first = last;
-			d_first->prev = 0;
 			last->prev->next = 0;
+			d_first->prev = 0;
 		}
 		else if (last == 0){
 			d_last = first->prev;
@@ -670,111 +633,59 @@ protected:
 		}
 		else {
 			first->prev->next = last;
-			last->prev = first->prev;
 			last->prev->next = 0;
+			last->prev = first->prev;
 		}
 		first->prev = 0;
 		d_size -= range_size;
 		return range_size;
 	}
-	Node *get_middle(Node *first, Node *last){
-		if (first->next != last){
-			for (Node *fast = first; fast != last; fast = fast->next){
-				if (fast != last && fast->next != last){
+
+// MERGE SORT UTILS ###########################################################
+	Node *split_list(Node *first){
+		if (first->next != 0){
+			for (Node *fast = first; fast != 0; fast = fast->next){
+				if (fast && fast->next){
 					fast = fast->next;
 					first = first->next;
 				}
 		}}
-		first->prev->next = 0;
+		if (first->prev)
+			first->prev->next = 0;
 		return first;
 	}
-	// void l_merge(Node *a, Node *c, Node *d){
-	// 	Node *save;
-	// 	Node *b = c;
-	// 	std::cout << "\nLIST TO BE MERGED: ";
-	// 	for (Node *trav = a; trav != d; trav = trav->next){
-	// 		std::cout << trav->value << ' ';
-	// 	}
-	// 	std::cout  << '\n';
-	// 	while (a && c && a != b && c != d){
-	// 		std::cout << "v--A	[1]	C--v\n" << a->value << "		   " << c->value << '\n';
-	// 		if (c && c->value < a->value) {
-	// 			save = c->next;
-	// 			splice(a, *this, c);
-	// 			c = save;
-	// 			// a = a->prev;
-	// 		}
-	// 		else
-	// 			a = a->next;
-	// 	}
-	// }
-
-	Node *l_merge(Node *a, Node *c, Node *d){
-		    // If first linked list is empty
-		    if (a == c)
-		        return c;
-		    // If second linked list is empty
-		    if (c == d)
-		        return a;
-		    // Pick the smaller value
-		    if (a->value < c->value)
-		    {
-		        a->next = l_merge(a->next,c, d);
-		        a->next->prev = a;
-		        a->prev = 0;
-		        return a;
-		    }
-		    else
-		    {
-		        c->next = l_merge(a,c->next, d);
-		        c->next->prev = c;
-		        c->prev = 0;
-		        return c;
-		    }
+	template <typename Comp>
+	Node *sort_merge(Node *a, Node *c, Comp comp){
+		if (!a) {d_last = c; return c;}
+		if (!c) {d_last = a; return a;}
+		if (comp(a->value, c->value)){
+			a->next = sort_merge(a->next,c, comp);
+			a->next->prev = a;
+			a->prev = 0;
+			return a;
+		}else{
+			c->next = sort_merge(a,c->next, comp);
+			c->next->prev = c;
+			c->prev = 0;
+			return c;
 		}
-	//
-	// void l_merge(Node *a, Node *c, Node *d){
-	// 	// Node *b = c;
-	// 	std::cout << "\nLIST TO BE MERGED: ";
-	// 	for (Node *trav = a; trav != d; trav = trav->next){
-	// 		std::cout << trav->value << ' ';
-	// 	}
-	// 	std::cout  << '\n';
-	// 	while (a != c && c != d){
-	// 		std::cout << "v--A	[1]	C--v\n" << a->value << "		   " << c->value << '\n';
-	// 		if (c->value < a->value) {
-	// 			a->swap(*c);
-	// 			if (c->next != d)
-	// 				c = c->next;
-	// 		}
-	// 		else{
-	// 			a = a->next;
-	// 		}
-	// 	}
-	// }
-	void quicksort(Node *first, Node *last){
-		if (first == last || first->next == last)
+	}
+	template <typename Comp>
+	void mergesort(Node **first, Comp comp){
+		if (!*first || !(*first)->next)
 			return ;
-		// std::cout << "| ";
-		// for (Node *trav = first; trav != last; trav = trav->next)
-		// 	std::cout << trav->value << " | ";
-		// std::cout << "\n";
-		Node *middle = get_middle(first, last);
-		// std::cout << "--------- " << middle->value << " ---------" << '\n';
-		quicksort(first, middle);
-		quicksort(middle, last);
-		first = l_merge(first, middle, last);
-		std::cout << "AFTER MERGE: ";
-		for (Node *trav = first; trav != last; trav = trav->next)
-			std::cout << trav->value << " ";
-		std::cout << "\n\n";
+		Node *middle = split_list(*first);
+		mergesort(first, comp);
+		mergesort(&middle, comp);
+		*first = sort_merge(*first, middle, comp);
 	}
 };
 template <class InsertIterator>
 void advance(InsertIterator &it, size_t n){
-	while (--n)
+	while (n--)
 		it++;
 }
+
 
 // template <class T>
 // void swap(ft::list<T> &a, ft::list<T> &b){

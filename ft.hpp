@@ -5,10 +5,10 @@
 // # include "deque.hpp"
 // # include "map.hpp"
 // # include "multimap.hpp"
-// # include "stack.hpp"
+# include "stack.hpp"
 // # include "vector.hpp"
 // # include "set.hpp"
 // # include "multiset.hpp"
-// # include "queue.hpp"
+# include "queue.hpp"
 
 #endif

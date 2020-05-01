@@ -6,10 +6,10 @@
 
 namespace ft
 {
-	template <class T> class vector;
+	template <class T, class Alloc = allocator<T> > class vector;
 }
 
-template <class T>
+template <class T, class Alloc = allocator<T> >
 class ft::vector
 {
 protected:
@@ -17,6 +17,7 @@ protected:
 	size_t	d_size;
 	size_t	d_capacity;
 	size_t	d_multi;
+	Alloc	d_alloc;
 public:
 	class reverse_iterator
 	{

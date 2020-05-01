@@ -6,10 +6,10 @@
 
 namespace ft
 {
-	template <class T, class Alloc = allocator<T> > class vector;
+	template <class T> class vector;
 }
 
-template <class T, class Alloc = allocator<T> >
+template <class T>
 class ft::vector
 {
 protected:
@@ -17,7 +17,6 @@ protected:
 	size_t	d_size;
 	size_t	d_capacity;
 	size_t	d_multi;
-	Alloc	d_alloc;
 public:
 	class reverse_iterator
 	{
@@ -50,10 +49,6 @@ public:
 	typedef ptrdiff_t difference_type;
 
 
-	// explicit vector (const allocator_type& alloc = allocator_type()){}
-	// explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type());
-	// template <class InputIterator>
-	// vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
 	explicit vector ():arr(0), d_size(0), d_capacity(0), d_multi(0){} // maxsize ??
 	explicit vector (size_type n, const value_type& val = value_type()):d_size(n), d_capacity(n), d_multi(n){
 		arr = new T[n];
@@ -82,13 +77,7 @@ public:
 	~vector(){delete []arr;}
 	vector& operator= (const vector& x){
 		vector ret(x);
-
-		delete arr;
-		arr = ret.arr;
-		d_size = ret.d_size;
-		d_capacity = ret.d_capacity;
-		d_multi = ret.d_multi;
-		ret.arr = 0;
+		swap(x);
 		return *this;
 	}
 
@@ -110,7 +99,7 @@ public:
 		if (n > max_size())
 			throw std::length_error("max_size(size_t n) 'n' exceeds maximum supported size"); //allocator<T>::allocate(size_t n) 'n' exceeds maximum supported size
 		if (n > d_capacity){
-			T* newArr = new T[n];
+			T* newArr = new T[n]; // SET MULTI?
 			for (size_type i = 0; i < d_size; i++)
 				newArr[i] = arr[i];
 			delete []arr;
@@ -121,9 +110,8 @@ public:
 			clear();
 		}
 		else if (n > 0 && n < d_capacity){
-
-			for (size_type i = n; i < d_size; i++)
-				arr[i] = T();
+			// for (size_type i = n; i < d_size; i++) //DO I REALLY NEED TO?
+			// 	arr[i] = T();
 			d_multi = d_size = d_capacity = n;
 		}
 	}
@@ -147,25 +135,12 @@ public:
 
 	template <class InputIterator>
 	void assign (InputIterator first, InputIterator last){
-		delete []arr;
-
-		d_size = 0;
-		for (InputIterator getSize = first; getSize != last; getSize++)
-			d_size++;
-		d_capacity = d_multi = d_size;
-		arr = new T[d_capacity];
-		for (size_type i = 0; first != last; i++){
-			arr[i] = *first;
-			first++;
-		}
+		vector tmp(first, last);
+		swap(tmp);
 	}
 	void assign (size_type n, const value_type& val){
-		delete []arr;
-
-		d_capacity = d_multi = d_size = n;
-		arr = new T[d_capacity];
-		for (size_type i = 0; i < n; i++)
-			arr[i] = val;
+		vector tmp(n, val);
+		swap(tmp);
 	}
 
 	void push_back (const value_type& val){
@@ -267,7 +242,7 @@ public:
 				*back++ = *first++;
 			}
 		}
-		else { // create new array of double size
+		else {
 			d_capacity += n;
 			d_multi = d_capacity;
 			T *newArr = new T[d_capacity];
@@ -311,19 +286,11 @@ public:
 				d_size--;
 		}
 	}
-
 	void swap (vector& x){
-		vector temp;
-		temp.arr = x.arr;
-		temp.d_size = x.d_size;
-		temp.d_capacity = x.d_capacity;
-		x.arr = arr;
-		x.d_size = d_size;
-		x.d_capacity = d_capacity;
-		arr = temp.arr;
-		d_size = temp.d_size;
-		d_capacity = temp.d_capacity;
-		temp.arr = 0;
+		char buffer[sizeof(vector)];
+		memcpy(buffer, &x, sizeof(vector));
+		memcpy(reinterpret_cast<char *>(&x), this, sizeof(vector));
+		memcpy(reinterpret_cast<char *>(this), buffer, sizeof(vector));
 	}
 
 	void clear(){
