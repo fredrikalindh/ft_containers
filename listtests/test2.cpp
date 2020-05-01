@@ -2,10 +2,14 @@
 #include <iostream>
 #include <list>
 
+#ifndef LIBRARY
+# define LIBRARY ft
+#endif
+
 int main ()
 {
-  ft::list<int> first;
-  ft::list<int> second;
+  LIBRARY::list<int> first;
+  LIBRARY::list<int> second;
 
   first.assign (size_t(7),100);                      // 7 ints with value 100
 

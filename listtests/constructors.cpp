@@ -1,20 +1,22 @@
-#include "../list.hpp"
+#include "../ft.hpp"
 #include <iostream>
 
-// void
+#ifndef LIBRARY
+# define LIBRARY ft
+#endif
 
 int main()
 {
-	ft::list<int> clean;
-	ft::list<int> withn(10);
-	ft::list<int> withnnum(10, 5);
-	ft::list<int>::iterator first = withnnum.begin();
-	ft::list<int>::iterator last = withnnum.end();
+	LIBRARY::list<int> clean;
+	LIBRARY::list<int> withn(10);
+	LIBRARY::list<int> withnnum(10, 5);
+	LIBRARY::list<int>::iterator first = withnnum.begin();
+	LIBRARY::list<int>::iterator last = withnnum.end();
 	last--;
 	last--;
-	ft::list<int> cpynum(first, last);
-	ft::list<int> cpycpy(cpynum);
-	ft::list<int> eq = withn;
+	LIBRARY::list<int> cpynum(first, last);
+	LIBRARY::list<int> cpycpy(cpynum);
+	LIBRARY::list<int> eq = withn;
 	std::cout << "SIZE = " << clean.size() << " IS EMPTY ? " << (clean.empty()) << " LIST: " ;
 	clean.print();
 	std::cout << "SIZE = " << withn.size() << " IS EMPTY ? " << (withn.empty()) << " LIST: " ;

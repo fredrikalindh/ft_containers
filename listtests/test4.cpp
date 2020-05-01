@@ -3,10 +3,14 @@
 #include <list>
 #include <vector>
 
+#ifndef LIBRARY
+# define LIBRARY ft
+#endif
+
 int main ()
 {
-  ft::list<int> mylist;
-  ft::list<int>::iterator it;
+  LIBRARY::list<int> mylist;
+  LIBRARY::list<int>::iterator it;
 
   // set some initial values:
   for (int i=1; i<=5; ++i) mylist.push_back(i); // 1 2 3 4 5

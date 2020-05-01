@@ -1,9 +1,11 @@
-#include "ft.hpp"
+#include "../ft.hpp"
 #include <iostream>
-
+#ifndef LIBRARY
+# define LIBRARY ft
+#endif
 int main()
 {
-	ft::list<int> my;
+	LIBRARY::list<int> my;
 
 	for (int i = 0; i < 3; i++)
 	 my.push_back(i);
@@ -12,8 +14,8 @@ int main()
 
 	std::cout << "SIZE = " << my.size() << std::endl;
 
-	ft::list<int>::iterator start = my.begin();
-	ft::list<int>::iterator end = my.end();
+	LIBRARY::list<int>::iterator start = my.begin();
+	LIBRARY::list<int>::iterator end = my.end();
 	while (start != end)
 		std::cout << *start++ << ' ';
 	my.reverse();
@@ -31,13 +33,13 @@ int main()
 	my.push_back(2);
 	std::cout << "back = " << my.back() << " front = " << my.front() << " size = " << my.size() << "\n\n";
 
-	ft::list<std::string> strmy;
+	LIBRARY::list<std::string> strmy;
 	strmy.push_front("hej ");
 	strmy.push_back("jag ");
 	strmy.push_back("heter ");
 	strmy.push_back("fredrika ");
-	ft::list<std::string>::iterator b = strmy.begin();
-	ft::list<std::string>::iterator e = strmy.end();
+	LIBRARY::list<std::string>::iterator b = strmy.begin();
+	LIBRARY::list<std::string>::iterator e = strmy.end();
 	while (b != e)
 		std::cout << *b++;
 	strmy.sort();

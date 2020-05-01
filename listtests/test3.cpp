@@ -2,9 +2,13 @@
 #include <iostream>
 #include <list>
 
+#ifndef LIBRARY
+# define LIBRARY ft
+#endif
+
 int main ()
 {
-	ft::list<int> mylist (size_t(2),100);         // two ints with a value of 100
+	LIBRARY::list<int> mylist (size_t(2),100);         // two ints with a value of 100
 	mylist.push_front (200);
 	mylist.push_front (300);
 	mylist.push_back (100);
@@ -13,7 +17,7 @@ int main ()
 
 
 	std::cout << "mylist contains:";
-	for (ft::list<int>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
+	for (LIBRARY::list<int>::iterator it=mylist.begin(); it!=mylist.end(); ++it)
 		std::cout << ' ' << *it;
 
 	std::cout << "\nPopping out the elements in mylist of size " << mylist.size() << ": ";
