@@ -3,6 +3,7 @@ TEST		=	cleartest \
 				mergetest \
 				resizetest \
 				splicetest \
+				sorttest \
 				swaptest \
 				uniquetest \
 				removetest \
@@ -22,7 +23,7 @@ STD			=	$(addprefix std_, $(TESTS))
 EXEC		=	$(addprefix ./, $(TESTS))
 DEF			=	-D LIBRARY=std
 CC			=	clang++
-FLAGS		=	-Wall -O3  -g3 -fsanitize=address 
+FLAGS		=	-Wall -O3  -g3 -fsanitize=address
 
 all: ft std
 
@@ -37,6 +38,8 @@ std: $(TESTS)
 	$(CC) $(FLAGS) $^ -o $@
 
 clean:
+	rm -rf *.dSYM
+fclean: clean
 	rm -f $(TESTS)
 
 re: clean all

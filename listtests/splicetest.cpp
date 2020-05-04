@@ -42,7 +42,7 @@ int main ()
 	// 	std::cout << *it << ' ';
 	// std::cout << '\n';
   it = mylist1.begin();
-  advance(it,3);           // "it" points now to 30
+  std::advance(it,3);           // "it" points now to 30
 
   mylist1.splice (mylist1.begin(), mylist1, it, mylist1.end());
                                 // mylist1: 30 3 4 1 10 20

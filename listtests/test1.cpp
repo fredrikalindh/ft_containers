@@ -11,6 +11,7 @@ int main ()
 	  // constructors used in the same order as described above:
 	  LIBRARY::list<int> first;                                // empty list of ints
 	  LIBRARY::list<int> second (size_t(4),100);
+	  // LIBRARY::list<int> second (size_t(4),100);
 	// the iterator constructor can be used to construct from arrays:
 	  int myints[] = {16,2,77,29,141,-24};
 	  LIBRARY::list<int> third (myints, myints + sizeof(myints) / sizeof(int) );

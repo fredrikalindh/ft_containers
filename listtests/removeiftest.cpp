@@ -26,9 +26,6 @@ int main ()
     std::cout << ' ' << *it;
   std::cout << '\n';
   it--;
-  while (it-- != 0)
-    std::cout << ' ' << *it;
-  std::cout << '\n';
   mylist.remove_if (is_odd());               // 36 20
 
   std::cout << "mylist contains:";

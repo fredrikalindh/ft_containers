@@ -2,13 +2,13 @@
 # define FT_HPP
 
 # include "list.hpp"
-// # include "deque.hpp"
-// # include "map.hpp"
-// # include "multimap.hpp"
-# include "stack.hpp"
 // # include "vector.hpp"
+# include "stack.hpp"
+# include "queue.hpp"
+// # include "map.hpp"
+// # include "deque.hpp"
+// # include "multimap.hpp"
 // # include "set.hpp"
 // # include "multiset.hpp"
-# include "queue.hpp"
 
 #endif

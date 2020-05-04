@@ -20,7 +20,7 @@ int main ()
   it1 = it2 = mylist.begin(); // ^^
   std::cout << " IT1: " << *it1   << " IT2: " << *it2  << '\n';
 
-  advance (it2,6);            // ^                 ^
+  std::advance (it2,6);            // ^                 ^
   std::cout << " IT1: " << *it1   << " IT2: " << *it2  << '\n';
 
   ++it1;                      //    ^              ^

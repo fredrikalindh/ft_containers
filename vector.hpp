@@ -4,13 +4,13 @@
 # include <iostream>
 # include <stdexcept>
 
+# include "iterator.hpp"
+
 namespace ft
 {
-	template <class T> class vector;
-}
 
 template <class T>
-class ft::vector
+class vector
 {
 protected:
 	T		*arr;
@@ -18,38 +18,20 @@ protected:
 	size_t	d_capacity;
 	size_t	d_multi;
 public:
-	class reverse_iterator
-	{
-		T* p;
-	public:
-		reverse_iterator(T* p):p(p){}
-		reverse_iterator(reverse_iterator const &other):p(other.p){}
+	typedef size_t								size_type;
+	typedef T 									value_type;
+	typedef value_type& 						reference;
+	typedef const value_type&					const_reference;
+	typedef value_type* 						pointer;
+	typedef const value_type*					const_pointer;
+	typedef T*									iterator;
+	typedef const T*							const_iterator;
 
-		reverse_iterator operator++(int){T* old = p; p--; return old;}
-		reverse_iterator operator++(){p--; return *this;}
-		reverse_iterator operator--(int){T* old = p; p++; return old;}
-		reverse_iterator operator--(){p++; return *this;}
+	typedef ft::reverse_iterator<iterator>		reverse_iterator;
+	typedef ft::reverse_iterator<const T*>		const_reverse_iterator;
+	typedef ptrdiff_t							difference_type;
 
-		T& operator*(){return *p;}
-
-		bool operator==(reverse_iterator const &other){return p == other.p;}
-		bool operator!=(reverse_iterator const &other){return p != other.p;}
-	};
-
-	typedef size_t size_type;
-	typedef T value_type;
-	typedef value_type& reference;
-	typedef const value_type& const_reference;
-	typedef value_type* pointer;
-	typedef const value_type* const_pointer;
-	typedef T* iterator;
-	typedef const T* const_iterator;
-	// typedef reverse_iterator = reverse_iterator;
-	typedef const reverse_iterator const_reverse_iterator;
-	typedef ptrdiff_t difference_type;
-
-
-	explicit vector ():arr(0), d_size(0), d_capacity(0), d_multi(0){} // maxsize ??
+	explicit vector ():arr(0), d_size(0), d_capacity(0), d_multi(0){}
 	explicit vector (size_type n, const value_type& val = value_type()):d_size(n), d_capacity(n), d_multi(n){
 		arr = new T[n];
 		for (size_type i = 0; i < n; i++)
@@ -85,10 +67,10 @@ public:
 	const_iterator begin() const {return arr;}
 	iterator end() {return &arr[d_size];}
 	const_iterator end() const {return &arr[d_size];}
-	reverse_iterator rbegin() {return &arr[d_size - 1];}
-	const_reverse_iterator rbegin() const {if (d_size > 0){return &arr[d_size - 1];}return 0;}
-	reverse_iterator rend(){return arr - 1;}
-	const_reverse_iterator rend() const{return arr - 1;}
+	reverse_iterator rbegin() {return reverse_iterator(end());}
+	const_reverse_iterator rbegin() const {return reverse_iterator(end());}
+	reverse_iterator rend(){return reverse_iterator(begin());}
+	const_reverse_iterator rend() const{return reverse_iterator(begin());}
 
 	size_type size() const {return d_size;}
 	size_type max_size() const {return 4611686018427387903;}
@@ -115,23 +97,22 @@ public:
 			d_multi = d_size = d_capacity = n;
 		}
 	}
-
-	reference operator[] (size_type n){return arr[n];}
-	const_reference operator[] (size_type n) const {return arr[n];};
-	reference at (size_type n){
+	inline reference operator[] (size_type n){return arr[n];}
+	inline const_reference operator[] (size_type n) const {return arr[n];};
+	inline reference at (size_type n){
 		if (n >= d_size)
 			throw std::out_of_range("vector");
 		return arr[n];
 	}
-	const_reference at (size_type n) const{
+	inline const_reference at (size_type n) const{
 		if (n >= d_size)
 			throw std::out_of_range("vector");
 		return arr[n];
 	}
-	reference front(){return arr[0];}
-	const_reference front() const{return arr[0];}
-	reference back(){return arr[d_size - 1];}
-	const_reference back() const{return arr[d_size - 1];}
+	inline reference front(){return arr[0];}
+	inline const_reference front() const{return arr[0];}
+	inline reference back(){return arr[d_size - 1];}
+	inline const_reference back() const{return arr[d_size - 1];}
 
 	template <class InputIterator>
 	void assign (InputIterator first, InputIterator last){
@@ -295,7 +276,11 @@ public:
 
 	void clear(){
 		delete []arr;
-		arr = d_size = d_capacity = d_multi = 0;
+		arr = 0;
+		d_size = d_capacity = d_multi = 0;
 	}
 };
+
+} //namespace ft
+
 #endif
