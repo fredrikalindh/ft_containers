@@ -2,7 +2,7 @@
 # define FT_HPP
 
 # include "list.hpp"
-// # include "vector.hpp"
+# include "vector.hpp"
 # include "stack.hpp"
 # include "queue.hpp"
 // # include "map.hpp"

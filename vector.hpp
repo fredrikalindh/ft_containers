@@ -13,10 +13,10 @@ template <class T>
 class vector
 {
 protected:
-	T		*arr;
-	size_t	d_size;
-	size_t	d_capacity;
-	size_t	d_multi;
+	T		*array_;
+	size_t	size_;
+	size_t	capacity_;
+	size_t	multi_;
 public:
 	typedef size_t								size_type;
 	typedef T 									value_type;
@@ -26,93 +26,106 @@ public:
 	typedef const value_type*					const_pointer;
 	typedef T*									iterator;
 	typedef const T*							const_iterator;
-
 	typedef ft::reverse_iterator<iterator>		reverse_iterator;
 	typedef ft::reverse_iterator<const T*>		const_reverse_iterator;
-	typedef ptrdiff_t							difference_type;
+	typedef std::ptrdiff_t						difference_type;
 
-	explicit vector ():arr(0), d_size(0), d_capacity(0), d_multi(0){}
-	explicit vector (size_type n, const value_type& val = value_type()):d_size(n), d_capacity(n), d_multi(n){
-		arr = new T[n];
+	explicit vector ():array_(0), size_(0), capacity_(0), multi_(0){}
+	explicit vector (size_type n, const value_type& val = value_type()):size_(n), capacity_(n), multi_(n){
+		array_ = new T[n];
 		for (size_type i = 0; i < n; i++)
-			arr[i] = val;
+			array_[i] = val;
 	}
 	template <class InputIterator>
-	vector (InputIterator first, InputIterator last):arr(0), d_size(0), d_capacity(0), d_multi(0){
+	vector (InputIterator first, InputIterator last,
+	typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0):array_(0), size_(0), capacity_(0), multi_(0){
 		for (InputIterator getSize = first; getSize != last; getSize++)
-			d_size++;
-		arr = new T[d_size];
+			size_++;
+		array_ = new T[size_];
 		int i = 0;
 		while (first != last)
 		{
-			arr[i] = *first;
+			array_[i] = *first;
 			i++;
 			first++;
 		}
-		d_capacity = d_multi = d_size;
+		capacity_ = multi_ = size_;
 	}
-	vector (const vector& x):arr(0), d_size(x.d_size), d_capacity(x.d_capacity), d_multi(x.d_multi){
-		arr = new T[d_capacity];
-		for (size_type i = 0; i < d_size; i++)
-			arr[i] = x.arr[i];
+	vector (const vector& x):array_(0), size_(x.size_), capacity_(x.capacity_), multi_(x.multi_){
+		array_ = new T[capacity_];
+		for (size_type i = 0; i < size_; i++)
+			array_[i] = x.array_[i];
 	}
-	~vector(){delete []arr;}
+	~vector(){
+		delete []array_;
+		array_ = 0;
+		size_ = capacity_ = multi_ = 0;
+	}
 	vector& operator= (const vector& x){
 		vector ret(x);
-		swap(x);
+		swap(ret);
 		return *this;
 	}
 
-	iterator begin() {return arr;}
-	const_iterator begin() const {return arr;}
-	iterator end() {return &arr[d_size];}
-	const_iterator end() const {return &arr[d_size];}
-	reverse_iterator rbegin() {return reverse_iterator(end());}
-	const_reverse_iterator rbegin() const {return reverse_iterator(end());}
-	reverse_iterator rend(){return reverse_iterator(begin());}
-	const_reverse_iterator rend() const{return reverse_iterator(begin());}
+	iterator				begin() {return array_;}
+	const_iterator			begin() const {return array_;}
+	iterator				end() {return &array_[size_];}
+	const_iterator			end() const {return &array_[size_];}
+	reverse_iterator		rbegin() {return reverse_iterator(end());}
+	const_reverse_iterator	rbegin() const {return reverse_iterator(end());}
+	reverse_iterator		rend(){return reverse_iterator(begin());}
+	const_reverse_iterator	rend() const{return reverse_iterator(begin());}
 
-	size_type size() const {return d_size;}
-	size_type max_size() const {return 4611686018427387903;}
-	void resize (size_type n, value_type val = value_type());
-	size_type capacity() const {return d_capacity;}
-	bool empty() const {return d_size == 0 ? true : false;}
-	void reserve (size_type n){
+	size_type	size() const {return size_;}
+	size_type	max_size() const {return 4611686018427387903;}
+	void		resize (size_type n, value_type val = value_type()){
 		if (n > max_size())
 			throw std::length_error("max_size(size_t n) 'n' exceeds maximum supported size"); //allocator<T>::allocate(size_t n) 'n' exceeds maximum supported size
-		if (n > d_capacity){
+		if (n > capacity_){
 			T* newArr = new T[n]; // SET MULTI?
-			for (size_type i = 0; i < d_size; i++)
-				newArr[i] = arr[i];
-			delete []arr;
-			arr = newArr;
-			d_capacity = n;
+			size_type i;
+			for (i = 0; i < size_; i++)
+				newArr[i] = array_[i];
+			for ( ; i < n; i++)
+				newArr[i] = val;
+			delete []array_;
+			array_ = newArr;
 		}
 		else if (n == 0){
 			clear();
 		}
-		else if (n > 0 && n < d_capacity){
-			// for (size_type i = n; i < d_size; i++) //DO I REALLY NEED TO?
-			// 	arr[i] = T();
-			d_multi = d_size = d_capacity = n;
+		multi_ = size_ = capacity_ = n;
+	}
+	size_type capacity() const {return capacity_;}
+	bool empty() const {return !size_;}
+	void reserve (size_type n){
+		if (n > capacity_){
+			if (n > max_size())
+				throw std::length_error("reserve(size_t n) 'n' exceeds maximum supported size");
+			T* newArr = new T[n];
+			for (size_type i = 0; i < size_; i++)
+				newArr[i] = array_[i];
+			delete []array_;
+			array_ = newArr;
+			capacity_ = multi_ = n; // MULTI OR NOT ?
 		}
 	}
-	inline reference operator[] (size_type n){return arr[n];}
-	inline const_reference operator[] (size_type n) const {return arr[n];};
-	inline reference at (size_type n){
-		if (n >= d_size)
+	inline reference		operator[] (size_type n) {return array_[n];}
+	inline const_reference	operator[] (size_type n) const {return array_[n];}
+	inline reference		at (size_type n) {
+		if (n >= size_)
 			throw std::out_of_range("vector");
-		return arr[n];
+		return array_[n];
 	}
-	inline const_reference at (size_type n) const{
-		if (n >= d_size)
+	inline const_reference	at (size_type n) const {
+		if (n >= size_)
 			throw std::out_of_range("vector");
-		return arr[n];
+		return array_[n];
 	}
-	inline reference front(){return arr[0];}
-	inline const_reference front() const{return arr[0];}
-	inline reference back(){return arr[d_size - 1];}
-	inline const_reference back() const{return arr[d_size - 1];}
+	inline reference 		front(){return array_[0];}
+	inline const_reference	front() const{return array_[0];}
+	inline reference		back(){return array_[size_ - 1];}
+	inline const_reference	back() const{return array_[size_ - 1];}
 
 	template <class InputIterator>
 	void assign (InputIterator first, InputIterator last){
@@ -125,62 +138,65 @@ public:
 	}
 
 	void push_back (const value_type& val){
-		if (d_size + 1 < d_capacity)
-			arr[d_size++] = val;
+		if (size_ < capacity_)
+			array_[size_++] = val;
 		else {
-			if (d_capacity == 0)
-				d_multi = ++d_capacity;
+			if (!multi_)
+				capacity_ = ++multi_;
 			else {
-				d_capacity += d_multi;
-				d_multi *= 2;
+				capacity_ += multi_;
+				multi_ *= 2;
 			}
-			T* newArr = new T[d_capacity];
-			for (size_t i = 0; i < d_size; i++)
-				newArr[i] = arr[i];
-			newArr[d_size] = val;
-			delete []arr;
-			arr = newArr;
-			d_size++;
+			T* newArr = new T[capacity_];
+			for (size_t i = 0; i < size_; i++)
+				newArr[i] = array_[i];
+			newArr[size_] = val;
+			delete []array_;
+			array_ = newArr;
+			size_++;
 		}
 	}
 	void pop_back(){
-		if (d_size > 0){
-			d_size--;
-			arr[d_size] = T();
+		if (size_ > 0){
+			size_--;
+			// array_[size_] = T();
 		}
 	}
 
 	iterator insert (iterator position, const value_type& val){
-		if (d_size < d_capacity){ // if there's space: just add at position
+		iterator ret(position);
+		if (size_ < capacity_){ // if there's space: just add at position
 			T forNext = *position;
 			T curr;
 			*position = val;
-			while (++position < &arr[d_size]){ // and shift everything 1
+			while (++position < &array_[size_]){ // and shift everything 1
 				curr = *position;
 				*position = forNext;
 				forNext = curr;
 			}
 		}
-		else { // create new array of double size
-			d_capacity += d_multi;
-			T *newArr = new T[d_capacity];
-			d_multi *= 2;
+		else { // create new array_ay of double size
+			capacity_ += multi_;
+			multi_ *= 2;
+			T *newArr = new T[capacity_];
 			size_type i = 0;
-			for (iterator start = arr; start != position; start++){ // copy normally until position
-				newArr[i] = arr[i];
+			for (iterator start = array_; start != position; start++){ // copy normally until position
+				newArr[i] = array_[i];
 				i++;
 			}
+			ret = &newArr[i];
 			newArr[i++] = val; // insert value
-			while (position < &arr[d_size]) // and copy the rest
+			while (position < &array_[size_]) // and copy the rest
 				newArr[i++] = *position++;
-			delete []arr;
-			arr = newArr;
+			delete []array_;
+			array_ = newArr;
 		}
-		d_size++;
+		size_++;
+		return ret;
 	}
 	void insert (iterator position, size_type n, const value_type& val){
-		if (d_size + n < d_capacity){ // if there's space: just add at position
-			iterator back = &arr[d_size - 1];
+		if (size_ + n < capacity_){ // if there's space: just add at position
+			iterator back = &array_[size_ - 1];
 			while (back >= position){ // shift everything after pos n -> right
 				back[n] = *back;
 				back--;
@@ -190,31 +206,32 @@ public:
 				back++;
 			}
 		}
-		else { // create new array of double size
-			d_capacity += n;
-			d_multi = d_capacity;
-			T *newArr = new T[d_capacity];
+		else {
+			capacity_ += n;
+			multi_ = capacity_;
+			T *newArr = new T[capacity_];
 			size_type i = 0;
-			for (iterator start = arr; start != position; start++){ // copy normally until position
-				newArr[i] = arr[i];
+			for (iterator start = array_; start != position; start++){ // copy normally until position
+				newArr[i] = array_[i];
 				i++;
 			}
 			for (size_type k = 0; k < n; k++) // insert values
 				newArr[i++] = val;
-			while (position < &arr[d_size]) // and copy the rest
+			while (position < &array_[size_]) // and copy the rest
 				newArr[i++] = *position++;
-			delete []arr;
-			arr = newArr;
+			delete []array_;
+			array_ = newArr;
 		}
-		d_size += n;
+		size_ += n;
 	}
 	template <class InputIterator>
-	void insert (iterator position, InputIterator first, InputIterator last){
+	void insert (iterator position, InputIterator first, InputIterator last,
+	typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0){ // OWN ENABLE_IF ?
 		size_type n = 0;
 		for (InputIterator getSize = first; getSize != last; getSize++)
 			n++;
-		if (d_size + n < d_capacity){ // if there's space: just add at position
-			iterator back = &arr[d_size - 1];
+		if (size_ + n < capacity_){ // if there's space: just add at position
+			iterator back = &array_[size_ - 1];
 			while (back >= position){ // shift everything after pos n -> right
 				back[n] = *back;
 				back--;
@@ -224,48 +241,49 @@ public:
 			}
 		}
 		else {
-			d_capacity += n;
-			d_multi = d_capacity;
-			T *newArr = new T[d_capacity];
+			capacity_ += n;
+			multi_ = capacity_;
+			T *newArr = new T[capacity_];
 			size_type i = 0;
-			for (iterator start = arr; start != position; start++){ // copy normally until position
-				newArr[i] = arr[i];
+			for (iterator start = array_; start != position; start++){ // copy normally until position
+				newArr[i] = array_[i];
 				i++;
 			}
 			while (first != last){
 				newArr[i++] = *first++;
 			}// insert values
-			while (position < &arr[d_size]) // and copy the rest
+			while (position < &array_[size_]) // and copy the rest
 				newArr[i++] = *position++;
-			delete []arr;
-			arr = newArr;
+			delete []array_;
+			array_ = newArr;
 		}
-		d_size += n;
+		size_ += n;
 	}
 
 	iterator erase (iterator position){
-		iterator next = position;
-		next++;
-		while (next < &arr[d_size]){
+		iterator ret(position);
+		iterator next(position + 1);
+		while (next < &array_[size_]){
 			*position = *next;
 			position++;
 			next++;
 		}
-		if (d_size)
-			d_size--;
+		if (size_)
+			size_--;
+		return ret;
 	}
 	iterator erase (iterator first, iterator last){
-		iterator getVal = last;
-		while (first != last)
+		iterator ret(first);
+		size_type minus = 0;
+		iterator getVal(last);
+		while (getVal < &array_[size_])
 		{
-			if (getVal < &arr[d_size]){
-				*first++ = *getVal++;
-			}else{
-				*first++ = T();
-			}
-			if (d_size)
-				d_size--;
+			*first++ = *getVal++;
+			if (first <= last)
+				minus++;
 		}
+		size_ -= minus;
+		return ret;
 	}
 	void swap (vector& x){
 		char buffer[sizeof(vector)];
@@ -275,12 +293,64 @@ public:
 	}
 
 	void clear(){
-		delete []arr;
-		arr = 0;
-		d_size = d_capacity = d_multi = 0;
+		delete []array_;
+		array_ = 0;
+		size_ = capacity_ = multi_ = 0;
 	}
 };
 
 } //namespace ft
+
+template <class T>
+void swap(ft::vector<T> &a, ft::vector<T> &b) {
+	a.swap(b);
+}
+
+template <class T>
+bool operator== (const ft::vector<T>& lhs, const ft::vector<T>& rhs){
+	if (lhs.size() != rhs.size())
+		return false;
+	typename ft::vector<T>::const_iterator l_it = lhs.begin();// #########################   WHY TYPENAME?
+	typename ft::vector<T>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end()) {
+		if (*l_it != *r_it){
+			std::cout << *l_it << " != " << *r_it << '\n';
+			return false;
+		}
+		l_it++;
+		r_it++;
+	}
+	return true;
+}
+template <class T>
+bool operator!= (const ft::vector<T>& lhs, const ft::vector<T>& rhs){
+	return !(lhs == rhs);
+}
+template <class T>
+bool operator<  (const ft::vector<T>& lhs, const ft::vector<T>& rhs){
+	typename ft::vector<T>::const_iterator l_it = lhs.begin();// #########################   WHY TYPENAME?
+	typename ft::vector<T>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end()) {
+		if (*l_it < *r_it)
+			return true;
+		if (*l_it > *r_it)
+			return false;
+		l_it++;
+		r_it++;
+	}
+	return true;
+}
+template <class T>
+bool operator<= (const ft::vector<T>& lhs, const ft::vector<T>& rhs){
+	return !(rhs < lhs);
+}
+template <class T>
+bool operator>  (const ft::vector<T>& lhs, const ft::vector<T>& rhs){
+	return rhs < lhs;
+}
+template <class T>
+bool operator>= (const ft::vector<T>& lhs, const ft::vector<T>& rhs){
+	return !(lhs < rhs);
+}
 
 #endif

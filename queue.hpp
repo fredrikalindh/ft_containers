@@ -21,65 +21,35 @@ public:
 	const value_type&	front() const {return d_ctnr.front();}
 	value_type&			back() {return d_ctnr.back();}
 	const value_type&	back() const {return d_ctnr.back();}
-	void				push (const value_type& val) {d_ctnr.push_front(val);}
-	void				pop() {d_ctnr.pop_back();}
+	void				push (const value_type& val) {d_ctnr.push_back(val);}
+	void				pop() {d_ctnr.pop_front();}
 
-	friend bool operator== (const queue& lhs, const queue& rhs){
+	friend
+	bool operator== (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr == rhs.d_ctnr;
 	}
-	friend bool operator!= (const queue& lhs, const queue& rhs){
+	friend
+	bool operator!= (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr != rhs.d_ctnr;
 	}
-	friend bool operator<  (const queue& lhs, const queue& rhs){
+	friend
+	bool operator<  (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr < rhs.d_ctnr;
 	}
-	friend bool operator<= (const queue& lhs, const queue& rhs){
+	friend
+	bool operator<= (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr <= rhs.d_ctnr;
 	}
-	friend bool operator>  (const queue& lhs, const queue& rhs){
+	friend
+	bool operator>  (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr > rhs.d_ctnr;
 	}
-	friend bool operator>= (const queue& lhs, const queue& rhs){
+	friend
+	bool operator>= (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr >= rhs.d_ctnr;
 	}
 };
 
 } //namespace ft
 
-// template <class T, class Container>
-// friend bool operator== (const queue<T,Container>& lhs, const queue<T,Container>& rhs){
-// 	return lhs.d_ctnr == rhs.d_ctnr;
-// }
-// template <class T, class Container>
-// friend bool operator!= (const queue<T,Container>& lhs, const queue<T,Container>& rhs){
-// 	return lhs.d_ctnr != rhs.d_ctnr;
-// }
-// template <class T, class Container>
-// friend bool operator<  (const queue<T,Container>& lhs, const queue<T,Container>& rhs){
-// 	return lhs.d_ctnr < rhs.d_ctnr;
-// }
-// template <class T, class Container>
-// friend bool operator<= (const queue<T,Container>& lhs, const queue<T,Container>& rhs){
-// 	return lhs.d_ctnr <= rhs.d_ctnr;
-// }
-// template <class T, class Container>
-// friend bool operator>  (const queue<T,Container>& lhs, const queue<T,Container>& rhs){
-// 	return lhs.d_ctnr > rhs.d_ctnr;
-// }
-// template <class T, class Container>
-// friend bool operator>= (const queue<T,Container>& lhs, const queue<T,Container>& rhs){
-// 	return lhs.d_ctnr >= rhs.d_ctnr;
-// }
-// 	template <class T, class Container>
-// 	bool operator== (const ft::queue<T,Container>& lhs, const ft::queue<T,Container>& rhs);
-// 	template <class T, class Container>
-// 	bool operator!= (const ft::queue<T,Container>& lhs, const ft::queue<T,Container>& rhs);
-// 	template <class T, class Container>
-// 	bool operator<  (const ft::queue<T,Container>& lhs, const ft::queue<T,Container>& rhs);
-// 	template <class T, class Container>
-// 	bool operator<= (const ft::queue<T,Container>& lhs, const ft::queue<T,Container>& rhs);
-// 	template <class T, class Container>
-// 	bool operator>  (const ft::queue<T,Container>& lhs, const ft::queue<T,Container>& rhs);
-// 	template <class T, class Container>
-// 	bool operator>= (const ft::queue<T,Container>& lhs, const ft::queue<T,Container>& rhs);
 #endif

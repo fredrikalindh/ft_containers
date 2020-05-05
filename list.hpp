@@ -23,12 +23,6 @@ protected:
 		Node(T value = T()):next(0), prev(0), value(value){}
 		Node(Node *prev, Node *next, T value):prev(prev), next(next), value(value){}
 		Node(Node const &cpy):prev(cpy.prev), next(cpy.next), value(cpy.value){}
-		// void swap(Node &b){
-		// 	char buffer[sizeof(T)];
-		// 	memcpy(buffer, &b.value, sizeof(T));
-		// 	memcpy(reinterpret_cast<char *>(&b.value), &value,   sizeof(T));
-		// 	memcpy(reinterpret_cast<char *>(&value),   buffer, sizeof(T));
-		// }
 	};
 	Node*	first_;
 	Node*	last_;
@@ -88,6 +82,8 @@ public:
 			return old;
 		}
 		inline Node *base(){return node_;}
+		inline reference	operator*(void) {return node_->value;}
+		inline pointer		operator->(void) {return &(node_->value);}
 		inline reference	operator*(void) const {return node_->value;}
 		inline pointer		operator->(void) const {return &(node_->value);}
 		inline bool			operator!=(bidirectional_iterator const &other) const {return node_ != other.node_;}
@@ -100,6 +96,72 @@ public:
 			memcpy(reinterpret_cast<char *>(this),   buffer, sizeof(bidirectional_iterator));
 		}
 	};
+	class const_bidirectional_iterator
+	{
+	protected:
+		Node*	node_;
+		const list*	container_;
+	public:
+		typedef std::bidirectional_iterator_tag			iterator_category; // CHANGE TO FT AND MAKE OWN DISTANCE + ADVANCE
+		typedef const T									value_type;
+		typedef std::ptrdiff_t							difference_type;
+		typedef const T*								pointer;
+		typedef const T&								reference;
+
+		const_bidirectional_iterator(Node *node = 0):node_(node), container_(0){}
+		const_bidirectional_iterator(Node *node, list const *container):node_(node), container_(container){}
+		const_bidirectional_iterator(bidirectional_iterator const &cpy):node_(cpy.node_), container_(cpy.container_){}
+		// ~bidirectional_iterator(){}
+		const_bidirectional_iterator& operator=(bidirectional_iterator const &cpy){
+			const_bidirectional_iterator tmp(cpy);
+			swap(tmp);
+			return *this;
+		}
+		const_bidirectional_iterator& operator++(void){
+			if (node_)
+				node_ = node_->next;
+			else
+				node_ = container_->first_;
+			return *this;
+		}
+		const_bidirectional_iterator operator++(int){
+			const_bidirectional_iterator old(*this);
+			if (node_)
+				node_ = node_->next;
+			else
+				node_ = container_->first_;
+			return old;
+		}
+		const_bidirectional_iterator& operator--(void){
+			if (node_)
+				node_ = node_->prev;
+			else
+				node_ = container_->last_;
+			return *this;
+		}
+		const_bidirectional_iterator operator--(int){
+			const_bidirectional_iterator old(*this);
+			if (node_)
+				node_ = node_->prev;
+			else
+				node_ = container_->last_;
+			return old;
+		}
+		inline Node *base(){return node_;}
+		inline reference	operator*(void) {return node_->value;}
+		inline pointer		operator->(void) {return &(node_->value);}
+		inline reference	operator*(void) const {return node_->value;}
+		inline pointer		operator->(void) const {return &(node_->value);}
+		inline bool			operator!=(const_bidirectional_iterator const &other) const {return node_ != other.node_;}
+		inline bool			operator==(const_bidirectional_iterator const &other) const {return node_ == other.node_;}
+
+		void swap(const_bidirectional_iterator &other){  // PRIVATE?
+			char buffer[sizeof(const_bidirectional_iterator)];
+			memcpy(buffer, &other, sizeof(const_bidirectional_iterator));
+			memcpy(reinterpret_cast<char *>(&other), this,   sizeof(const_bidirectional_iterator));
+			memcpy(reinterpret_cast<char *>(this),   buffer, sizeof(const_bidirectional_iterator));
+		}
+	};
 // TYPEDEFS ####################################################################
 	typedef T										value_type;
 	typedef value_type&								reference;
@@ -107,7 +169,7 @@ public:
 	typedef value_type*								pointer;
 	typedef const value_type*						const_pointer;
 	typedef bidirectional_iterator					iterator;
-	typedef const bidirectional_iterator			const_iterator;
+	typedef const_bidirectional_iterator			const_iterator;
 	typedef ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	typedef size_t									size_type;
@@ -129,9 +191,9 @@ public:
 			last_ = prev;
 		}
 	}
-
 	template <class InputIterator>
-	list (InputIterator first, InputIterator last):
+	list (InputIterator first, InputIterator last,
+	typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0):
 	first_(0), last_(0), size_(0) {
 		if (first != last) {
 			size_ = 1;
@@ -177,7 +239,6 @@ public:
 		first_ = last_ = 0;
 		size_ = 0;
 	}
-
 	list &operator=(list const &x){
 		list cpy(x);
 		swap(cpy);
@@ -186,8 +247,8 @@ public:
 //############################# MEMBER FUNCTIONS ###############################
 	inline size_type		size() const {return size_;}
 	inline size_type		max_size() const {return 768614336404564650;} // ?
-	inline bool			empty() const {return !first_;} // return first == 0}
-	void 			resize(size_t n, T val = T())
+	inline bool				empty() const {return !first_;} // return first == 0}
+	void 					resize(size_t n, T val = T())
 	{
 		Node *trav;
 		if (!n)
@@ -195,31 +256,14 @@ public:
 		else if (empty()){
 			list tmp(n, val);
 			swap(tmp);
-		}else if (n < size_)
-		{
+		}else if (n < size_){
 			trav = first_;
-			size_ = n;
-			while (--n > 0)
+			while (n-- > 0)
 				trav = trav->next;
-			last_ = trav;
-			if (trav && trav->next){
-				trav = trav->next;
-				Node *del = trav;
-				while (trav != 0){
-					trav = trav->next;
-					delete del;
-					del = trav;
-				}}
-			last_->next = 0;
+			erase(trav, 0);
 		}
-		else if (n > size_)
-		{
-			while (size_++ < n)
-			{
-				trav = last_;
-				last_ = new Node(last_, 0, val);
-				trav->next = last_;
-			}
+		else if (n > size_){
+			insert(0, n - size_, val);
 		}
 	}
 	void swap(list &other){
@@ -234,14 +278,14 @@ public:
 	inline reference			back() {return last_->value;}
 	inline const_reference		back() const  {return last_->value;}
 
-	inline iterator			begin() {return iterator(first_, this);}
-	inline const_iterator		begin() const {return iterator(first_, this);}
-	inline iterator			end() {return iterator(0, this);}
-	inline const_iterator		end() const {return iterator(0, this);}
-	inline reverse_iterator	rbegin() {return reverse_iterator(end());}
-	inline const_reverse_iterator rbegin() const {return reverse_iterator(end());}
+	inline iterator				begin() {return iterator(first_, this);}
+	inline const_iterator		begin() const {return const_iterator(first_, this);}
+	inline iterator				end() {return iterator(0, this);}
+	inline const_iterator		end() const {return const_iterator(0, this);}
+	inline reverse_iterator		rbegin() {return reverse_iterator(end());}
+	inline const_reverse_iterator rbegin() const {return const_reverse_iterator(end());}
 	inline reverse_iterator 	rend() {return reverse_iterator(begin());}
-	inline const_reverse_iterator rend() const {return reverse_iterator(begin());}
+	inline const_reverse_iterator rend() const {return const_reverse_iterator(begin());}
 
 //################################ ASSIGN ######################################
 	template 		<class InputIterator>
@@ -297,14 +341,16 @@ public:
 			prev->next = toAdd;
 			prev = toAdd;
 		}
-		if (position.base() == 0)
+		if (position.base() == 0){
 			last_ = toAdd;
-		else
+		}else{
+			position.base()->prev = toAdd;
 			toAdd->next = position.base();
-		size_ += n;
+		}size_ += n;
 	}
 	template <class InputIterator>
-	void			insert (iterator position, InputIterator first, InputIterator last){
+	void			insert (iterator position, InputIterator first, InputIterator last,
+	typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0){
 		Node *prev;
 		if (position.base() == first_)
 		{
@@ -324,10 +370,12 @@ public:
 			first++;
 			size_++;
 		}
-		if (position.base() == 0)
+		if (position.base() == 0){
 			last_ = toAdd;
-		else
+		}else{
+			position.base()->prev = toAdd;
 			toAdd->next = position.base();
+		}
 	}
 //################################ ERASE ######################################
 	iterator 		erase(iterator position){
@@ -453,7 +501,6 @@ public:
 			last.base()->next = position.base();
 		}
 	}
-
 //################################ REMOVE ######################################
 	void	remove (const T& val){
 		iterator it = first_;
@@ -661,16 +708,15 @@ template <class T>
 bool operator== (const ft::list<T>& lhs, const ft::list<T>& rhs){
 	if (lhs.size() != rhs.size())
 		return false;
-	typename ft::list<T>::iterator l_it;// #########################   WHY TYPENAME?
-	typename ft::list<T>::iterator r_it;
-	for (l_it = lhs.begin(); l_it != lhs.end(); l_it++){
-		for (r_it = rhs.begin(); r_it != rhs.end(); r_it++){
-			if (*l_it != *r_it)
-				return false;
+	typename ft::list<T>::const_iterator l_it = lhs.begin();// #########################   WHY TYPENAME?
+	typename ft::list<T>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end()) {
+		if (*l_it != *r_it){
+			return false;
 		}
+		l_it++;
+		r_it++;
 	}
-	if (l_it != lhs.end() || r_it != rhs.end())
-		return false;
 	return true;
 }
 template <class T>
@@ -679,13 +725,17 @@ bool operator!= (const ft::list<T>& lhs, const ft::list<T>& rhs){
 }
 template <class T>
 bool operator<  (const ft::list<T>& lhs, const ft::list<T>& rhs){
-	for (typename ft::list<T>::iterator l_it = lhs.begin(); l_it != lhs.end(); l_it++){
-		for (typename ft::list<T>::iterator r_it = rhs.begin(); r_it != rhs.end(); r_it++){
-			if (*l_it >= *r_it)
-				return false;
-		}
+	typename ft::list<T>::const_iterator l_it = lhs.begin();// #########################   WHY TYPENAME?
+	typename ft::list<T>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end()) {
+		if (*l_it < *r_it)
+			return true;
+		if (*l_it > *r_it)
+			return false;
+		l_it++;
+		r_it++;
 	}
-	return true;
+	return false;
 }
 template <class T>
 bool operator<= (const ft::list<T>& lhs, const ft::list<T>& rhs){
