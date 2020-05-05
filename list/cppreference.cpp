@@ -297,7 +297,7 @@ void Erase()
 
                               // 10 20 30 40 50 60 70 80 90
   it1 = it2 = mylist.begin(); // ^^
-  std::advance (it2,6);            // ^                 ^
+  LIBRARY::advance (it2,6);            // ^                 ^
   ++it1;                      //    ^              ^
 
   it1 = mylist.erase (it1);   // 10 30 40 50 60 70 80 90
@@ -406,7 +406,7 @@ void Splice()
                                 // mylist2: 2
                                 // "it" is now invalid.
   it = mylist1.begin();
-  std::advance(it,3);           // "it" points now to 30
+  LIBRARY::advance(it,3);           // "it" points now to 30
 
   mylist1.splice ( mylist1.begin(), mylist1, it, mylist1.end());
                                 // mylist1: 30 3 4 1 10 20

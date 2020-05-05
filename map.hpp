@@ -8,7 +8,6 @@ template<
 	class Key,
 	class T,
 	class Compare = std::less<Key>,
-	// class Allocator = std::allocator<std::pair<const Key, T> >
 > class map
 {
 	struct pair
@@ -22,34 +21,31 @@ template<
 	struct rb_tree_node
 	{
 
-		pair<Key, T>		m_pair;
-		rb_tree_node*		m_parent;
-		rb_tree_node*		m_leftChild;
-		rb_tree_node*		m_rightChild;
+		pair<Key, T>		pair_;
+		rb_tree_node*		parent_;
+		rb_tree_node*		leftChild_;
+		rb_tree_node*		rightChild_;
 		bool				isRed;
-		bool				isLeftSide;
+		bool				isLeft;
 
-		rb_tree_node(pair<Key, T> pair, rb_tree_node* parent = 0, bool side = false):
-			m_pair(pair),
-			m_parent(parent),
-			m_leftChild(0),
-			m_rightChild(0),
+		rb_tree_node(pair<Key, T> pair, rb_tree_node* parent = 0, bool left = false):
+			pair_(pair),
+			parent_(parent),
+			leftChild_(0),
+			rightChild_(0),
 			isRed(true),
-			isLeftSide(side){}
+			isLeftSide(left){}
 		rb_tree_node(rb_tree_node const &x):
-			m_pair(x.m_pair),
-			m_parent(0), // SHOULD I REALLY COPY POINTERS HERE
-			m_leftChild(0),
-			m_rightChild(0),
+			pair_(x.pair_),
+			parent_(0), // SHOULD I REALLY COPY POINTERS HERE
+			leftChild_(0),
+			rightChild_(0),
 			isRed(x.isRed),
-			isLeftSide(x.isLeftSide){}
-
-
+			isLeft(x.isLeft){}
 	};
-	rb_tree_node	*d_root;
-	size_t			d_size;
+	rb_tree_node	*root_;
+	size_t			size_;
 	key_compare		compare;
-
 public:
 	typedef	Key						key_type;
 	typedef	T						mapped_type;
@@ -63,35 +59,45 @@ public:
 	typedef	const value_type*		const_pointer;
 	// typedef	iterator				iterator;
 	// typedef	const iterator			const_iterator;
-	// typedef	reverse_iterator		reverse_iterator;
-	// typedef	const reverse_iterator	const_reverse_iterator;
+	// typedef	reverse_iterator<iterator>		reverse_iterator;
+	// typedef	reverse_iterator<const_iterator>	const_reverse_iterator;
 	typedef	rb_tree_node			Node;
 
 //######################### CONSTRUCTORS #######################################
-	explicit map (const key_compare& comp = key_compare()):d_root(0), d_size(0), compare(comp){}
+	explicit map (const key_compare& comp = key_compare()):root_(0), size_(0), compare(comp){}
 	template <class InputIterator>
 	map (InputIterator first, InputIterator last, const key_compare& comp = key_compare()):
-		d_root(0),
-		d_size(0),
-		compare(comp){}{
-		while (first != last)
-			insert(*first);
+	root_(0),size_(0),compare(comp) {
+		while (first != last) {
+			add(*first);
+		}
 	}
-	map (const map& x){
-
+	map (const map& x):root_(0), size(0), compare(x.compare){
+		add_inOrder(x.root_);
 	}
 	~map(){
-
+		removeNodes(root_);
+		root_ = size_ = 0;
 	}
 	map& operator= (const map& x){
-		clear();
 		map ret(x);
-		d_root = x.d_root;
-		d_size = x.d_size;
-		ret.d_root = 0;
+		swap(ret);
 		return *this;
 	}
-	mapped_type& operator[] (const key_type& k);
+	mapped_type& operator[] (const key_type& k){
+		// Node *parent = find(k);
+		// add(k);
+		Node *trav = root;
+		while (trav != 0){
+			if (trav->pair_.key_ == k)
+				return trav->pair_.value_;
+			else if (trav.pair_.key_ < k)
+				trav = trav->rightChild_;
+			else
+				trav = trav->leftChild_;
+		}
+		return mapped_type();
+	}
 //########################## ITERATORS #######################################
 	iterator				begin();
 	const_iterator			begin() const;
@@ -102,9 +108,9 @@ public:
 	reverse_iterator		rend();
 	const_reverse_iterator	rend() const;
 //########################### CAPACITY #######################################
-	bool					empty() const;
-	size_type				size() const;
-	size_type				max_size() const;
+	bool					empty() const {return !size_;}
+	size_type				size() const {return size_;}
+	size_type				max_size() const {return 576460752303423487;}
 //########################### INSERT #######################################
 	pair<iterator,bool>		insert (const value_type& val);
 	iterator				insert (iterator position, const value_type& val);
@@ -115,14 +121,14 @@ public:
 	size_type				erase (const key_type& k);
 	void					erase (iterator first, iterator last);
 //########################### MODIFIERS #######################################
-	void					swap (map& x){
+	void					swap (map& x) {
 		char buffer[sizeof(map)];
 		memcpy(buffer, &x, sizeof(map));
 		memcpy(reinterpret_cast<char *>(&x), this, sizeof(map));
 		memcpy(reinterpret_cast<char *>(this), &x, sizeof(map));
 	}
 	void					clear(){
-		~map();
+		this->~map();
 	}
 //########################### OBSERVERS #######################################
 	key_compare				key_comp() const;
@@ -135,45 +141,164 @@ public:
 	const_iterator			lower_bound (const key_type& k) const;
 	iterator				upper_bound (const key_type& k);
 	const_iterator			upper_bound (const key_type& k) const;
+
 	pair<const_iterator,const_iterator>	equal_range (const key_type& k) const;
 	pair<iterator,iterator>	equal_range (const key_type& k);
 
 private:
-	void	add_node(pair<Key, T> pair){ // BETTER RECURSIVELY?
-		if (!d_root){
-			d_root = new Node(pair);
+	void	add(Node &node, pair<Key, T> toAdd)){ // BETTER RECURSIVELY?
+		if (comp(pair, node->pair_) < 0){
+			if (node->leftChild_)
+				return add(node->leftChild_);
+			node->leftChild_ = new Node(pair, trav, true);
+			node = node->leftChild_;
 		}
-		else{
-			Node *trav = d_root;
-			while (1) {
-				if (comp(pair, trav->m_pair) < 0){
-					if (trav->m_leftChild)
-						trav = trav->m_leftChild;
-					else{
-						trav->m_leftChild = new Node(pair, trav, true);
-						return (checkBalance(trav->m_leftChild));
-					}
-				}
-				else {
-					if (trav->m_rightChild)
-						trav = trav->m_rightChild;
-					else{
-						trav->m_rightChild = new Node(pair, trav, false);
-						return (checkBalance(trav->m_rightChild));
-					}
-				}
+		else {
+			if (node->rightChild_)
+				return add(node->rightChild_);
+			node->rightChild_ = new Node(pair, trav, false);
+			node = node->rightChild_;
+		}
+		size_++;
+		checkColor(node);
+	}
+	void	checkColor(Node *node){
+		if (node == root_){
+			root_.isRed = black;
+			return ;
+		}
+		if (node->isRed && node->parent_->isRed){
+			correctTree(node);
+		}
+		checkColor(node->parent_);
+	}
+	bool AuntIsRed(Node *node){
+		if (node->parent->isLeft){
+			if (!node->parent->parent->rightChild_)
+				return false;
+			return node->parent->parent->rightChild_->isRed;
+		}
+		if (!node->parent->parent->leftChild_)
+			return false;
+		return node->parent->parent->leftChild_->isRed;
+	}
+	void correctTree(Node *node){
+		if (AuntIsRed(node))
+			colorFlip(node);
+		else
+			rotate(node);
+	}
+	void colorFlip(Node *node){
+		node->parent->parent->isRed = true;
+		if (node->parent->parent->leftChild_)
+			node->parent->parent->leftChild_->isRed = false;
+		if (node->parent->parent->rightChild_)
+			node->parent->parent->rightChild_->isRed = false;
+	}
+	void rotate(Node *node){
+		if (node->isLeft) {
+			if (node->parent->isLeft) {
+				rightRotate(node->parent->parent);
+				node->isRed = true;
+				node->parent->isRed = false;
+				if (node->parent->leftChild_)
+					node->parent->leftChild_->isRed = true;
+			}
+			else {
+				rightLeftRotate(node->parent->parent);
+				node->isRed = false;
+				node->leftChild_->isRed = true;
+				node->rightChild_->isRed = true;
+			}
+		}
+		else {
+			if (node->parent->isRight) {
+				leftRotate(node->parent->parent);
+				node->isRed = true;
+				node->parent->isRed = false;
+				if (node->parent->rightChild_)
+					node->parent->rightChild_->isRed = true;
+			}
+			else {
+				leftRightRotate(node->parent->parent);
+				node->isRed = false;
+				node->leftChild_->isRed = true;
+				node->rightChild_->isRed = true;
 			}
 		}
 	}
-	bool	checkBalance(Node *inserted){
-		if (d_root.isRed){
-			d_root.isRed = black;
+	void leftRotate(Node *gparent)
+	{
+		Node *tmp = gparent->rightChild_;
+		gparent->rightChild_ = tmp->leftChild_;
+		if (gparent->rightChild_) {
+			gparent->rightChild_->parent = gparent;
+			gparent->rightChild_->isLeft = false;
 		}
-		// bool PrevWasRed = inserted.isRed;
-		for (Node *trav = inserted; trav.parent != 0; trav = trav->parent){
-			if (trav.isRed && trav.parent.isRed)
-				trav.isRed = false;
+		tmp->parent = gparent->parent;
+		tmp->isLeft = gparent->isLeft;
+		if (gparent->parent == 0)
+			root_ = tmp;
+		else if (gparent.isLeft)
+			tmp->parent->leftChild_ = tmp;
+		else
+			tmp->parent->rightChild_ = tmp;
+		tmp->leftChild_ = gparent;
+		tmp->leftChild_->parent = tmp;
+		tmp->leftChild_->isLeft = true;
+	}
+	void rightRotate(Node *gparent)
+	{
+		Node *tmp = gparent->leftChild_;
+		gparent->leftChild_ = tmp->rightChild_;
+		if (gparent->leftChild_) {
+			gparent->leftChild_->parent = gparent;
+			gparent->leftChild_->isLeft = true;
 		}
+		tmp->parent = gparent->parent;
+		tmp->isLeft = gparent->isLeft;
+		if (gparent->parent == 0)
+			root_ = tmp;
+		else if (gparent.isLeft)
+			tmp->parent->rightChild_ = tmp;
+		else
+			tmp->parent->leftChild_ = tmp;
+		tmp->rightChild_ = gparent;
+		tmp->rightChild_->parent = tmp;
+		tmp->rightChild_->isLeft = false;
+	}
+	void leftRightRotate(Node *node){
+		leftRotate(node->leftChild_);
+		rightRotate(node);
+	}
+	void rightLeftRotate(Node *node){
+		rightRotate(node->rightChild_);
+		leftRotate(node);
+	}
+	size_t heigth(){
+		if (!root_)
+			return 0;
+		return height(root_) - 1;
+	}
+	size_t heigth(Node *node){
+		if (node == 0)
+			return 0;
+		size_t left = height(node->leftChild_);
+		size_t right = height(node->rightChild_);
+		if (left > right)
+			return left + 1;
+		return right + 1;
+	}
+	int blackNodes(Node *node){
+		if (node == 0)
+			return 1;
+		int left = blackNodes(node->leftChild_);
+		int right = blackNodes(node->rightChild_);
+		if (left != right)
+			fixTree(node);
+		if (node->isRed)
+			return left + right;
+		return left + right + 1;
 	}
 };
 

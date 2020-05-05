@@ -41,8 +41,26 @@ namespace ft
 	  typedef random_access_iterator_tag iterator_category ;
 	};
 
+	template <class InputIterator, class Distance>
+	void advance (InputIterator& i, Distance n, ft::input_iterator_tag) {
+	  for ( ; n > 0 ; --n ) ++i;
+	}
 
+	template <class BidirectionalIterator, class Distance>
+	void advance (BidirectionalIterator& i, Distance n, ft::bidirectional_iterator_tag) {
+	  if (n<=0)  for ( ; n > 0 ; --n ) ++i;
+	  else       for ( ; n < 0 ; ++n ) --i;
+	}
 
+	template <class RandomAccessIterator, class Distance>
+	void advance (RandomAccessIterator& i, Distance n, ft::random_access_iterator_tag) {
+	  i += n;
+	}
+
+	template <class InputIterator, class Distance>
+	void advance (InputIterator i, Distance n) {
+	  advance (i, n, typename iterator_traits<InputIterator>::iterator_category());
+	}
 
 	template <class Iterator>
 	class reverse_iterator

@@ -1,0 +1,12 @@
+60c60
+< mylist contains: 30
+---
+> mylist contains: 10 30 60 80 90
+74c74
+< mylist1 contains: 1 10 20 30 3 4
+---
+> mylist1 contains: 30 3 4 1 10 20
+97a98,100
+> b and c are not equal
+> b is less than c
+> c is greater than b

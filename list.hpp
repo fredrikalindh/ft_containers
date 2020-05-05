@@ -36,7 +36,7 @@ public:
 		Node*	node_;
 		list*	container_;
 	public:
-		typedef std::bidirectional_iterator_tag	iterator_category; // CHANGE TO FT AND MAKE OWN DISTANCE + ADVANCE
+		typedef ft::bidirectional_iterator_tag	iterator_category; // CHANGE TO FT AND MAKE OWN DISTANCE + ADVANCE
 		typedef T								value_type;
 		typedef std::ptrdiff_t					difference_type;
 		typedef T*								pointer;
@@ -96,15 +96,15 @@ public:
 			memcpy(reinterpret_cast<char *>(this),   buffer, sizeof(bidirectional_iterator));
 		}
 	};
-	class const_bidirectional_iterator
+	class const_bidirectional_iterator : public bidirectional_iterator
 	{
 	protected:
 		Node*	node_;
 		const list*	container_;
 	public:
-		typedef std::bidirectional_iterator_tag			iterator_category; // CHANGE TO FT AND MAKE OWN DISTANCE + ADVANCE
+		// typedef ft::bidirectional_iterator_tag			iterator_category; // CHANGE TO FT AND MAKE OWN DISTANCE + ADVANCE
 		typedef const T									value_type;
-		typedef std::ptrdiff_t							difference_type;
+		// typedef std::ptrdiff_t							difference_type;
 		typedef const T*								pointer;
 		typedef const T&								reference;
 
@@ -112,55 +112,55 @@ public:
 		const_bidirectional_iterator(Node *node, list const *container):node_(node), container_(container){}
 		const_bidirectional_iterator(bidirectional_iterator const &cpy):node_(cpy.node_), container_(cpy.container_){}
 		// ~bidirectional_iterator(){}
-		const_bidirectional_iterator& operator=(bidirectional_iterator const &cpy){
-			const_bidirectional_iterator tmp(cpy);
-			swap(tmp);
-			return *this;
-		}
-		const_bidirectional_iterator& operator++(void){
-			if (node_)
-				node_ = node_->next;
-			else
-				node_ = container_->first_;
-			return *this;
-		}
-		const_bidirectional_iterator operator++(int){
-			const_bidirectional_iterator old(*this);
-			if (node_)
-				node_ = node_->next;
-			else
-				node_ = container_->first_;
-			return old;
-		}
-		const_bidirectional_iterator& operator--(void){
-			if (node_)
-				node_ = node_->prev;
-			else
-				node_ = container_->last_;
-			return *this;
-		}
-		const_bidirectional_iterator operator--(int){
-			const_bidirectional_iterator old(*this);
-			if (node_)
-				node_ = node_->prev;
-			else
-				node_ = container_->last_;
-			return old;
-		}
-		inline Node *base(){return node_;}
-		inline reference	operator*(void) {return node_->value;}
-		inline pointer		operator->(void) {return &(node_->value);}
-		inline reference	operator*(void) const {return node_->value;}
-		inline pointer		operator->(void) const {return &(node_->value);}
-		inline bool			operator!=(const_bidirectional_iterator const &other) const {return node_ != other.node_;}
-		inline bool			operator==(const_bidirectional_iterator const &other) const {return node_ == other.node_;}
-
-		void swap(const_bidirectional_iterator &other){  // PRIVATE?
-			char buffer[sizeof(const_bidirectional_iterator)];
-			memcpy(buffer, &other, sizeof(const_bidirectional_iterator));
-			memcpy(reinterpret_cast<char *>(&other), this,   sizeof(const_bidirectional_iterator));
-			memcpy(reinterpret_cast<char *>(this),   buffer, sizeof(const_bidirectional_iterator));
-		}
+		// const_bidirectional_iterator& operator=(bidirectional_iterator const &cpy){
+		// 	const_bidirectional_iterator tmp(cpy);
+		// 	swap(tmp);
+		// 	return *this;
+		// }
+		// const_bidirectional_iterator& operator++(void){
+		// 	if (node_)
+		// 		node_ = node_->next;
+		// 	else
+		// 		node_ = container_->first_;
+		// 	return *this;
+		// }
+		// const_bidirectional_iterator operator++(int){
+		// 	const_bidirectional_iterator old(*this);
+		// 	if (node_)
+		// 		node_ = node_->next;
+		// 	else
+		// 		node_ = container_->first_;
+		// 	return old;
+		// }
+		// const_bidirectional_iterator& operator--(void){
+		// 	if (node_)
+		// 		node_ = node_->prev;
+		// 	else
+		// 		node_ = container_->last_;
+		// 	return *this;
+		// }
+		// const_bidirectional_iterator operator--(int){
+		// 	const_bidirectional_iterator old(*this);
+		// 	if (node_)
+		// 		node_ = node_->prev;
+		// 	else
+		// 		node_ = container_->last_;
+		// 	return old;
+		// }
+		// inline Node *base(){return node_;}
+		// inline reference	operator*(void) {return node_->value;}
+		// inline pointer		operator->(void) {return &(node_->value);}
+		// inline reference	operator*(void) const {return node_->value;}
+		// inline pointer		operator->(void) const {return &(node_->value);}
+		// inline bool			operator!=(const_bidirectional_iterator const &other) const {return node_ != other.node_;}
+		// inline bool			operator==(const_bidirectional_iterator const &other) const {return node_ == other.node_;}
+		//
+		// void swap(const_bidirectional_iterator &other){  // PRIVATE?
+		// 	char buffer[sizeof(const_bidirectional_iterator)];
+		// 	memcpy(buffer, &other, sizeof(const_bidirectional_iterator));
+		// 	memcpy(reinterpret_cast<char *>(&other), this,   sizeof(const_bidirectional_iterator));
+		// 	memcpy(reinterpret_cast<char *>(this),   buffer, sizeof(const_bidirectional_iterator));
+		// }
 	};
 // TYPEDEFS ####################################################################
 	typedef T										value_type;
