@@ -48,7 +48,7 @@ Final size of mylist is 0
 
 void PushBack()
 Please enter some integers (enter 0 to end):
-mylist stores 3 numbers.
+mylist stores 4 numbers.
 
 void PopBack()
 The elements of mylist summed 600
@@ -57,7 +57,7 @@ void Insert()
 mylist contains: 1 10 20 30 30 20 2 3 4 5
 
 void Erase()
-mylist contains: 30
+mylist contains: 10 30 60 80 90
 
 void Swap()
 first contains: 200 200 200 200 200
@@ -71,7 +71,7 @@ mylist contains: 100 200 300
 mylist contains: 1101 2202
 
 void Splice()
-mylist1 contains: 1 10 20 30 3 4
+mylist1 contains: 30 3 4 1 10 20
 mylist2 contains: 2
 
 void Remove()
@@ -95,6 +95,9 @@ mylist contains: 9 8 7 6 5 4 3 2 1
 
 void RelationalOp()
 a and b are equal
+b and c are not equal
+b is less than c
+c is greater than b
 a is less than or equal to b
 a is greater than or equal to b
 

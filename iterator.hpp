@@ -1,9 +1,10 @@
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 
-
 namespace ft
 {
+
+// ITERATOR TAGS ###############################################################
 	struct input_iterator_tag {};
 	///  Marking output iterators.
 	struct output_iterator_tag {};
@@ -16,6 +17,7 @@ namespace ft
 	/// operations.
 	struct random_access_iterator_tag : public bidirectional_iterator_tag {};
 
+// ITERATOR TRAITS #############################################################
 	template < class Iterator >
 	struct iterator_traits {
 	  typedef typename Iterator::value_type        value_type ;
@@ -41,6 +43,7 @@ namespace ft
 	  typedef random_access_iterator_tag iterator_category ;
 	};
 
+// ADVANCE #####################################################################
 	template <class InputIterator, class Distance>
 	void advance (InputIterator& i, Distance n, ft::input_iterator_tag) {
 	  for ( ; n > 0 ; --n ) ++i;
@@ -48,8 +51,8 @@ namespace ft
 
 	template <class BidirectionalIterator, class Distance>
 	void advance (BidirectionalIterator& i, Distance n, ft::bidirectional_iterator_tag) {
-	  if (n<=0)  for ( ; n > 0 ; --n ) ++i;
-	  else       for ( ; n < 0 ; ++n ) --i;
+		if (n >= 0) for ( ; n > 0 ; --n ) ++i;
+		else for ( ; n < 0 ; ++n ) --i;
 	}
 
 	template <class RandomAccessIterator, class Distance>
@@ -58,10 +61,32 @@ namespace ft
 	}
 
 	template <class InputIterator, class Distance>
-	void advance (InputIterator i, Distance n) {
+	void advance (InputIterator& i, Distance n) {
 	  advance (i, n, typename iterator_traits<InputIterator>::iterator_category());
 	}
 
+// DISTANCE ####################################################################
+	template <class InputIterator>
+	typename ft::iterator_traits<InputIterator>::difference_type
+	distance (InputIterator first, InputIterator last, ft::input_iterator_tag) {
+		typename ft::iterator_traits<InputIterator>::difference_type n = 0;
+		for ( ; first != last; first++) n++;
+		return n;
+	}
+
+	template <class RandomAccessIterator>
+	typename ft::iterator_traits<RandomAccessIterator>::difference_type
+	distance (RandomAccessIterator first, RandomAccessIterator last, ft::random_access_iterator_tag) {
+		return last - first;
+	}
+
+	template<class InputIterator>
+	typename ft::iterator_traits<InputIterator>::difference_type
+	distance (InputIterator first, InputIterator last){
+		return distance(first, last, typename iterator_traits<InputIterator>::iterator_category());
+	}
+
+// REVERSE_ITERATOR ############################################################
 	template <class Iterator>
 	class reverse_iterator
 	{

@@ -54,7 +54,7 @@ public:
 		bidirectional_iterator& operator++(void){
 			if (node_)
 				node_ = node_->next;
-			else if (container_)
+			else
 				node_ = container_->first_;
 			return *this;
 		}
@@ -62,14 +62,14 @@ public:
 			bidirectional_iterator old(*this);
 			if (node_)
 				node_ = node_->next;
-			else if (container_)
+			else
 				node_ = container_->first_;
 			return old;
 		}
 		bidirectional_iterator& operator--(void){
 			if (node_)
 				node_ = node_->prev;
-			else if (container_)
+			else
 				node_ = container_->last_;
 			return *this;
 		}
@@ -77,7 +77,7 @@ public:
 			bidirectional_iterator old(*this);
 			if (node_)
 				node_ = node_->prev;
-			else if (container_)
+			else
 				node_ = container_->last_;
 			return old;
 		}
@@ -112,55 +112,55 @@ public:
 		const_bidirectional_iterator(Node *node, list const *container):node_(node), container_(container){}
 		const_bidirectional_iterator(bidirectional_iterator const &cpy):node_(cpy.node_), container_(cpy.container_){}
 		// ~bidirectional_iterator(){}
-		const_bidirectional_iterator& operator=(bidirectional_iterator const &cpy){
-			const_bidirectional_iterator tmp(cpy);
-			swap(tmp);
-			return *this;
-		}
-		const_bidirectional_iterator& operator++(void){
-			if (node_)
-				node_ = node_->next;
-			else
-				node_ = container_->first_;
-			return *this;
-		}
-		const_bidirectional_iterator operator++(int){
-			const_bidirectional_iterator old(*this);
-			if (node_)
-				node_ = node_->next;
-			else
-				node_ = container_->first_;
-			return old;
-		}
-		const_bidirectional_iterator& operator--(void){
-			if (node_)
-				node_ = node_->prev;
-			else
-				node_ = container_->last_;
-			return *this;
-		}
-		const_bidirectional_iterator operator--(int){
-			const_bidirectional_iterator old(*this);
-			if (node_)
-				node_ = node_->prev;
-			else
-				node_ = container_->last_;
-			return old;
-		}
-		inline Node *base(){return node_;}
-		inline reference	operator*(void) {return node_->value;}
-		inline pointer		operator->(void) {return &(node_->value);}
-		inline reference	operator*(void) const {return node_->value;}
-		inline pointer		operator->(void) const {return &(node_->value);}
-		inline bool			operator!=(const_bidirectional_iterator const &other) const {return node_ != other.node_;}
-		inline bool			operator==(const_bidirectional_iterator const &other) const {return node_ == other.node_;}
-
-		void swap(const_bidirectional_iterator &other){  // PRIVATE?
-			char buffer[sizeof(const_bidirectional_iterator)];
-			memcpy(buffer, &other, sizeof(const_bidirectional_iterator));
-			memcpy(reinterpret_cast<char *>(&other), this,   sizeof(const_bidirectional_iterator));
-			memcpy(reinterpret_cast<char *>(this),   buffer, sizeof(const_bidirectional_iterator));
-		}
+		// const_bidirectional_iterator& operator=(bidirectional_iterator const &cpy){
+		// 	const_bidirectional_iterator tmp(cpy);
+		// 	swap(tmp);
+		// 	return *this;
+		// }
+		// const_bidirectional_iterator& operator++(void){
+		// 	if (node_)
+		// 		node_ = node_->next;
+		// 	else
+		// 		node_ = container_->first_;
+		// 	return *this;
+		// }
+		// const_bidirectional_iterator operator++(int){
+		// 	const_bidirectional_iterator old(*this);
+		// 	if (node_)
+		// 		node_ = node_->next;
+		// 	else
+		// 		node_ = container_->first_;
+		// 	return old;
+		// }
+		// const_bidirectional_iterator& operator--(void){
+		// 	if (node_)
+		// 		node_ = node_->prev;
+		// 	else
+		// 		node_ = container_->last_;
+		// 	return *this;
+		// }
+		// const_bidirectional_iterator operator--(int){
+		// 	const_bidirectional_iterator old(*this);
+		// 	if (node_)
+		// 		node_ = node_->prev;
+		// 	else
+		// 		node_ = container_->last_;
+		// 	return old;
+		// }
+		// inline Node *base(){return node_;}
+		// inline reference	operator*(void) {return node_->value;}
+		// inline pointer		operator->(void) {return &(node_->value);}
+		// inline reference	operator*(void) const {return node_->value;}
+		// inline pointer		operator->(void) const {return &(node_->value);}
+		// inline bool			operator!=(const_bidirectional_iterator const &other) const {return node_ != other.node_;}
+		// inline bool			operator==(const_bidirectional_iterator const &other) const {return node_ == other.node_;}
+		//
+		// void swap(const_bidirectional_iterator &other){  // PRIVATE?
+		// 	char buffer[sizeof(const_bidirectional_iterator)];
+		// 	memcpy(buffer, &other, sizeof(const_bidirectional_iterator));
+		// 	memcpy(reinterpret_cast<char *>(&other), this,   sizeof(const_bidirectional_iterator));
+		// 	memcpy(reinterpret_cast<char *>(this),   buffer, sizeof(const_bidirectional_iterator));
+		// }
 	};
 // TYPEDEFS ####################################################################
 	typedef T										value_type;
@@ -260,10 +260,10 @@ public:
 			trav = first_;
 			while (n-- > 0)
 				trav = trav->next;
-			erase(iterator(trav), iterator(0));
+			erase(iterator(trav, this), iterator(0, this));
 		}
 		else if (n > size_){
-			insert(iterator(0), n - size_, val);
+			insert(0, n - size_, val);
 		}
 	}
 	void swap(list &other){
@@ -379,7 +379,7 @@ public:
 	}
 //################################ ERASE ######################################
 	iterator 		erase(iterator position){
-		if (position.base() == 0)
+		if (position == 0)
 			return position;
 		iterator ret(position);
 		ret++;
@@ -390,7 +390,7 @@ public:
 	iterator 		erase(iterator first, iterator last){
 		Node* toDel;
 		unlink_range(first.base(), last.base());
-		while (first.base() != 0 && first != last){
+		while (first != 0 && first != last){
 			toDel = first.base();
 			first++;
 			delete toDel;
@@ -503,8 +503,8 @@ public:
 	}
 //################################ REMOVE ######################################
 	void	remove (const T& val){
-		iterator it(first_);
-		while (it.base() != 0)
+		iterator it = first_;
+		while (it != 0)
 		{
 			if (*it == val)
 				it = erase(it);
@@ -514,7 +514,7 @@ public:
 	}
 	template <class Predicate>
 	void	remove_if (Predicate pred){
-		iterator it(first_);
+		iterator it = first_;
 		while (it.base() != 0)
 		{
 			if (pred(*it))
@@ -528,8 +528,8 @@ public:
 		iterator it2;
 		for (Node *it1 = first_; it1->next != 0; it1 = it1->next)
 		{
-			it2 = iterator(it1->next);
-			while (it2.base() != 0 && *it2 == it1->value)
+			it2 = it1->next;
+			while (it2 != 0 && *it2 == it1->value)
 				it2 = erase(it2);
 		}
 	}
@@ -538,22 +538,23 @@ public:
 		iterator it2;
 		for (Node *it1 = first_; it1 != 0; it1 = it1->next)
 		{
-			it2 = iterator(it1->next);
-			while (it2.base() != 0 && binary_pred(*it2, it1->value))
+			it2 = it1->next;
+			while (it2 != 0 && binary_pred(*it2, it1->value))
 				it2 = erase(it2);
 		}
 	}
+
 //################################ MERGE ######################################
 // A subtlety is that merge doesn't alter the list if the list itself is used as
 //argument: object.merge(object) won't change the list `object'. !!!!!!!
 
 	void	merge (list& x){ //sorted merge
-		iterator a(first_, this);
-		iterator b(x.first_, &x);
-		iterator insert;
-		while (a.base() != 0 && b.base() != 0){
+		iterator a(first_);
+		iterator b(x.first_);
+		Node *insert;
+		while (a != 0 && b != 0){
 			if (*b < *a){
-				insert = b;
+				insert = b.base();
 				b++;
 				splice(a, x, insert);
 			}
@@ -569,12 +570,12 @@ public:
 	}
 	template <class Compare>
   	void	merge (list& x, Compare comp){
-		iterator a(first_, this);
-		iterator b(x.first_, &x);
-		iterator insert;
-		while (a.base() != 0 && b.base() != 0){
+		iterator a(first_);
+		iterator b(x.first_);
+		Node *insert;
+		while (a != 0 && b != 0){
 			if (comp(*b, *a) > 0) {
-				insert = b;
+				insert = b.base();
 				b++;
 				splice(a, x, insert);
 			}
@@ -603,8 +604,8 @@ public:
 	}
 //############################## REVERSE #######################################
 	void	reverse(){
-		iterator front(first_);
-		iterator back(last_);
+		iterator front = first_;
+		iterator back = last_;
 		while (front != back){
 			std::swap(*front, *back);
 			front++;
@@ -707,12 +708,13 @@ template <class T>
 bool operator== (const ft::list<T>& lhs, const ft::list<T>& rhs){
 	if (lhs.size() != rhs.size())
 		return false;
-	typename ft::list<T>::const_iterator l_it = lhs.begin();
+	typename ft::list<T>::const_iterator l_it = lhs.begin();// #########################   WHY TYPENAME?
 	typename ft::list<T>::const_iterator r_it = rhs.begin();
 	while (l_it != lhs.end() && r_it != rhs.end()) {
 		if (*l_it != *r_it){
 			return false;
-		}l_it++;
+		}
+		l_it++;
 		r_it++;
 	}
 	return true;
@@ -723,7 +725,7 @@ bool operator!= (const ft::list<T>& lhs, const ft::list<T>& rhs){
 }
 template <class T>
 bool operator<  (const ft::list<T>& lhs, const ft::list<T>& rhs){
-	typename ft::list<T>::const_iterator l_it = lhs.begin();
+	typename ft::list<T>::const_iterator l_it = lhs.begin();// #########################   WHY TYPENAME?
 	typename ft::list<T>::const_iterator r_it = rhs.begin();
 	while (l_it != lhs.end() && r_it != rhs.end()) {
 		if (*l_it < *r_it)
@@ -733,8 +735,6 @@ bool operator<  (const ft::list<T>& lhs, const ft::list<T>& rhs){
 		l_it++;
 		r_it++;
 	}
-	if (r_it != rhs.end())
-		return true;
 	return false;
 }
 template <class T>
@@ -753,5 +753,6 @@ template <class T>
 void swap(ft::list<T> &a, ft::list<T> &b){
 	a.swap(b);
 }
+
 
 #endif

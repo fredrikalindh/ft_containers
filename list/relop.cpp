@@ -21,6 +21,8 @@ int main()
 	  c.push_back(30);
 	  c.push_back(20);
 	  c.push_back(10);
+
+
   if (a==b) std::cout << "a and b are equal\n";
   if (b!=c) std::cout << "b and c are not equal\n";
   if (b<c) std::cout << "b is less than c\n";
