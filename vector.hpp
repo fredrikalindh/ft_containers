@@ -36,20 +36,29 @@ public:
 		for (size_type i = 0; i < n; i++)
 			array_[i] = val;
 	}
+	// template <class InputIterator>
+	// vector (InputIterator first, InputIterator last,
+	// typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0):array_(0), size_(0), capacity_(0), multi_(0){
+	// 	for (InputIterator getSize = first; getSize != last; getSize++)
+	// 		size_++;
+	// 	array_ = new T[size_];
+	// 	int i = 0;
+	// 	while (first != last)
+	// 	{
+	// 		array_[i] = *first;
+	// 		i++;
+	// 		first++;
+	// 	}
+	// 	capacity_ = multi_ = size_;
+	// }
 	template <class InputIterator>
 	vector (InputIterator first, InputIterator last,
 	typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0):array_(0), size_(0), capacity_(0), multi_(0){
-		for (InputIterator getSize = first; getSize != last; getSize++)
-			size_++;
-		array_ = new T[size_];
-		int i = 0;
 		while (first != last)
 		{
-			array_[i] = *first;
-			i++;
+			push_back(*first);
 			first++;
 		}
-		capacity_ = multi_ = size_;
 	}
 	vector (const vector& x):array_(0), size_(x.size_), capacity_(x.capacity_), multi_(x.multi_){
 		array_ = new T[capacity_];
@@ -162,7 +171,6 @@ public:
 			// array_[size_] = T();
 		}
 	}
-
 	iterator insert (iterator position, const value_type& val){
 		iterator ret(position);
 		if (size_ < capacity_){ // if there's space: just add at position
@@ -227,38 +235,44 @@ public:
 	template <class InputIterator>
 	void insert (iterator position, InputIterator first, InputIterator last,
 	typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0){ // OWN ENABLE_IF ?
-		size_type n = 0;
-		for (InputIterator getSize = first; getSize != last; getSize++)
-			n++;
-		if (size_ + n < capacity_){ // if there's space: just add at position
-			iterator back = &array_[size_ - 1];
-			while (back >= position){ // shift everything after pos n -> right
-				back[n] = *back;
-				back--;
-			}
-			while (first != last){ // insert val
-				*back++ = *first++;
-			}
-		}
-		else {
-			capacity_ += n;
-			multi_ = capacity_;
-			T *newArr = new T[capacity_];
-			size_type i = 0;
-			for (iterator start = array_; start != position; start++){ // copy normally until position
-				newArr[i] = array_[i];
-				i++;
-			}
-			while (first != last){
-				newArr[i++] = *first++;
-			}// insert values
-			while (position < &array_[size_]) // and copy the rest
-				newArr[i++] = *position++;
-			delete []array_;
-			array_ = newArr;
-		}
-		size_ += n;
+		for ( ; first != last; first++)
+			position = insert(position, *first);
 	}
+	// template <class InputIterator>
+	// void insert (iterator position, InputIterator first, InputIterator last,
+	// typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0){ // OWN ENABLE_IF ?
+	// 	size_type n = 0;
+	// 	for (InputIterator getSize = first; getSize != last; getSize++)
+	// 		n++;
+	// 	if (size_ + n < capacity_){ // if there's space: just add at position
+	// 		iterator back = &array_[size_ - 1];
+	// 		while (back >= position){ // shift everything after pos n -> right
+	// 			back[n] = *back;
+	// 			back--;
+	// 		}
+	// 		while (first != last){ // insert val
+	// 			*back++ = *first++;
+	// 		}
+	// 	}
+	// 	else {
+	// 		capacity_ += n;
+	// 		multi_ = capacity_;
+	// 		T *newArr = new T[capacity_];
+	// 		size_type i = 0;
+	// 		for (iterator start = array_; start != position; start++){ // copy normally until position
+	// 			newArr[i] = array_[i];
+	// 			i++;
+	// 		}
+	// 		while (first != last){
+	// 			newArr[i++] = *first++;
+	// 		}// insert values
+	// 		while (position < &array_[size_]) // and copy the rest
+	// 			newArr[i++] = *position++;
+	// 		delete []array_;
+	// 		array_ = newArr;
+	// 	}
+	// 	size_ += n;
+	// }
 
 	iterator erase (iterator position){
 		iterator ret(position);

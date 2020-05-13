@@ -1,0 +1,122 @@
+
+int Constructors()
+
+int Assignment()
+Size of first: 0
+Size of second: 3
+
+int Begin()
+a => 200
+b => 100
+c => 300
+
+int RBegin()
+z => 300
+y => 200
+x => 100
+
+int Empty()
+a => 10
+b => 20
+c => 30
+SIZE: 0
+
+int Size()
+mymap.size() is 3
+
+int MaxSize()
+max: 461168601842738790
+The map contains 1000 elements.
+
+int Brackets()
+mymap['a'] is an element
+mymap['b'] is another element
+mymap['c'] is another element
+mymap['d'] is 
+mymap now contains 4 elements.
+
+int Insert()
+element 'z' already existed with a value of 200
+mymap contains:
+a => 100
+b => 300
+c => 400
+z => 200
+anothermap contains:
+a => 100
+b => 300
+
+int Erase()
+a => 10
+d => 40
+
+int Swap()
+foo contains:
+a => 11
+b => 22
+c => 33
+bar contains:
+x => 100
+y => 200
+foo contains:
+x => 100
+y => 200
+bar contains:
+a => 11
+b => 22
+c => 33
+
+int Clear()
+mymap contains:
+x => 100
+y => 200
+z => 300
+mymap contains:
+a => 1101
+b => 2202
+
+int KeyComp()
+mymap contains:
+a => 100
+b => 200
+c => 300
+
+
+int ValComp()
+mymap contains:
+x => 1001
+y => 2002
+z => 3003
+
+int Find()
+elements in mymap:
+a => 50
+c => 150
+d => 200
+
+int Count()
+a is an element of mymap.
+b is not an element of mymap.
+c is an element of mymap.
+d is not an element of mymap.
+e is not an element of mymap.
+f is an element of mymap.
+g is not an element of mymap.
+
+int Bound()
+lower = b
+upper = e
+a => 20
+b => 40
+c => 60
+d => 80
+e => 100
+
+int EqualRange()
+lower bound points to: b => 20
+upper bound points to: c => 30
+
+int RelOps()
+foo and bar are not equal
+foo is greater than bar
+foo is greater than or equal to bar
