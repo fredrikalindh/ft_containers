@@ -13,7 +13,6 @@ c => 300
 int RBegin()
 z => 300
 y => 200
-x => 100
 
 int Empty()
 a => 10
@@ -115,8 +114,3 @@ e => 100
 int EqualRange()
 lower bound points to: b => 20
 upper bound points to: c => 30
-
-int RelOps()
-foo and bar are not equal
-foo is greater than bar
-foo is greater than or equal to bar
