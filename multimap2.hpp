@@ -1,5 +1,5 @@
-#ifndef MAP_HPP
-# define MAP_HPP
+#ifndef MULTIMAP_HPP
+# define MULTIMAP_HPP
 
 #include "RBTree.hpp"
 #include "utility.hpp"
@@ -10,14 +10,14 @@ template <
 	class Key,
 	class T,
 	class Compare = std::less<Key> >
-class map
+class multimap
 {
 public:
 	typedef	Key										key_type;
 	typedef	T										mapped_type;
 	typedef ft::pair<Key, T>						value_type;
 	typedef	size_t									size_type;
-	typedef	std::ptrdiff_t								difference_type;
+	typedef	ptrdiff_t								difference_type;
 	typedef	Compare									key_compare;
 	typedef	value_type&								reference;
 	typedef	const value_type&						const_reference;
@@ -29,7 +29,7 @@ public:
 		Compare comp;
 		value_compare (Compare c) : comp(c) {}	// constructed with map's comparison object
 	public:
-		friend class map;
+		friend class multimap;
 
 		typedef bool result_type;
 		typedef value_type first_argument_type;
@@ -51,23 +51,17 @@ typedef	typename RBT::const_iterator			const_iterator;
 typedef	ft::reverse_iterator<iterator>			reverse_iterator;
 typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 //######################### CONSTRUCTORS #######################################
-	explicit map (const key_compare& comp = key_compare()):tree_(value_compare(comp)), comp(comp){}
+	explicit multimap (const key_compare& comp = key_compare()):tree_(comp, RBT::MULTI), comp(comp){}
 	template <class InputIterator>
-	map (InputIterator first, InputIterator last, const key_compare& comp = key_compare()):
-	tree_(value_compare(comp)), comp(comp) {
+	multimap (InputIterator first, InputIterator last, const key_compare& comp = key_compare()):
+	tree_(comp, RBT::MULTI), comp(comp){
 		for ( ; first != last; first++)
 			tree_.add(*first);
 	}
-	map (const map& x):tree_(x.tree_), comp(x.comp){}
-	~map(){}
-	map& operator= (const map& x){
-		map ret(x);
-		swap(ret);
-		return *this;
-	}
-	mapped_type& operator[] (const key_type& k) { // find node or parent to where it should be?
-		return (tree_.add(k))->value_.second;
-	}
+	multimap (const multimap& x):tree_(x.tree_), comp(x.comp){}
+	~multimap(){}
+
+	multimap& operator= (const multimap& x);
 //########################## ITERATORS #######################################
 	iterator				begin() {return iterator(tree_.min(), &tree_);}
 	const_iterator			begin() const {return const_iterator(tree_.min(), &tree_);}
@@ -75,7 +69,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	const_iterator			end() const { return const_iterator(0, &tree_); }
 	reverse_iterator		rbegin() { return reverse_iterator(end());}
 	const_reverse_iterator	rbegin() const { return reverse_iterator(end());}
-	reverse_iterator		rend() {return reverse_iterator(begin());}
+	reverse_iterator		rend() { return reverse_iterator(begin()); }
 	const_reverse_iterator	rend() const { return reverse_iterator(begin()); }
 //########################### CAPACITY #######################################
 	bool					empty() const {return !tree_.size();}
@@ -122,7 +116,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		memcpy(reinterpret_cast<char *>(&x), this, sizeof(map));
 		memcpy(reinterpret_cast<char *>(this), buffer, sizeof(map));
 	}
-	void					clear() {
+	void					clear(){
 		tree_.clear();
 	}
 //########################### OBSERVERS #######################################
@@ -136,7 +130,12 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		return const_iterator(tree_.find(k), &tree_);
 	}
 	size_type				count (const key_type& k) const {
-		return (tree_.find(k)) ? 1 : 0;
+	size_type n = 0;
+		for (iterator ret(tree_.find(k), &tree_) ;
+			!comp(ret->first, k) && !comp(k, ret->first) ;
+			++ret)
+			++n;
+		return n;
 	}
 	iterator				lower_bound (const key_type& k) {
 		return iterator(tree_.find(k), &tree_);
@@ -145,12 +144,15 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		return const_iterator(tree_.find(k), &tree_);
 	}
 	iterator				upper_bound (const key_type& k) {
-		return ++(iterator(tree_.find(k), &tree_));
+		iterator ret(tree_.find(k), &tree_);
+		while (!comp(ret->first, k) && !comp(k, ret->first))
+			++ret;
+		return ret;
 	}
 	const_iterator			upper_bound (const key_type& k) const {
 		return ++(const_iterator(tree_.find(k), &tree_));
 	}
-	ft::pair<const_iterator,const_iterator>	equal_range (const key_type& k) const {
+	ft::pair<const_iterator,const_iterator>	equal_range (const key_type& k) const{
 		 return ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k));
 	}
 	ft::pair<iterator,iterator>				equal_range (const key_type& k){
@@ -158,14 +160,14 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 };
 
-} //namespace ft
+} // namespace ft
 
 template <class Key, class T, class Compare>
-bool operator== (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+bool operator== (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Key, T, Compare>& rhs){
 	if (lhs.size() != rhs.size())
 		return false;
-	typename ft::map<Key, T, Compare>::const_iterator l_it = lhs.begin();
-	typename ft::map<Key, T, Compare>::const_iterator r_it = rhs.begin();
+	typename ft::multimap<Key, T, Compare>::const_iterator l_it = lhs.begin();
+	typename ft::multimap<Key, T, Compare>::const_iterator r_it = rhs.begin();
 	while (l_it != lhs.end() && r_it != rhs.end()) {
 		if (l_it->second != r_it->second){
 			return false;
@@ -176,13 +178,13 @@ bool operator== (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Comp
 	return true;
 }
 template <class Key, class T, class Compare>
-bool operator!= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+bool operator!= (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Key, T, Compare>& rhs){
 	return !(lhs == rhs);
 }
 template <class Key, class T, class Compare>
-bool operator<  (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
-	typename ft::map<Key, T, Compare>::const_iterator l_it = lhs.begin();
-	typename ft::map<Key, T, Compare>::const_iterator r_it = rhs.begin();
+bool operator<  (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Key, T, Compare>& rhs){
+	typename ft::multimap<Key, T, Compare>::const_iterator l_it = lhs.begin();
+	typename ft::multimap<Key, T, Compare>::const_iterator r_it = rhs.begin();
 	while (l_it != lhs.end() && r_it != rhs.end()) {
 		if (l_it->second < r_it->second)
 			return true;
@@ -196,20 +198,21 @@ bool operator<  (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Comp
 	return false;
 }
 template <class Key, class T, class Compare>
-bool operator<= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+bool operator<= (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Key, T, Compare>& rhs){
 	return !(rhs < lhs);
 }
 template <class Key, class T, class Compare>
-bool operator>  (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+bool operator>  (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Key, T, Compare>& rhs){
 	return rhs < lhs;
 }
 template <class Key, class T, class Compare>
-bool operator>= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+bool operator>= (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Key, T, Compare>& rhs){
 	return !(lhs < rhs);
 }
 template <class Key, class T, class Compare>
-void swap(ft::map<Key, T, Compare> &a, ft::map<Key, T, Compare> &b){
+void swap(ft::multimap<Key, T, Compare> &a, ft::multimap<Key, T, Compare> &b){
 	a.swap(b);
 }
+
 
 #endif

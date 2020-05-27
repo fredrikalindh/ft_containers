@@ -95,20 +95,32 @@ public:
 		return size_;
 	}
 // ########################## MAIN FUNCTIONS ###################################
-	Node	*find(const value_type k) const {
+	// Node	*find(const value_type k) const {
+	// 	return find(root_, k);
+	// }
+	Node	*find(const value_type& k) const {
 		return find(root_, k);
 	}
 	Node	*find(Node *node, const value_type& k) const {
 		// if (k == 0) THROW SOMETHING ?
 		while (node){
-			if (node->value_ == k)
+			if (!comp(node->value_,k) && !comp(k, node->value_))
 				return node;
-			if (!comp(node->value_, k))
-				node = node->left_;
-			else
+			if (!comp(k, node->value_))
 				node = node->right_;
+			else
+				node = node->left_;
 		}
 		return 0;
+	}
+	Node	*find_upper(const value_type k) const {
+		return find_upper(root_, k);
+	}
+	Node	*find_upper(Node *node, const value_type& k) const {
+		node = find(root_, k);
+		while (node && !comp(node->value_, k))
+			node = node->right_;
+		return node;
 	}
 	Node	*add(value_type toAdd){ // REFERENCE OR NOT ?
 		Node* added; // sending address to this pointer so that I can select it even with the recursive
@@ -124,12 +136,13 @@ public:
 			*added = new Node(value, parent, left);
 			return *added;
 		}
-		if (x->value_ == value) // IF !MULTIPLE
-			*added = x;
-		else if (!comp(x->value_, value))
-			 x->left_ = add(x, x->left_, value, true, added); // if comp gives false
-		else
+		if (!comp(x->value_, value) && !comp(value, x->value_) && allowMulti == false) // ---> EQUAL
+				*added = x;
+		else if (!comp(value, x->value_))
 			x->right_ = add(x, x->right_, value, false, added);
+		else
+			x->left_ = add(x, x->left_, value, true, added); // if comp gives false
+
 		if (isRed(x->right_) && !isRed(x->left_)) x = rotateLeft(x);
 		if (isRed(x->left_) && isRed(x->left_->left_)) x = rotateRight(x);
 		if (isRed(x->left_) && isRed(x->right_)) colorFlip(x);
@@ -137,7 +150,6 @@ public:
 		return x;
 	}
 	bool deleteKey(value_type value){
-		// if (!(count(toDelete)))
 		if (!find(root_, value))
 			return false;
 		if (!isRed(root_->left_) && !isRed(root_->right_))
@@ -156,7 +168,7 @@ public:
 		else {
 			if (isRed(x->left_))
 				x = rotateRight(x);
-			if (x->value_ == value && !x->right_){
+			if (!comp(x->value_, value) && !x->right_) { // EQUAL
 				--size_;
 				delete x;
 				return 0;
@@ -352,9 +364,9 @@ class rb_tree_iterator
 
 	typedef typename RB_Tree<T, Compare>::Node Node;
 	typedef RB_Tree<T, Compare> Tree;
-
-	Node*	node_;
-	Tree*	tree_;
+public:
+	Node*		node_;
+	Tree const*	tree_;
 public:
 	typedef ft::bidirectional_iterator_tag	iterator_category;
 	typedef std::ptrdiff_t					difference_type;
@@ -362,7 +374,7 @@ public:
 	typedef T*								pointer;
 	typedef T&								reference;
 
-	rb_tree_iterator(Node *node = 0, Tree *tree = 0):node_(node), tree_(tree){}
+	rb_tree_iterator(Node *node = 0, Tree const *tree = 0):node_(node), tree_(tree){}
 	rb_tree_iterator(rb_tree_iterator const &cpy):node_(cpy.node_), tree_(cpy.tree_){}
 	rb_tree_iterator& operator=(rb_tree_iterator const &cpy){
 		node_ = cpy.node_;
@@ -414,17 +426,17 @@ public:
 
 } //namespace ft
 
-
-// template <class T, class Compare>
-// bool operator== (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
-// 	if (lhs.size() != rhs.size())
+// template <class T, class Compare, Vcomp>
+// bool operator== (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs, Vcomp& isEq){
+// 	if (lhs.size() != rhs.size() || lhs.allowMulti_ != rhs.allowMulti_)
 // 		return false;
 // 	typename ft::RB_Tree<T, Compare>::const_iterator l_it = lhs.begin();
 // 	typename ft::RB_Tree<T, Compare>::const_iterator r_it = rhs.begin();
 // 	while (l_it != lhs.end() && r_it != rhs.end()) {
-// 		if (!comp(l_it != r_it)){
+// 		if (!isEq(*l_it, *r_it)){
 // 			return false;
-// 		}l_it++;
+// 		}
+// 		l_it++;
 // 		r_it++;
 // 	}
 // 	return true;
@@ -438,9 +450,9 @@ public:
 // 	typename ft::RB_Tree<T, Compare>::const_iterator l_it = lhs.begin();
 // 	typename ft::RB_Tree<T, Compare>::const_iterator r_it = rhs.begin();
 // 	while (l_it != lhs.end() && r_it != rhs.end()) {
-// 		if (l_it->second < r_it->second)
+// 		if (comp(*l_it, *r_it))
 // 			return true;
-// 		if (l_it->second > r_it->second)
+// 		if (comp(*r_it, *l_it))
 // 			return false;
 // 		l_it++;
 // 		r_it++;
@@ -465,6 +477,5 @@ public:
 // void swap(ft::RB_Tree<T, Compare> &a, ft::RB_Tree<T, Compare> &b){
 // 	a.swap(b);
 // }
-
 
 #endif

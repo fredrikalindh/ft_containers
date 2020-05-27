@@ -35,6 +35,10 @@ int main ()
   mymap['x'] = 100;
   mymap['y'] = 200;
   mymap['z'] = 300;
+  mymap['f'] = 300;
+  mymap['e'] = 300;
+  mymap['r'] = 300;
+  mymap['k'] = 300;
 
   // show content:
   for (LIBRARY::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
@@ -45,8 +49,8 @@ int main ()
 	 LIBRARY::map<char,int>::reverse_iterator it = mymap.rbegin();
 	 LIBRARY::map<char,int>::reverse_iterator it2 = mymap.rend();
 
-	 if (it2.base() == mymap.end())
-	 	std::cout << "YES" << '\n';
+	 // if (it2.base() == mymap.begin())
+	 	std::cout << "rend : " << it2.base()->first << '\n';
 	 // it2--;
 	 for ( ; it != it2; it++)
 	 	std::cout << it->first << " => " << it->second << '\n';

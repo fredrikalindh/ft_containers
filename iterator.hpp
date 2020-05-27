@@ -150,31 +150,32 @@ namespace ft
 			++base_;
 			return tmp;
 		}
+		template <class it>
+		friend bool operator== (const ft::reverse_iterator<it>& lhs, const ft::reverse_iterator<it>& rhs){
+			return lhs.base_ == rhs.base_;
+		}
+		template <class it>
+		friend bool operator!= (const ft::reverse_iterator<it>& lhs, const ft::reverse_iterator<it>& rhs){
+			return lhs.base_ != rhs.base_;
+		}
+		template <class it>
+		friend bool operator<  (const ft::reverse_iterator<it>& lhs, const ft::reverse_iterator<it>& rhs){
+			return lhs.base_ > rhs.base_;
+		}
+		template <class it>
+		friend bool operator<= (const ft::reverse_iterator<it>& lhs, const ft::reverse_iterator<it>& rhs){
+			return lhs.base_ >= rhs.base_;
+		}
+		template <class it>
+		friend bool operator>  (const ft::reverse_iterator<it>& lhs, const ft::reverse_iterator<it>& rhs){
+			return lhs.base_ < rhs.base_;
+		}
+		template <class it>
+		friend bool operator>= (const ft::reverse_iterator<it>& lhs, const ft::reverse_iterator<it>& rhs){
+			return lhs.base_ <= rhs.base_;
+		}
 	};
-	template <class Iterator>
-	bool operator== (const ft::reverse_iterator<Iterator>& lhs, const ft::reverse_iterator<Iterator>& rhs){
-		return lhs.base() == rhs.base();
-	}
-	template <class Iterator>
-	bool operator!= (const ft::reverse_iterator<Iterator>& lhs, const ft::reverse_iterator<Iterator>& rhs){
-		return lhs.base() != rhs.base();
-	}
-	template <class Iterator>
-	bool operator<  (const ft::reverse_iterator<Iterator>& lhs, const ft::reverse_iterator<Iterator>& rhs){
-		return lhs.base() > rhs.base();
-	}
-	template <class Iterator>
-	bool operator<= (const ft::reverse_iterator<Iterator>& lhs, const ft::reverse_iterator<Iterator>& rhs){
-		return lhs.base() >= rhs.base();
-	}
-	template <class Iterator>
-	bool operator>  (const ft::reverse_iterator<Iterator>& lhs, const ft::reverse_iterator<Iterator>& rhs){
-		return lhs.base() < rhs.base();
-	}
-	template <class Iterator>
-	bool operator>= (const ft::reverse_iterator<Iterator>& lhs, const ft::reverse_iterator<Iterator>& rhs){
-		return lhs.base() <= rhs.base();
-	}
+
 	template <class Iterator>
 	ft::reverse_iterator<Iterator> operator+ (
 						typename ft::reverse_iterator<Iterator>::difference_type n,

@@ -1,0 +1,89 @@
+
+int Constructors()
+
+int Assignment()
+Size of foo: 0
+Size of bar: 4
+
+int Begin()
+a => 10
+b => 20
+b => 150
+
+int RBegin()
+z => 9
+y => 150
+y => 20
+x => 10
+
+int Empty()
+b => 101
+b => 202
+q => 505
+
+int Size()
+mymultimap.size() is 4
+
+int MaxSize()
+The multimap contains 1000 elements.
+
+int Insert()
+mymultimap contains:
+a => 100
+b => 75
+c => 300
+z => 400
+z => 150
+anothermultimap contains:
+a => 100
+b => 75
+
+int Erase()
+a => 10
+b => 30
+c => 40
+
+int Swap()
+foo contains:
+a => 11
+a => 55
+b => 22
+bar contains:
+x => 100
+y => 200
+foo contains:
+x => 100
+y => 200
+bar contains:
+a => 11
+a => 55
+b => 22
+
+int Clear()
+mymultimap contains:
+b => 80
+b => 120
+q => 360
+mymultimap contains:
+a => 11
+x => 22
+
+int KeyComp()
+mymultimap contains:
+a => 100
+b => 200
+b => 211
+c => 300
+
+
+int ValComp()
+mymultimap contains:
+x => 101
+y => 202
+y => 252
+z => 303
+
+int Find()
+elements in mymm:
+y => 20
+z => 40

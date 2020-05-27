@@ -1,0 +1,66 @@
+
+int Constructors()
+
+int Assignment()
+Size of first: 0
+Size of second: 5
+
+int Begin()
+myset contains: 13 23 42 65 75
+
+int RBegin()
+myset contains: 78 64 49 21 17
+
+int Empty()
+myset contains: 10 20 30
+
+int Size()
+0. size: 0
+1. size: 10
+2. size: 11
+3. size: 10
+
+int MaxSize()
+The set contains 1000 elements.
+
+int Insert()
+myset contains: 5 10 15 20 24 25 26 30 40 50
+
+int Erase()
+myset contains: 10 30 50
+
+int Swap()
+first contains: 20 25 32
+second contains: 10 12 75
+
+int Clear()
+myset contains: 100 200 300
+myset contains: 1101 2202
+
+int KeyComp()
+myset contains: 0 1 2 3 4
+
+int ValComp()
+myset contains: 0 1 2 3 4
+
+int Find()
+myset contains: 10 30 50
+
+int Count()
+0 is not an element of myset.
+1 is not an element of myset.
+2 is not an element of myset.
+3 is an element of myset.
+4 is not an element of myset.
+5 is not an element of myset.
+6 is an element of myset.
+7 is not an element of myset.
+8 is not an element of myset.
+9 is an element of myset.
+
+int Bound()
+myset contains: 10 20 70 80 90
+
+int EqualRange()
+the lower bound points to: 30
+the upper bound points to: 40
