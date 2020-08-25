@@ -87,14 +87,13 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 	template <class InputIterator>
 	void					insert (InputIterator first, InputIterator last){
-		while (first != last)
-			tree_.add(*first++);
+		while (first != last) tree_.add(*first++);
 	}
 //########################### ERASE #######################################
 	void					erase (iterator position){
-		tree_.deleteKey(position->first);
+		tree_.deleteKey(position);
 	}
-	size_type				erase (const key_type& k){ // TRY CATCH ?
+	size_type				erase (const key_type& k) { // TRY CATCH ?
 		return tree_.deleteKey(k);
 	}
 	void					erase (iterator first, iterator last){ // CAN MAKE MORE EFFICIENT
@@ -135,8 +134,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		size_type n = 0;
 		for (iterator i(tree_.find(k), &tree_);
 			i.node_ && !comp(i->first, k) && !comp(k, i->first);
-			++i )
-				++n;
+			++i ) ++n;
 		return n;
 	}
 	iterator				lower_bound (const key_type& k) {
@@ -145,12 +143,6 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	const_iterator			lower_bound (const key_type& k) const {
 		return const_iterator(tree_.find(k), &tree_);
 	}
-	// iterator				upper_bound (const key_type& k) {
-	// 	return iterator(tree_.find(k), &tree_);
-	// }
-	// const_iterator			upper_bound (const key_type& k) const {
-	// 	return const_iterator(tree_.find(k), &tree_);
-	// }
 	iterator				upper_bound (const key_type& k) {
 		return iterator(tree_.find_upper(k), &tree_);
 	}
@@ -198,9 +190,7 @@ bool operator<  (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Ke
 		l_it++;
 		r_it++;
 	}
-	if (r_it != rhs.end()) /// ??
-		return true;
-	return false;
+	return (r_it != rhs.end()) ? true : false;
 }
 template <class Key, class T, class Compare>
 bool operator<= (const ft::multimap<Key, T, Compare>& lhs, const ft::multimap<Key, T, Compare>& rhs){

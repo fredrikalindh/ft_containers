@@ -20,10 +20,15 @@ int Constructors ()
 
    first.insert(LIBRARY::pair<char,int>('a',10));
    first.insert(LIBRARY::pair<char,int>('b',15));
+   first.insert(LIBRARY::pair<char,int>('b',35));
    first.insert(LIBRARY::pair<char,int>('b',20));
    first.insert(LIBRARY::pair<char,int>('c',25));
+   for (LIBRARY::multimap<char,int>::iterator it=first.begin(); it!=first.end(); ++it)
+	 std::cout << (*it).first << " => " << (*it).second << '\n';
 
    LIBRARY::multimap<char,int> second (first.begin(),first.end());
+   for (LIBRARY::multimap<char,int>::iterator it=first.begin(); it!=first.end(); ++it)
+	 std::cout << (*it).first << " => " << (*it).second << '\n';
 
    LIBRARY::multimap<char,int> third (second);
 
@@ -47,6 +52,9 @@ int Assignment ()
 
 	  bar = foo;                  // bar now contains 4 ints
 	  foo.clear();                // and first is now empty
+
+	  for (LIBRARY::multimap<char,int>::iterator it=bar.begin(); it!=bar.end(); ++it)
+	  std::cout << (*it).first << " => " << (*it).second << '\n';
 
 	  std::cout << "Size of foo: " << foo.size() << '\n';
 	  std::cout << "Size of bar: " << bar.size() << '\n';
@@ -94,7 +102,8 @@ int Empty ()
 
   mymultimap.insert (LIBRARY::pair<char,int>('b',101));
   mymultimap.insert (LIBRARY::pair<char,int>('b',202));
-  mymultimap.insert (LIBRARY::pair<char,int>('q',505));
+  // mymultimap.insert (LIBRARY::pair<char,int>('q',505));
+  // mymultimap.insert (LIBRARY::pair<char,int>('q',405));
 
   while (!mymultimap.empty())
   {

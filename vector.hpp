@@ -145,7 +145,6 @@ public:
 		vector tmp(n, val);
 		swap(tmp);
 	}
-
 	void push_back (const value_type& val){
 		if (size_ < capacity_)
 			array_[size_++] = val;

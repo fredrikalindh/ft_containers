@@ -175,7 +175,7 @@ namespace ft
 		typedef value_type *pointer;
 		typedef const value_type *const_pointer;
 		typedef deque_iterator<T> iterator;
-		typedef deque_iterator<T> const_iterator; // #########################################
+		typedef deque_iterator<const T> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -381,7 +381,7 @@ namespace ft
 
 		int i_out;								  	 // index for array
 		int i_in;								  	 // index inside array
-		const deque_array<deque_array<T> > *array_;	 // pointer to the container
+		deque_array<deque_array<T> > const *array_;	 // pointer to the container
 
 	public:
 		typedef ft::random_access_iterator_tag iterator_category;
@@ -391,7 +391,7 @@ namespace ft
 		typedef T &reference;
 
 		deque_iterator() : i_out(0), i_in(0), array_(0){}
-		deque_iterator(int out, int in, const deque_array<deque_array<T> > *d) : i_out(out), i_in(in), array_(d) {}
+		deque_iterator(int out, int in, deque_array<deque_array<T> > const *d) : i_out(out), i_in(in), array_(d) {}
 		deque_iterator(deque_iterator const &x) : i_out(x.i_out), i_in(x.i_in), array_(x.array_) {}
 		~deque_iterator() {}
 		deque_iterator &operator=(deque_iterator const &x)
@@ -535,56 +535,70 @@ namespace ft
 		a.swap(b);
 	}
 
-	template <class T>
-	bool operator==(deque<T> const &lhs, deque<T> const &rhs)
-	{
-		if (lhs.size() != rhs.size())
-			return false;
-		typename ft::deque<T>::const_iterator l_it = lhs.begin();
-		typename ft::deque<T>::const_iterator r_it = rhs.begin();
-		while (l_it != lhs.end() && r_it != rhs.end()) {
-			if (*l_it != *r_it)
-			return false;
-			l_it++;
-			r_it++;
-		}
-		return true;
-	}
-	template <class T>
-	bool operator!=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
-	{
-		return !(lhs == rhs);
-	}
-	template <class T>
-	bool operator<(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
-	{
-		typename ft::deque<T>::const_iterator l_it = lhs.begin(); 
-		typename ft::deque<T>::const_iterator r_it = rhs.begin();
-		while (l_it != lhs.end() && r_it != rhs.end()) {
-			if (*l_it < *r_it)
-				return true;
-			if (*l_it > *r_it)
-				return false;
-			l_it++;
-			r_it++;
-		}
-		return true; // ?????
-	}
-	template <class T>
-	bool operator<=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
-	{
-		return !(rhs < lhs);
-	}
-	template <class T>
-	bool operator>(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
-	{
-		return rhs < lhs;
-	}
-	template <class T>
-	bool operator>=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
-	{
-		return !(lhs < rhs);
-	}
+template <class T>
+bool operator==(deque<T> const &lhs, deque<T> const &rhs) {
+	if (lhs.size() != rhs.size())
+		return (false);
+	typename deque<T>::const_iterator first1 = lhs.begin();
+	typename deque<T>::const_iterator last1 = lhs.end();
+	typename deque<T>::const_iterator first2 = rhs.begin();
+	typename deque<T>::const_iterator last2 = rhs.end();
+	while (first1 != last1)
+		if (*first1++ != *first2++)
+			return (false);
+	return (true);
+}
+
+	// template <class T>
+	// bool operator==(deque<T> const &lhs, deque<T> const &rhs)
+	// {
+	// 	if (lhs.size() != rhs.size())
+	// 		return false;
+	// 	typename ft::deque<T>::const_iterator l_it = lhs.begin();
+	// 	typename ft::deque<T>::const_iterator r_it = rhs.begin();
+	// 	while (l_it != lhs.end() && r_it != rhs.end()) {
+	// 		if (*l_it != *r_it)
+	// 		return false;
+	// 		l_it++;
+	// 		r_it++;
+	// 	}
+	// 	return true;
+	// }
+	// template <class T>
+	// bool operator!=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
+	// {
+	// 	return !(lhs == rhs);
+	// }
+	// template <class T>
+	// bool operator<(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
+	// {
+	// 	typename ft::deque<T>::const_iterator l_it = lhs.begin(); 
+	// 	typename ft::deque<T>::const_iterator r_it = rhs.begin();
+	// 	while (l_it != lhs.end() && r_it != rhs.end()) {
+	// 		if (*l_it < *r_it)
+	// 			return true;
+	// 		if (*l_it > *r_it)
+	// 			return false;
+	// 		l_it++;
+	// 		r_it++;
+	// 	}
+	// 	return true; // ?????
+	// }
+	// template <class T>
+	// bool operator<=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
+	// {
+	// 	return !(rhs < lhs);
+	// }
+	// template <class T>
+	// bool operator>(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
+	// {
+	// 	return rhs < lhs;
+	// }
+	// template <class T>
+	// bool operator>=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
+	// {
+	// 	return !(lhs < rhs);
+	// }
 
 } //namespace ft
 

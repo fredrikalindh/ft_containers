@@ -7,18 +7,18 @@ Size of bar: 4
 
 int Begin()
 a => 10
-b => 150
 b => 20
+b => 150
 
 int RBegin()
 z => 9
-y => 20
 y => 150
+y => 20
 x => 10
 
 int Empty()
-b => 202
-b => 202
+b => 101
+b => 101
 q => 505
 
 int Size()
@@ -32,22 +32,22 @@ mymultimap contains:
 a => 100
 b => 75
 c => 300
-z => 400
 z => 150
+z => 400
 anothermultimap contains:
 a => 100
 b => 75
 
 int Erase()
 a => 10
-b => 20
+b => 30
 c => 40
-d => 60
+d => 50
 
 int Swap()
 foo contains:
-a => 55
 a => 11
+a => 55
 b => 22
 bar contains:
 x => 100
@@ -56,14 +56,14 @@ foo contains:
 x => 100
 y => 200
 bar contains:
-a => 55
 a => 11
+a => 55
 b => 22
 
 int Clear()
 mymultimap contains:
-b => 120
 b => 80
+b => 120
 q => 360
 mymultimap contains:
 a => 11
@@ -72,19 +72,38 @@ x => 22
 int KeyComp()
 mymultimap contains:
 a => 100
-b => 211
 b => 200
+b => 211
 c => 300
 
 
 int ValComp()
 mymultimap contains:
 x => 101
-y => 252
 y => 202
+y => 252
 z => 303
 
 int Find()
 elements in mymm:
 y => 20
-z => 30
+z => 40
+
+int Count()
+There are 1 elements with key x: 50 100 150 200 250 300
+There are 1 elements with key y: 200 250 300
+There are 1 elements with key z: 300
+
+int Bound()
+b => 121
+c => 1001
+c => 2002
+d => 11011
+e => 44
+
+int EqualRange()
+mymm contains:
+a => 10 20 30 40 50 60 60
+b => 40 50 60 60
+c => 60 60
+d => 60

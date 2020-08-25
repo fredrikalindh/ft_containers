@@ -122,16 +122,46 @@ public:
 		 return ft::pair<iterator,iterator>(lower_bound(val), upper_bound(val));
 	}
 };
+
+template <class T, class Compare>
+bool operator== (const set<T, Compare>& lhs, const set<T, Compare>& rhs){
+	return lhs.tree_ == rhs.tree_;
+}
+template <class T, class Compare>
+bool operator!= (const set<T, Compare>& lhs, const set<T, Compare>& rhs){
+	return lhs.tree_ != rhs.tree_;
+}
+template <class T, class Compare>
+bool operator<  (const set<T, Compare>& lhs, const set<T, Compare>& rhs){
+	return lhs.tree_ < rhs.tree_;
+}
+template <class T, class Compare>
+bool operator<= (const set<T, Compare>& lhs, const set<T, Compare>& rhs){
+	return lhs.tree_ <= rhs.tree_;
+}
+template <class T, class Compare>
+bool operator>  (const set<T, Compare>& lhs, const set<T, Compare>& rhs){
+	return lhs.tree_ > rhs.tree_;
+}
+template <class T, class Compare>
+bool operator>= (const set<T, Compare>& lhs, const set<T, Compare>& rhs){
+	return lhs.tree_ >= rhs.tree_;
+}
+template <class T, class Compare>
+void swap(set<T, Compare> &a, set<T, Compare> &b){
+	a.swap(b);
+}
+
 } // namespace ft
 
-// template <class Key, class T, class Compare>
+// template <class T, class Compare>
 // bool operator== (const ft::set<Key, T, Compare>& lhs, const ft::set<Key, T, Compare>& rhs){
 // 	if (lhs.size() != rhs.size())
 // 		return false;
 // 	typename ft::set<Key, T, Compare>::const_iterator l_it = lhs.begin();
 // 	typename ft::set<Key, T, Compare>::const_iterator r_it = rhs.begin();
 // 	while (l_it != lhs.end() && r_it != rhs.end()) {
-// 		if (*l_it != *r_it){
+// 		if (comp(*l_it, *r_it) || comp(*r_it, *l_it)){
 // 			return false;
 // 		}
 // 		l_it++;
@@ -139,16 +169,16 @@ public:
 // 	}
 // 	return true;
 // }
-// template <class Key, class T, class Compare>
+// template <class T, class Compare>
 // bool operator!= (const ft::set<Key, T, Compare>& lhs, const ft::set<Key, T, Compare>& rhs){
 // 	return !(lhs == rhs);
 // }
-// template <class Key, class T, class Compare>
+// template <class T, class Compare>
 // bool operator<  (const ft::set<Key, T, Compare>& lhs, const ft::set<Key, T, Compare>& rhs){
 // 	typename ft::set<Key, T, Compare>::const_iterator l_it = lhs.begin();
 // 	typename ft::set<Key, T, Compare>::const_iterator r_it = rhs.begin();
 // 	while (l_it != lhs.end() && r_it != rhs.end()) {
-// 		if (*l_it < *r_it)
+// 		if (*l_it, *r_it)
 // 			return true;
 // 		if (*l_it > *r_it)
 // 			return false;
@@ -159,21 +189,18 @@ public:
 // 		return true;
 // 	return false;
 // }
-// template <class Key, class T, class Compare>
+// template <class T, class Compare>
 // bool operator<= (const ft::set<Key, T, Compare>& lhs, const ft::set<Key, T, Compare>& rhs){
 // 	return !(rhs < lhs);
 // }
-// template <class Key, class T, class Compare>
+// template <class T, class Compare>
 // bool operator>  (const ft::set<Key, T, Compare>& lhs, const ft::set<Key, T, Compare>& rhs){
 // 	return rhs < lhs;
 // }
-// template <class Key, class T, class Compare>
+// template <class T, class Compare>
 // bool operator>= (const ft::set<Key, T, Compare>& lhs, const ft::set<Key, T, Compare>& rhs){
 // 	return !(lhs < rhs);
 // }
-// template <class Key, class T, class Compare>
-// void swap(ft::set<Key, T, Compare> &a, ft::set<Key, T, Compare> &b){
-// 	a.swap(b);
-// }
+
 
 #endif

@@ -17,7 +17,7 @@ public:
 	typedef	T										mapped_type;
 	typedef ft::pair<Key, T>						value_type;
 	typedef	size_t									size_type;
-	typedef	std::ptrdiff_t								difference_type;
+	typedef	std::ptrdiff_t							difference_type;
 	typedef	Compare									key_compare;
 	typedef	value_type&								reference;
 	typedef	const value_type&						const_reference;
@@ -162,51 +162,75 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 template <class Key, class T, class Compare>
 bool operator== (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
-	if (lhs.size() != rhs.size())
-		return false;
-	typename ft::map<Key, T, Compare>::const_iterator l_it = lhs.begin();
-	typename ft::map<Key, T, Compare>::const_iterator r_it = rhs.begin();
-	while (l_it != lhs.end() && r_it != rhs.end()) {
-		if (l_it->second != r_it->second){
-			return false;
-		}
-		l_it++;
-		r_it++;
-	}
-	return true;
+	return lhs.tree_ == rhs.tree_;
 }
 template <class Key, class T, class Compare>
 bool operator!= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
-	return !(lhs == rhs);
+	return lhs.tree_ != rhs.tree_;
 }
 template <class Key, class T, class Compare>
 bool operator<  (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
-	typename ft::map<Key, T, Compare>::const_iterator l_it = lhs.begin();
-	typename ft::map<Key, T, Compare>::const_iterator r_it = rhs.begin();
-	while (l_it != lhs.end() && r_it != rhs.end()) {
-		if (l_it->second < r_it->second)
-			return true;
-		if (l_it->second > r_it->second)
-			return false;
-		l_it++;
-		r_it++;
-	}
-	if (r_it != rhs.end()) /// ??
-		return true;
-	return false;
+	return lhs.tree_ < rhs.tree_;
 }
 template <class Key, class T, class Compare>
 bool operator<= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
-	return !(rhs < lhs);
+	return lhs.tree_ <= rhs.tree_;
 }
 template <class Key, class T, class Compare>
 bool operator>  (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
-	return rhs < lhs;
+	return lhs.tree_ > rhs.tree_;
 }
 template <class Key, class T, class Compare>
 bool operator>= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
-	return !(lhs < rhs);
+	return lhs.tree_ >= rhs.tree_;
 }
+// template <class Key, class T, class Compare>
+// bool operator== (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+// 	if (lhs.size() != rhs.size())
+// 		return false;
+// 	typename ft::map<Key, T, Compare>::const_iterator l_it = lhs.begin();
+// 	typename ft::map<Key, T, Compare>::const_iterator r_it = rhs.begin();
+// 	while (l_it != lhs.end() && r_it != rhs.end()) {
+// 		if (l_it->second != r_it->second){
+// 			return false;
+// 		}
+// 		l_it++;
+// 		r_it++;
+// 	}
+// 	return true;
+// }
+// template <class Key, class T, class Compare>
+// bool operator!= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+// 	return !(lhs == rhs);
+// }
+// template <class Key, class T, class Compare>
+// bool operator<  (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+// 	typename ft::map<Key, T, Compare>::const_iterator l_it = lhs.begin();
+// 	typename ft::map<Key, T, Compare>::const_iterator r_it = rhs.begin();
+// 	while (l_it != lhs.end() && r_it != rhs.end()) {
+// 		if (l_it->second < r_it->second)
+// 			return true;
+// 		if (l_it->second > r_it->second)
+// 			return false;
+// 		l_it++;
+// 		r_it++;
+// 	}
+// 	if (r_it != rhs.end()) /// ??
+// 		return true;
+// 	return false;
+// }
+// template <class Key, class T, class Compare>
+// bool operator<= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+// 	return !(rhs < lhs);
+// }
+// template <class Key, class T, class Compare>
+// bool operator>  (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+// 	return rhs < lhs;
+// }
+// template <class Key, class T, class Compare>
+// bool operator>= (const ft::map<Key, T, Compare>& lhs, const ft::map<Key, T, Compare>& rhs){
+// 	return !(lhs < rhs);
+// }
 template <class Key, class T, class Compare>
 void swap(ft::map<Key, T, Compare> &a, ft::map<Key, T, Compare> &b){
 	a.swap(b);

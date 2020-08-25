@@ -60,7 +60,8 @@ public:
 	typedef	value_type*								pointer;
 	typedef	const value_type*						const_pointer;
 	typedef	rb_tree_iterator<T, Compare>			iterator;
-	typedef	rb_tree_iterator<const T, Compare>		const_iterator;
+	typedef	rb_tree_iterator<T, Compare>		const_iterator;
+	// typedef	rb_tree_iterator<const T, Compare>		const_iterator; ???????????????????????????????????
 //######################### CONSTRUCTORS #######################################
 	explicit RB_Tree (const Compare& comp, bool allow = false ):root_(0), size_(0), comp(comp), allowMulti(allow){}
 	RB_Tree (const RB_Tree& x):root_(0), size_(x.size_), comp(x.comp), allowMulti(x.allowMulti){
@@ -364,7 +365,7 @@ class rb_tree_iterator
 
 	typedef typename RB_Tree<T, Compare>::Node Node;
 	typedef RB_Tree<T, Compare> Tree;
-public:
+
 	Node*		node_;
 	Tree const*	tree_;
 public:
@@ -426,56 +427,56 @@ public:
 
 } //namespace ft
 
-// template <class T, class Compare, Vcomp>
-// bool operator== (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs, Vcomp& isEq){
-// 	if (lhs.size() != rhs.size() || lhs.allowMulti_ != rhs.allowMulti_)
-// 		return false;
-// 	typename ft::RB_Tree<T, Compare>::const_iterator l_it = lhs.begin();
-// 	typename ft::RB_Tree<T, Compare>::const_iterator r_it = rhs.begin();
-// 	while (l_it != lhs.end() && r_it != rhs.end()) {
-// 		if (!isEq(*l_it, *r_it)){
-// 			return false;
-// 		}
-// 		l_it++;
-// 		r_it++;
-// 	}
-// 	return true;
-// }
-// template <class T, class Compare>
-// bool operator!= (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
-// 	return !(lhs == rhs);
-// }
-// template <class T, class Compare>
-// bool operator<  (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
-// 	typename ft::RB_Tree<T, Compare>::const_iterator l_it = lhs.begin();
-// 	typename ft::RB_Tree<T, Compare>::const_iterator r_it = rhs.begin();
-// 	while (l_it != lhs.end() && r_it != rhs.end()) {
-// 		if (comp(*l_it, *r_it))
-// 			return true;
-// 		if (comp(*r_it, *l_it))
-// 			return false;
-// 		l_it++;
-// 		r_it++;
-// 	}
-// 	if (r_it != rhs.end()) /// ??
-// 		return true;
-// 	return false;
-// }
-// template <class T, class Compare>
-// bool operator<= (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
-// 	return !(rhs < lhs);
-// }
-// template <class T, class Compare>
-// bool operator>  (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
-// 	return rhs < lhs;
-// }
-// template <class T, class Compare>
-// bool operator>= (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
-// 	return !(lhs < rhs);
-// }
-// template <class T, class Compare>
-// void swap(ft::RB_Tree<T, Compare> &a, ft::RB_Tree<T, Compare> &b){
-// 	a.swap(b);
-// }
+template <class T, class Compare>
+bool operator== (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
+	if (lhs.size() != rhs.size())
+		return false;
+	typename ft::RB_Tree<T, Compare>::const_iterator l_it = lhs.begin();
+	typename ft::RB_Tree<T, Compare>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end()) {
+		if (comp(*l_it, *r_it) || comp(*r_it, *l_it)){
+			return false;
+		}
+		l_it++;
+		r_it++;
+	}
+	return true;
+}
+template <class T, class Compare>
+bool operator!= (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
+	return !(lhs == rhs);
+}
+template <class T, class Compare>
+bool operator<  (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
+	typename ft::RB_Tree<T, Compare>::const_iterator l_it = lhs.begin();
+	typename ft::RB_Tree<T, Compare>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end()) {
+		if (comp(*l_it, *r_it))
+			return true;
+		if (comp(*r_it, *l_it))
+			return false;
+		l_it++;
+		r_it++;
+	}
+	if (r_it != rhs.end()) /// ??
+		return true;
+	return false;
+}
+template <class T, class Compare>
+bool operator<= (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
+	return !(rhs < lhs);
+}
+template <class T, class Compare>
+bool operator>  (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
+	return rhs < lhs;
+}
+template <class T, class Compare>
+bool operator>= (const ft::RB_Tree<T, Compare>& lhs, const ft::RB_Tree<T, Compare>& rhs){
+	return !(lhs < rhs);
+}
+template <class T, class Compare>
+void swap(ft::RB_Tree<T, Compare> &a, ft::RB_Tree<T, Compare> &b){
+	a.swap(b);
+}
 
 #endif

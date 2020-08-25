@@ -87,3 +87,21 @@ int Find()
 elements in mymm:
 y => 20
 z => 40
+
+int Count()
+There are 1 elements with key x: 50
+There are 3 elements with key y: 100 150 200
+There are 2 elements with key z: 250 300
+
+int Bound()
+b => 121
+c => 1001
+c => 2002
+d => 11011
+
+int EqualRange()
+mymm contains:
+a => 10
+b => 20 30 40
+c => 50 60
+d => 60
