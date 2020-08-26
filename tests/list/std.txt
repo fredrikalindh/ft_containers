@@ -48,7 +48,7 @@ Final size of mylist is 0
 
 void PushBack()
 Please enter some integers (enter 0 to end):
-mylist stores 4 numbers.
+mylist stores 3 numbers.
 
 void PopBack()
 The elements of mylist summed 600

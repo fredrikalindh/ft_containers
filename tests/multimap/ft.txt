@@ -1,7 +1,21 @@
 
 int Constructors()
+a => 10
+b => 15
+b => 35
+b => 20
+c => 25
+a => 10
+b => 15
+b => 35
+b => 20
+c => 25
 
 int Assignment()
+x => 32
+y => 64
+y => 96
+z => 128
 Size of foo: 0
 Size of bar: 4
 
@@ -18,8 +32,7 @@ x => 10
 
 int Empty()
 b => 101
-b => 101
-q => 505
+b => 202
 
 int Size()
 mymultimap.size() is 4
@@ -107,3 +120,8 @@ a => 10 20 30 40 50 60 60
 b => 40 50 60 60
 c => 60 60
 d => 60
+
+int RelOps()
+foo and bar are not equal
+foo is greater than bar
+foo is greater than or equal to bar

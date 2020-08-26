@@ -115,3 +115,8 @@ e => 100
 int EqualRange()
 lower bound points to: b => 20
 upper bound points to: c => 30
+
+int RelOps()
+foo and bar are not equal
+foo is less than bar
+foo is less than or equal to bar

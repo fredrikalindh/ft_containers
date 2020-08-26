@@ -10,6 +10,6 @@
 #include "set.hpp"
 #include "deque.hpp"
 #include "multimap.hpp"
-// # include "multiset.hpp"
+#include "multiset.hpp"
 
 #endif

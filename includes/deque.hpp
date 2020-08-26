@@ -48,35 +48,22 @@ namespace ft
 				array_[i] = x.array_[i];
 		}
 		deque_array(deque_array const &x, int new_size) : capacity_(new_size),
-															 array_(new T[capacity_]),
-															 size_(x.size_),
-															index_first((new_size - x.size_) / 2)
+														  array_(new T[capacity_]),
+														  size_(x.size_),
+														  index_first((new_size - x.size_) / 2)
 		{
 			for (int i = index_first; i < size_ + index_first; ++i)
 				array_[i] = x.array_[i];
 		}
-		~deque_array()
-		{
-			delete[] array_;
-		}
+		~deque_array() { delete[] array_; }
 		deque_array &operator=(deque_array const &x)
 		{
 			deque_array tmp(x);
 			swap(tmp);
 			return *this;
 		}
-		T &operator[](int n)
-		{
-			// if (n > size_)
-			// 	std::out_of_range("deque");
-			return array_[index_first + n];
-		}
-		T &operator[](int n) const
-		{
-			// if (n > size_)
-			// 	std::out_of_range("deque");
-			return array_[index_first + n];
-		}
+		T &operator[](int n) { return array_[index_first + n]; }
+		T &operator[](int n) const { return array_[index_first + n]; }
 		bool full() const { return size_ >= capacity_; }
 		bool space_back() const { return (index_first + size_) < capacity_; }
 		bool space_front() const { return index_first > 0; }
@@ -191,7 +178,7 @@ namespace ft
 		}
 		template <class InputIterator>
 		deque(InputIterator first, InputIterator last,
-		typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0)
+			  typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
 		{
 			while (first != last)
 			{
@@ -331,7 +318,7 @@ namespace ft
 			arrays_[position.i_out].insert(position.i_in, n, val);
 		}
 		template <class InputIterator>
-		void insert(iterator position, InputIterator first, InputIterator last, typename std::enable_if<!std::is_integral<InputIterator>::value>::type* = 0)
+		void insert(iterator position, InputIterator first, InputIterator last, typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
 		{
 			while (first != last)
 				position = insert(position, *first++);
@@ -357,7 +344,7 @@ namespace ft
 		}
 
 	private:
-		pointer get_position(int n) const // COULD RETURN ITERATOR FOR MAKING USEFUL IN OTHER FUNCTIONS & then end() if error
+		pointer get_position(int n) const
 		{
 			for (int i = arrays_.index_first; i < arrays_.index_first + arrays_.size_; ++i)
 			{
@@ -379,9 +366,9 @@ namespace ft
 	{
 		friend class deque<T>;
 
-		int i_out;								  	 // index for array
-		int i_in;								  	 // index inside array
-		const deque_array<deque_array<T> > *array_;	 // pointer to the container
+		int i_out;								   // index for array
+		int i_in;								   // index inside array
+		const deque_array<deque_array<T> > *array_; // pointer to the container
 
 	public:
 		typedef ft::random_access_iterator_tag iterator_category;
@@ -390,9 +377,15 @@ namespace ft
 		typedef T *pointer;
 		typedef T &reference;
 
-		deque_iterator() : i_out(0), i_in(0), array_(0){}
-		deque_iterator(int out, int in, const deque_array<deque_array<T> > *d) : i_out(out), i_in(in), array_(d) {}
-		deque_iterator(deque_iterator const &x) : i_out(x.i_out), i_in(x.i_in), array_(x.array_) {}
+		deque_iterator() : i_out(0),
+						   i_in(0),
+						   array_(0) {}
+		deque_iterator(int out, int in, const deque_array<deque_array<T> > *d) : i_out(out),
+																				i_in(in),
+																				array_(d) {}
+		deque_iterator(deque_iterator const &x) : i_out(x.i_out),
+												  i_in(x.i_in),
+												  array_(x.array_) {}
 		~deque_iterator() {}
 		deque_iterator &operator=(deque_iterator const &x)
 		{
@@ -464,7 +457,7 @@ namespace ft
 			{
 				++i_in;
 			}
-			
+
 			return *this;
 		}
 		deque_iterator operator++(int)
@@ -512,7 +505,7 @@ namespace ft
 		template <class it>
 		friend bool operator<(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
 		{
-			return lhs.i_out < rhs.i_out || lhs.i_in < rhs.i_in;
+			return lhs.i_out < rhs.i_out || lhs.i_in < rhs.i_in || lhs.array_ < rhs.array_;
 		}
 		template <class it>
 		friend bool operator<=(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
@@ -522,19 +515,19 @@ namespace ft
 		template <class it>
 		friend bool operator>(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
 		{
-			return lhs.i_out > rhs.i_out || lhs.i_in > rhs.i_in;
+			return rhs < lhs;
 		}
 		template <class it>
 		friend bool operator>=(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
 		{
-			return !(lhs > rhs);
+			return !(rhs < lhs);
 		}
 	};
 	template <class T>
-	void swap(ft::deque<T> &a, ft::deque<T> &b) {
+	void swap(ft::deque<T> &a, ft::deque<T> &b)
+	{
 		a.swap(b);
 	}
-
 	template <class T>
 	bool operator==(deque<T> const &lhs, deque<T> const &rhs)
 	{
@@ -542,9 +535,10 @@ namespace ft
 			return false;
 		typename ft::deque<T>::const_iterator l_it = lhs.begin();
 		typename ft::deque<T>::const_iterator r_it = rhs.begin();
-		while (l_it != lhs.end() && r_it != rhs.end()) {
+		while (l_it != lhs.end() && r_it != rhs.end())
+		{
 			if (*l_it != *r_it)
-			return false;
+				return false;
 			l_it++;
 			r_it++;
 		}
@@ -558,9 +552,10 @@ namespace ft
 	template <class T>
 	bool operator<(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
 	{
-		typename ft::deque<T>::const_iterator l_it = lhs.begin(); 
+		typename ft::deque<T>::const_iterator l_it = lhs.begin();
 		typename ft::deque<T>::const_iterator r_it = rhs.begin();
-		while (l_it != lhs.end() && r_it != rhs.end()) {
+		while (l_it != lhs.end() && r_it != rhs.end())
+		{
 			if (*l_it < *r_it)
 				return true;
 			if (*l_it > *r_it)

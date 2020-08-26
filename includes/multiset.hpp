@@ -4,7 +4,7 @@
 namespace ft
 {
 
-template <class T>
+template <class T, class Compare = std::less<T> >
 class multiset
 {
 public:
@@ -119,60 +119,37 @@ public:
 	ft::pair<iterator,iterator> equal_range (const value_type& val) const {
 		 return ft::pair<iterator,iterator>(lower_bound(val), upper_bound(val));
 	}
+
+	friend bool operator==(const multiset &lhs, const multiset &rhs)
+	{
+		return lhs.tree_.equal(rhs.tree_, key_compare());
+	}
+	friend bool operator!=(const multiset &lhs, const multiset &rhs)
+	{
+		return !(lhs == rhs);
+	}
+	friend bool operator<(const multiset &lhs, const multiset &rhs)
+	{
+		return lhs.tree_.lesser(rhs.tree_, key_compare());
+	}
+	friend bool operator>=(const multiset &lhs, const multiset &rhs)
+	{
+		return !(lhs < rhs);
+	}
+	friend bool operator>(const multiset &lhs, const multiset &rhs)
+	{
+		return rhs < lhs;
+	}
+	friend bool operator<=(const multiset &lhs, const multiset &rhs)
+	{
+		return !(rhs < lhs);
+	}
 };
 } // namespace ft
 
-template <class Key, class T, class Compare>
-bool operator== (const ft::multiset<Key, T, Compare>& lhs, const ft::multiset<Key, T, Compare>& rhs){
-	if (lhs.size() != rhs.size())
-		return false;
-	typename ft::multiset<Key, T, Compare>::const_iterator l_it = lhs.begin();
-	typename ft::multiset<Key, T, Compare>::const_iterator r_it = rhs.begin();
-	while (l_it != lhs.end() && r_it != rhs.end()) {
-		if (*l_it != *r_it){
-			return false;
-		}
-		l_it++;
-		r_it++;
-	}
-	return true;
-}
-template <class Key, class T, class Compare>
-bool operator!= (const ft::multiset<Key, T, Compare>& lhs, const ft::multiset<Key, T, Compare>& rhs){
-	return !(lhs == rhs);
-}
-template <class Key, class T, class Compare>
-bool operator<  (const ft::multiset<Key, T, Compare>& lhs, const ft::multiset<Key, T, Compare>& rhs){
-	typename ft::multiset<Key, T, Compare>::const_iterator l_it = lhs.begin();
-	typename ft::multiset<Key, T, Compare>::const_iterator r_it = rhs.begin();
-	while (l_it != lhs.end() && r_it != rhs.end()) {
-		if (*l_it < *r_it)
-			return true;
-		if (*l_it > *r_it)
-			return false;
-		l_it++;
-		r_it++;
-	}
-	if (r_it != rhs.end()) /// ??
-		return true;
-	return false;
-}
-template <class Key, class T, class Compare>
-bool operator<= (const ft::multiset<Key, T, Compare>& lhs, const ft::multiset<Key, T, Compare>& rhs){
-	return !(rhs < lhs);
-}
-template <class Key, class T, class Compare>
-bool operator>  (const ft::multiset<Key, T, Compare>& lhs, const ft::multiset<Key, T, Compare>& rhs){
-	return rhs < lhs;
-}
-template <class Key, class T, class Compare>
-bool operator>= (const ft::multiset<Key, T, Compare>& lhs, const ft::multiset<Key, T, Compare>& rhs){
-	return !(lhs < rhs);
-}
-template <class Key, class T, class Compare>
-void swap(ft::multiset<Key, T, Compare> &a, ft::multiset<Key, T, Compare> &b){
+template <class T, class Compare>
+void swap(ft::multiset<T, Compare> &a, ft::multiset<T, Compare> &b){
 	a.swap(b);
 }
-
 
 #endif
