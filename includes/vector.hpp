@@ -104,6 +104,7 @@ namespace ft
 			swap(tmp);
 			for (size_type i = size_; i < capacity_; ++i)
 				array_[i] = val;
+			size_ = n;
 		}
 		size_type capacity() const { return capacity_; }
 		bool empty() const { return !size_; }

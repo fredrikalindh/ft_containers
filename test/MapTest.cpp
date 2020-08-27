@@ -1,0 +1,352 @@
+#include <map>
+#include <iostream>
+
+bool fncomp (char lhs, char rhs) {return lhs<rhs;}
+
+struct classcomp {
+  bool operator() (const char& lhs, const char& rhs) const
+  {return lhs<rhs;}
+};
+
+TEST(MapTest, Constructors)
+{
+  LIBRARY::map<char,int> first;
+
+  first['a']=10;
+  first['b']=30;
+  first['c']=50;
+  first['d']=70;
+
+  LIBRARY::map<char,int> second (first.begin(),first.end());
+
+  LIBRARY::map<char,int> third (second);
+
+  LIBRARY::map<char,int,classcomp> fourth;                 // class as Compare
+
+  EXPECT_EQ(first.size(), 4);
+  EXPECT_EQ(second.size(), 4);
+  EXPECT_EQ(third.size(), 4);
+  EXPECT_EQ(fourth.size(), 0);
+  bool(*fn_pt)(char,char) = fncomp;
+  LIBRARY::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
+}
+
+TEST(MapTest, Assignment)
+{
+  LIBRARY::map<char,int> first;
+  LIBRARY::map<char,int> second;
+
+  first['x']=8;
+  first['y']=16;
+  first['z']=32;
+
+  second=first;                // second now contains 3 ints
+  first=LIBRARY::map<char,int>();  // and first is now empty
+
+  EXPECT_EQ(first.size(), 0);
+  EXPECT_EQ(second.size(), 3);
+}
+
+TEST(MapTest, Begin)
+{
+  LIBRARY::map<char,int> mymap;
+
+  mymap['b'] = 100;
+  mymap['a'] = 200;
+  mymap['c'] = 300;
+
+  char c = 'a';
+  for (LIBRARY::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+    EXPECT_EQ(it->first, c++);
+}
+
+TEST(MapTest, RBegin)
+{
+  LIBRARY::map<char,int> mymap;
+
+  mymap['x'] = 100;
+  mymap['y'] = 200;
+  mymap['z'] = 300;
+
+  int i = 300;
+  LIBRARY::map<char,int>::reverse_iterator rit;
+  for (rit=mymap.rbegin(); rit!=mymap.rend(); ++rit)
+  {
+    EXPECT_EQ(rit->second, i);
+    i -= 100;
+  }
+}
+
+TEST(MapTest, Empty)
+{
+  LIBRARY::map<char,int> mymap;
+
+  mymap['a']=10;
+  mymap['b']=20;
+  mymap['c']=30;
+
+  while (!mymap.empty())
+  {
+    // std::cout << mymap.begin()->first << " => " << mymap.begin()->second << '\n';
+    mymap.erase(mymap.begin());
+  }
+	EXPECT_EQ(mymap.size(), 0);
+}
+  TEST(MapTest, Size)
+{
+  LIBRARY::map<char,int> mymap;
+  mymap['a']=101;
+  mymap['b']=202;
+  mymap['c']=302;
+
+  EXPECT_EQ(mymap.size(), 3);
+}
+
+TEST(MapTest, MaxSize)
+{
+  LIBRARY::map<int,int> mymap;
+  std::map<int, int> stdmap;
+  EXPECT_EQ(mymap.max_size(), stdmap.max_size());
+}
+
+TEST(MapTest, Brackets)
+{
+  LIBRARY::map<char,std::string> mymap;
+
+  mymap['a']="an element";
+  mymap['b']="another element";
+  mymap['c']=mymap['b'];
+
+	// for (ft::map<char, std::string>::iterator it = mymap.begin(); it != mymap.end(); it++)
+	// 	std::cout << it->first << " => " << it->second << '\n';
+
+  EXPECT_EQ(mymap['a'], "an element");
+  EXPECT_EQ(mymap['b'], "another element");
+  EXPECT_EQ(mymap['c'], "another element");
+  EXPECT_EQ(mymap['d'], "");
+   EXPECT_EQ(mymap.size(), 4);
+}
+TEST(MapTest, Insert)
+{
+  LIBRARY::map<char,int> mymap;
+
+  // first insert function version (single parameter):
+  mymap.insert ( LIBRARY::pair<char,int>('a',100) );
+  mymap.insert ( LIBRARY::pair<char,int>('z',200) );
+
+  LIBRARY::pair<LIBRARY::map<char,int>::iterator,bool> ret;
+  ret = mymap.insert ( LIBRARY::pair<char,int>('z',500) );
+  EXPECT_FALSE(ret.second);
+
+  // second insert function version (with hint position):
+  LIBRARY::map<char,int>::iterator it = mymap.begin();
+  mymap.insert (it, LIBRARY::pair<char,int>('b',300));  // max efficiency inserting
+  mymap.insert (it, LIBRARY::pair<char,int>('c',400));  // no max efficiency inserting
+
+  // third insert function version (range insertion):
+  LIBRARY::map<char,int> anothermap;
+  anothermap.insert(mymap.begin(),mymap.find('c'));
+
+  // showing contents:
+  int i = 0;
+  int res1[] = {100, 300, 400, 200};
+  for (it=mymap.begin(); it!=mymap.end(); ++it)
+    EXPECT_EQ(it->second, res1[i++]);
+
+  char c = 'a';
+  for (it=anothermap.begin(); it!=anothermap.end(); ++it)
+    EXPECT_EQ(it->first, c++);
+}
+
+TEST(MapTest, Erase)
+{
+  LIBRARY::map<char,int> mymap;
+  LIBRARY::map<char,int>::iterator it;
+
+  // insert some values:
+  mymap['a']=10;
+  mymap['b']=20;
+  mymap['c']=30;
+  mymap['d']=40;
+  mymap['e']=50;
+  mymap['f']=60;
+
+  it=mymap.find('b');
+  mymap.erase (it);                   // erasing by iterator
+
+  mymap.erase ('c');                  // erasing by key
+
+  it=mymap.find ('e');
+  mymap.erase ( it, mymap.end() );    // erasing by range
+
+  EXPECT_EQ(mymap['d'], 40);
+  EXPECT_EQ(mymap['a'], 10);
+  EXPECT_EQ(mymap.size(), 2);
+}
+
+TEST(MapTest, Swap)
+{
+  LIBRARY::map<char,int> foo,bar;
+
+  foo['x']=100;
+  foo['y']=200;
+
+  bar['a']=11;
+  bar['b']=22;
+  bar['c']=33;
+
+EXPECT_EQ(foo.size(), 2);
+EXPECT_EQ(bar.size(), 3);
+  foo.swap(bar);
+EXPECT_EQ(foo['a'], 11);
+EXPECT_EQ(foo.size(), 3);
+EXPECT_EQ(bar.size(), 2);
+
+  swap(bar, foo);
+  EXPECT_EQ(foo['x'], 100);
+EXPECT_EQ(foo.size(), 2);
+EXPECT_EQ(bar.size(), 3);
+}
+
+TEST(MapTest, Clear)
+{
+  LIBRARY::map<char,int> mymap;
+
+  mymap['x']=100;
+  mymap['y']=200;
+  mymap['z']=300;
+
+  mymap.clear();
+  EXPECT_EQ(mymap.size(), 0);
+  mymap['a']=1101;
+  mymap['b']=2202;
+  EXPECT_EQ(mymap.size(), 2);
+}
+
+TEST(MapTest, KeyComp)
+{
+  LIBRARY::map<char,int> mymap;
+
+  LIBRARY::map<char,int>::key_compare mycomp = mymap.key_comp();
+
+  mymap['a']=100;
+  mymap['b']=200;
+  mymap['c']=300;
+
+
+  char highest = mymap.rbegin()->first;     // key value of last element
+
+  LIBRARY::map<char,int>::iterator it = mymap.begin();
+  do {
+  } while ( mycomp((*it++).first, highest) );
+  EXPECT_EQ(it, mymap.end());
+}
+
+TEST(MapTest, ValComp)
+{
+  LIBRARY::map<char,int> mymap;
+
+  mymap['x']=1001;
+  mymap['y']=2002;
+  mymap['z']=3003;
+
+  LIBRARY::pair<char,int> highest = *mymap.rbegin();          // last element
+
+  LIBRARY::map<char,int>::iterator it = mymap.begin();
+  do {
+    // std::cout << it->first << " => " << it->second << '\n';
+  } while ( mymap.value_comp()(*it++, highest) );
+  EXPECT_EQ(it, mymap.end());
+}
+TEST(MapTest, Find)
+{
+  LIBRARY::map<char,int> mymap;
+  LIBRARY::map<char,int>::iterator it;
+
+  mymap['a']=50;
+  mymap['b']=100;
+  mymap['c']=150;
+  mymap['d']=200;
+
+  it = mymap.find('b');
+  if (it != mymap.end())
+    mymap.erase (it);
+
+  EXPECT_EQ(mymap.size(), 3);
+  EXPECT_EQ(mymap.find('a')->second, 50);
+  EXPECT_EQ(mymap.find('b'), mymap.end());
+  EXPECT_EQ(mymap.find('c')->second, 150);
+  EXPECT_EQ(mymap.find('d')->second, 200);
+  EXPECT_EQ(mymap.size(), 3);
+}
+TEST(MapTest, Count)
+{
+  LIBRARY::map<char,int> mymap;
+  char c;
+
+  mymap ['a']=101;
+  mymap ['c']=202;
+  mymap ['f']=303;
+  EXPECT_TRUE(mymap.count('a'));
+  EXPECT_FALSE(mymap.count('b'));
+  EXPECT_TRUE(mymap.count('c'));
+  EXPECT_TRUE(mymap.count('f'));
+}
+
+TEST(MapTest, Bound)
+{
+  LIBRARY::map<char,int> mymap;
+  LIBRARY::map<char,int>::iterator itlow,itup;
+
+  mymap['a']=20;
+  mymap['b']=40;
+  mymap['c']=60;
+  mymap['d']=80;
+  mymap['e']=100;
+
+  itlow=mymap.lower_bound ('b');  // itlow points to b
+  itup=mymap.upper_bound ('c');   // itup points to d (not c!)
+  EXPECT_EQ(itup->second, 80);
+  mymap.erase(itlow,itup);        // erases [itlow,itup)
+
+  EXPECT_EQ(mymap.size(), 3);
+  EXPECT_FALSE(mymap.count('b'));
+  EXPECT_TRUE(mymap.count('d'));
+}
+
+TEST(MapTest, EqualRange)
+{
+  LIBRARY::map<char,int> mymap;
+
+  mymap['a']=10;
+  mymap['b']=20;
+  mymap['c']=30;
+
+  LIBRARY::pair<LIBRARY::map<char,int>::iterator,LIBRARY::map<char,int>::iterator> ret;
+  ret = mymap.equal_range('b');
+  EXPECT_EQ(ret.first->first, 'b');
+  EXPECT_EQ(ret.first->second, 20);
+  EXPECT_EQ(ret.second->first, 'c');
+  EXPECT_EQ(ret.second->second, 30);
+  ret = mymap.equal_range('c');
+  EXPECT_EQ(ret.first->first, 'c');
+  EXPECT_EQ(ret.first->second, 30);
+  EXPECT_EQ(ret.second, mymap.end());
+}
+
+TEST(MapTest, RelOps)
+{
+  LIBRARY::map<char,int> foo,bar;
+  foo['a']=100;
+  foo['b']=200;
+  bar['a']=10;
+  bar['z']=1000;
+
+  // foo ({{a,100},{b,200}}) vs bar ({a,10},{z,1000}}):
+  EXPECT_FALSE(foo == bar);
+  EXPECT_TRUE(foo != bar);
+  EXPECT_FALSE(foo < bar);
+  EXPECT_TRUE(foo > bar);
+  EXPECT_FALSE(foo <= bar);
+  EXPECT_TRUE(foo >= bar);
+}
