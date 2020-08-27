@@ -152,7 +152,7 @@ namespace ft
 			if (size_ >= capacity_)
 			{
 				vector tmp(*this, capacity_ + multi_);
-				capacity_ ? tmp.multi_ = multi_ * 2 : 0;
+				tmp.multi_ = multi_ * 2;
 				swap(tmp);
 			}
 			array_[size_++] = val;

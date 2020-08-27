@@ -1,7 +1,3 @@
-// #include "../includes/ft.hpp"
-#include <iostream>
-#include <vector>
-
 TEST(VectorTest, RelationalOperators)
 {
   LIBRARY::vector<int> foo(3, 100); // three ints with a value of 100
@@ -57,7 +53,7 @@ TEST(VectorTest, Erase)
   myvector.erase(myvector.begin(), myvector.begin() + 3);
   int resultarr[] = {4, 5, 7, 8, 9, 10};
   for (int i = 0; i < myvector.size(); ++i)
-    EXPECT_EQ(myvector[i], resultarr[i]);
+    EXPECT_EQ(myvector[i], resultarr[i]) << "i = " << i;
 }
 
 TEST(VectorTest, Insert)
@@ -79,8 +75,10 @@ TEST(VectorTest, Insert)
   int myarray[] = {501, 502, 503};
   myvector.insert(myvector.begin(), myarray, myarray + 3);
 
+  // 503, 502, 501, 300, 300, 400, 400, 200, 100, 100, 100,
   int resultarr[] = {501, 502, 503, 300, 300, 400, 400, 200, 100, 100, 100};
   for (int i = 0; i < myvector.size(); ++i)
+    // std::cout << myvector[i] << ", ";
     EXPECT_EQ(myvector[i], resultarr[i]);
 }
 

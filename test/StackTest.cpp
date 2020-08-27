@@ -1,10 +1,3 @@
-#include <iostream> // std::cout
-#include <stack>    // std::stack
-#include <vector>   // std::vector
-#include <list>     // std::vector
-#include <deque>    // std::deque
-// #include "../includes/ft.hpp"
-
 TEST(StackTest, Constructor)
 {
   LIBRARY::list<int> mylist(3, 100);     // deque with 3 elements
@@ -99,4 +92,3 @@ TEST(StackTest, RelOp)
   EXPECT_FALSE(foo >= bar);
   EXPECT_TRUE(foo <= bar);
 }
-

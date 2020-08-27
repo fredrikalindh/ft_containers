@@ -1,11 +1,3 @@
-// #include "../includes/ft.hpp"
-#include <iostream>
-#include <list>
-#include <vector>
-#include <cmath>
-#include <string>
-#include <cctype>
-
 TEST(ListTest, Constructor)
 {
   // constructors used in the same order as described above:

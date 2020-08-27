@@ -52,8 +52,9 @@ namespace ft
 														  size_(x.size_),
 														  index_first((new_size - x.size_) / 2)
 		{
+			int j = x.index_first;
 			for (int i = index_first; i < size_ + index_first; ++i)
-				array_[i] = x.array_[i];
+				array_[i] = x.array_[j++];
 		}
 		~deque_array() { delete[] array_; }
 		deque_array &operator=(deque_array const &x)
@@ -73,10 +74,10 @@ namespace ft
 		T const &back() const { return array_[index_first + size_ - 1]; }
 		void push_front(T const &x)
 		{
-			while (index_first == 0)
+			if (index_first == 0)
 			{
 				int new_capacity = (capacity_ == 0) ? 2 : capacity_ * 2;
-				deque_array tmp(*this, new_capacity); // JUST CHANGE TO ALWAYS MAKE SURE IT'S NEVER 0 ?
+				deque_array tmp(*this, new_capacity);
 				swap(tmp);
 			}
 			array_[--index_first] = x;
@@ -296,10 +297,16 @@ namespace ft
 		void pop_back()
 		{
 			arrays_.back().pop_back();
+			if (!arrays_.back().size_)
+				--arrays_.size_;
 		}
 		void pop_front()
 		{
 			arrays_.front().pop_front();
+			if (!arrays_.front().size_){
+				++arrays_.index_first;
+				--arrays_.size_;
+			}
 		}
 		iterator insert(iterator position, const value_type &val)
 		{
@@ -344,7 +351,7 @@ namespace ft
 		}
 
 	private:
-		pointer get_position(int n) const
+		pointer get_position(size_t n) const
 		{
 			for (int i = arrays_.index_first; i < arrays_.index_first + arrays_.size_; ++i)
 			{

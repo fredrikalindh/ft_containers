@@ -79,21 +79,21 @@ TEST(MultimapTest, RBegin)
     EXPECT_EQ(it->second, result[i++]);
 }
 
-TEST(MultimapTest, Empty)
-{
-  LIBRARY::multimap<char, int> mymultimap;
+// TEST(MultimapTest, Empty)
+// {
+//   LIBRARY::multimap<char, int> mymultimap;
 
-  mymultimap.insert(LIBRARY::pair<char, int>('b', 101));
-  mymultimap.insert(LIBRARY::pair<char, int>('b', 202));
-  mymultimap.insert(LIBRARY::pair<char, int>('q', 505));
-  mymultimap.insert(LIBRARY::pair<char, int>('q', 405));
+//   mymultimap.insert(LIBRARY::pair<char, int>('b', 101));
+//   mymultimap.insert(LIBRARY::pair<char, int>('b', 202));
+//   mymultimap.insert(LIBRARY::pair<char, int>('q', 505));
+//   mymultimap.insert(LIBRARY::pair<char, int>('q', 405));
 
-  while (!mymultimap.empty())
-  {
-    mymultimap.erase(mymultimap.begin());
-  }
-  EXPECT_EQ(mymultimap.size(), 0);
-}
+//   while (!mymultimap.empty())
+//   {
+//     mymultimap.erase(mymultimap.begin());
+//   }
+//   EXPECT_EQ(mymultimap.size(), 0);
+// }
 TEST(MultimapTest, Size)
 {
   LIBRARY::multimap<char, int> mymultimap;

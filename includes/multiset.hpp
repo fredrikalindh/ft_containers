@@ -29,10 +29,10 @@ public:
 	typedef	ft::reverse_iterator<iterator>			reverse_iterator;
 	typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
-	explicit multiset (const key_compare& comp = key_compare()):tree_(value_compare(comp), RBT::MULTI), comp(comp){}
+	explicit multiset (const key_compare& comp = key_compare()):tree_(value_compare(comp), true), comp(comp){}
 	template <class InputIterator>
 	multiset (InputIterator first, InputIterator last, const key_compare& comp = key_compare()):
-	tree_(value_compare(comp), RBT::MULTI), comp(comp){
+	tree_(value_compare(comp), true), comp(comp){
 		for ( ; first != last; first++)
 			tree_.add(*first);
 	}

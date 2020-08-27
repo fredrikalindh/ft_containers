@@ -1,10 +1,3 @@
-#include <iostream> // std::cout
-#include <stack>    // std::stack
-#include <vector>   // std::vector
-#include <queue>    // std::vector
-#include <list>     // std::vector
-#include <deque>    // std::deque
-
 TEST(QueueTest, Constructor)
 {
   std::deque<int> mydeck(3, 100);            // deque with 3 elements
