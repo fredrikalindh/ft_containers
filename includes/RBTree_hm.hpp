@@ -63,14 +63,12 @@ namespace ft
 		typedef rb_tree_iterator<T, Compare> const_iterator;
 		// typedef	rb_tree_iterator<const T, Compare>		const_iterator; ???????????????????????????????????
 		//######################### CONSTRUCTORS #######################################
-		explicit RB_Tree(const Compare &comp, bool allow = false) : root_(0),
-																	size_(0),
-																	comp(comp),
-																	allowMulti(allow) {}
+		explicit RB_Tree(const Compare &comp) : root_(0),
+												size_(0),
+												comp(comp) {}
 		RB_Tree(const RB_Tree &x) : root_(0),
 									size_(x.size_),
 									comp(x.comp),
-									allowMulti(x.allowMulti)
 		{
 			if (size_)
 			{
@@ -113,46 +111,46 @@ namespace ft
 		{
 			return find(root_, k);
 		}
-		Node *find(Node *node, const value_type &k) const
-		{
-			rb_tree_iterator<T, Compare> it(min(root_), this);
-			while (it.node_ && (comp(*it, k) || comp(k, *it)))
-				++it;
-			return it.node_;
-		}
 		// Node *find(Node *node, const value_type &k) const
 		// {
-		// 	while (node)
-		// 	{
-		// 		if (!comp(node->value_, k) && !comp(k, node->value_)) // --> EQUAL
-		// 			return node;
-		// 		if (!comp(k, node->value_)) // --> k > node->value
-		// 			node = node->right_;
-		// 		else
-		// 			node = node->left_;
-		// 	}
-		// 	return 0;
+		// 	rb_tree_iterator<T, Compare> it(min(root_), this);
+		// 	while (it.node_ && (comp(*it, k) || comp(k, *it)))
+		// 		++it;
+		// 	return it.node_;
 		// }
-		Node *find_upper(const value_type k) const
+		Node *find(Node *node, const value_type &k) const
 		{
-			return find_upper(root_, k);
+			while (node)
+			{
+				if (!comp(node->value_, k) && !comp(k, node->value_)) // --> EQUAL
+					return node;
+				if (!comp(k, node->value_)) // --> k > node->value
+					node = node->right_;
+				else
+					node = node->left_;
+			}
+			return 0;
 		}
-		Node *find_upper(Node *node, const value_type &k) const
-		{
-			rb_tree_iterator<T, Compare> it(find(root_, k), this);
-			while (!comp(*it, k) && !comp(k, *it))
-				++it;
-			return it.node_;
-		}
-		size_type count(const value_type &k) const
-		{
-			size_type count = 0;
-			;
-			for (rb_tree_iterator<T, Compare> it(find(root_, k), this);
-				 it.node_ && !comp(*it, k) && !comp(k, *it); ++it)
-				++count;
-			return count;
-		}
+		// Node *find_upper(const value_type k) const
+		// {
+		// 	return find_upper(root_, k);
+		// }
+		// Node *find_upper(Node *node, const value_type &k) const
+		// {
+		// 	rb_tree_iterator<T, Compare> it(find(root_, k), this);
+		// 	while (!comp(*it, k) && !comp(k, *it))
+		// 		++it;
+		// 	return it.node_;
+		// }
+		// size_type count(const value_type &k) const
+		// {
+		// 	size_type count = 0;
+		// 	;
+		// 	for (rb_tree_iterator<T, Compare> it(find(root_, k), this);
+		// 	 it.node_ && !comp(*it, k) && !comp(k, *it); ++it)
+		// 		++count;
+		// 	return count;
+		// }
 		Node *add(value_type toAdd)
 		{
 			Node *added; // sending address to this pointer so that I can select it even with the recursive
@@ -169,13 +167,12 @@ namespace ft
 				*added = new Node(value, parent, left);
 				return *added;
 			}
-			if (!comp(x->value_, value) && !comp(value, x->value_) && allowMulti == false) // ---> EQUAL
+			if (!comp(x->value_, value) && !comp(value, x->value_)) // ---> EQUAL
 				*added = x;
-			else if (!comp(value, x->value_))
+			else if (!comp(value, x->value_)) // --> value >=
 				x->right_ = add(x, x->right_, value, false, added);
 			else
 				x->left_ = add(x, x->left_, value, true, added); // if comp gives false
-
 			if (isRed(x->right_) && !isRed(x->left_))
 				x = rotateLeft(x);
 			if (isRed(x->left_) && isRed(x->left_->left_))
@@ -189,13 +186,6 @@ namespace ft
 		{
 			if (!find(root_, value))
 				return false;
-			if (size_ < 2)
-			{
-				std::cout << " HERE ?>?" << std::endl;
-				size_ = 0;
-				root_ = nullptr;
-				return true;
-			}
 			if (!isRed(root_->left_) && !isRed(root_->right_))
 				root_->color_ = RED;
 			root_ = deleteKey(root_, value);
@@ -203,15 +193,15 @@ namespace ft
 				root_->color_ = BLACK;
 			return true;
 		}
-		// bool deleteKey(iterator position)
-		// {
-		// 	if (!isRed(root_->left_) && !isRed(root_->right_))
-		// 		root_->color_ = RED;
-		// 	root_ = deleteKey(root_, position.node_);
-		// 	if (root_)
-		// 		root_->color_ = BLACK;
-		// 	return true;
-		// }
+		bool deleteKey(iterator position)
+		{
+			if (!isRed(root_->left_) && !isRed(root_->right_))
+				root_->color_ = RED;
+			root_ = deleteKey(root_, position.node_);
+			if (root_)
+				root_->color_ = BLACK;
+			return true;
+		}
 		Node *deleteKey(Node *x, value_type &value)
 		{
 			if (comp(value, x->value_))
@@ -232,7 +222,7 @@ namespace ft
 				}
 				if (!isRed(x->right_) && x->right_ && !isRed(x->right_->left_))
 					x = moveRedRight(x);
-				if (!comp(x->value_, value) && !comp(value, x->value_))
+				if (x->value_ == value)
 				{
 					Node *h = min(x->right_);
 					x->value_ = h->value_;
@@ -243,27 +233,36 @@ namespace ft
 			}
 			return balance(x);
 		}
-		void deleteKey(Node *x)
+		Node *deleteKey(Node *x, Node *toDel)
 		{
-			if (size_ == 1)
+			if (comp(toDel->value_, x->value_))
 			{
-				delete x;
-				size_ = 0;
-				root_ = 0;
-			}
-			else if (x && !x->right_)
-			{
-				(x->isLeft) ? x->parent_->left_ = 0 : x->parent_->right_ = 0;
-				--size_;
-				delete x;
+				if (!isRed(x->left_) && x->left_ && !isRed(x->left_->left_))
+					x = moveRedLeft(x);
+				x->left_ = deleteKey(x->left_, toDel);
 			}
 			else
 			{
-				Node *h = min(x->right_);
-				x->value_ = h->value_;
-				x->right_ = deleteMin(x->right_);
+				if (isRed(x->left_))
+					x = rotateRight(x);
+				if (x == toDel && !x->right_)
+				{
+					--size_;
+					delete x;
+					return 0;
+				}
+				if (!isRed(x->right_) && x->right_ && !isRed(x->right_->left_))
+					x = moveRedRight(x);
+				if (x == toDel)
+				{
+					Node *h = min(x->right_);
+					x->value_ = h->value_;
+					x->right_ = deleteMin(x->right_);
+				}
+				else
+					x->right_ = deleteKey(x->right_, toDel);
 			}
-			// return balance(x);
+			return balance(x);
 		}
 		// ######################## HELPER FUNCTIONS ###################################
 		void deleteMin()
@@ -492,10 +491,10 @@ namespace ft
 				if (comp(*r_it, *l_it))
 					return false;
 				l_it++;
-				if (!l_it.node_)
-					return true;
 				r_it++;
 			}
+			if (l_it.node_) /// ??
+				return true;
 			return false;
 		}
 	};
@@ -512,7 +511,7 @@ namespace ft
 		Node *node_;
 		Tree const *tree_;
 
-		// public:
+	// public:
 		typedef ft::bidirectional_iterator_tag iterator_category;
 		typedef std::ptrdiff_t difference_type;
 		typedef T value_type;

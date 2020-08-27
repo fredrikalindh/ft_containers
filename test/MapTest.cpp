@@ -94,9 +94,15 @@ TEST(MapTest, Empty)
 
 TEST(MapTest, MaxSize)
 {
-  LIBRARY::map<int,int> mymap;
+  LIBRARY::map<int, int> mymap;
   std::map<int, int> stdmap;
   EXPECT_EQ(mymap.max_size(), stdmap.max_size());
+  LIBRARY::map<double, double> mymap2;
+  std::map<double, double> stdmap2;
+  EXPECT_EQ(mymap2.max_size(), stdmap2.max_size());
+  LIBRARY::map<char, int> mymap3;
+  std::map<char, int> stdmap3;
+  EXPECT_EQ(mymap3.max_size(), stdmap3.max_size());
 }
 
 TEST(MapTest, Brackets)

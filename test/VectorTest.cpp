@@ -1,7 +1,10 @@
 TEST(VectorTest, RelationalOperators)
 {
-  LIBRARY::vector<int> foo(3, 100); // three ints with a value of 100
-  LIBRARY::vector<int> bar(2, 200); // two ints with a value of 200
+  int myint[] = {0, 1, 2, 3, 4};
+  LIBRARY::vector<int> foo(3, 100);             // three ints with a value of 100
+  LIBRARY::vector<int> bar(2, 200);             // two ints with a value of 200
+  LIBRARY::vector<int> three(myint, myint + 3); // three ints with a value of 100
+  LIBRARY::vector<int> four(myint, myint + 4);  // two ints with a value of 200
 
   EXPECT_FALSE(foo == bar);
   EXPECT_TRUE(foo != bar);
@@ -9,6 +12,12 @@ TEST(VectorTest, RelationalOperators)
   EXPECT_TRUE(foo < bar);
   EXPECT_FALSE(foo >= bar);
   EXPECT_TRUE(foo <= bar);
+  EXPECT_FALSE(three == four);
+  EXPECT_TRUE(three != four);
+  EXPECT_FALSE(three > four);
+  EXPECT_TRUE(three < four);
+  EXPECT_FALSE(three >= four);
+  EXPECT_TRUE(three <= four);
 }
 
 TEST(VectorTest, Clear)
@@ -160,6 +169,7 @@ TEST(VectorTest, At)
 
   for (unsigned i = 0; i < myvector.size(); i++)
     EXPECT_EQ(myvector.at(i), i);
+  EXPECT_ANY_THROW(myvector.at(20));
 }
 
 TEST(VectorTest, BracketOperator)
@@ -208,6 +218,19 @@ TEST(VectorTest, Reserve)
   stdbar.reserve(50);
   EXPECT_EQ(bar.size(), stdbar.size());
   EXPECT_EQ(bar.capacity(), stdbar.capacity());
+  bar.push_back(10);
+  stdbar.push_back(10);
+  EXPECT_EQ(bar.size(), stdbar.size());
+  EXPECT_EQ(bar.capacity(), stdbar.capacity());
+
+  LIBRARY::vector<int> bar2(10, 100);
+  std::vector<int> stdbar2(10, 100);
+  EXPECT_EQ(bar2.size(), stdbar2.size());
+  EXPECT_EQ(bar2.capacity(), stdbar2.capacity());
+  bar2.push_back(10);
+  stdbar2.push_back(10);
+  EXPECT_EQ(bar2.size(), stdbar2.size());
+  EXPECT_EQ(bar2.capacity(), stdbar2.capacity());
 }
 
 TEST(VectorTest, Empty)
@@ -276,13 +299,14 @@ TEST(VectorTest, Resize)
 TEST(VectorTest, MaxSize)
 {
   LIBRARY::vector<int> myvector;
-
-  // set some content in the vector:
-  for (int i = 0; i < 100; i++)
-    myvector.push_back(i);
-  EXPECT_EQ(myvector.size(), 100);
-  EXPECT_EQ(myvector.capacity(), 128);
-  EXPECT_EQ(myvector.max_size(), 4611686018427387903);
+  std::vector<int> stdvector;
+  EXPECT_EQ(myvector.max_size(), stdvector.max_size());
+  LIBRARY::vector<double> myvector2;
+  std::vector<double> stdvector2;
+  EXPECT_EQ(myvector2.max_size(), stdvector2.max_size());
+  LIBRARY::vector<char> myvector3;
+  std::vector<char> stdvector3;
+  EXPECT_EQ(myvector3.max_size(), stdvector3.max_size());
 }
 
 TEST(VectorTest, Size)

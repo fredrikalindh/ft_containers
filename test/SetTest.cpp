@@ -91,13 +91,13 @@ TEST(SetTest, MaxSize)
 {
   LIBRARY::set<int> myset;
   std::set<int> stdset;
-  EXPECT_EQ(myset.max_size(), stdset.max_size());
+  EXPECT_EQ(myset.max_size(), stdset.max_size()) << "T = int = " << sizeof(int); 
   LIBRARY::set<double> myset2;
   std::set<double> stdset2;
-  EXPECT_EQ(myset2.max_size(), stdset2.max_size());
+  EXPECT_EQ(myset2.max_size(), stdset2.max_size())  << "T = double = " << sizeof(double); 
   LIBRARY::set<char> myset3;
   std::set<char> stdset3;
-  EXPECT_EQ(myset3.max_size(), stdset3.max_size());
+  EXPECT_EQ(myset3.max_size(), stdset3.max_size())  << "T = char = " << sizeof(char); 
 }
 
 TEST(SetTest, Insert)

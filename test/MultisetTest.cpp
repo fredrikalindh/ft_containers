@@ -261,7 +261,10 @@ TEST(Multiset, Count)
   // set some initial values:
   for (int i = 1; i < 5; ++i)
     myset.insert(i * 3); // set: 3 6 9 12
+  
   myset.insert(9);
+      // for (LIBRARY::multiset<int>::iterator it = myset.begin(); it != myset.end(); ++it)
+      // std::cout << *it << ", ";
   EXPECT_TRUE(myset.count(3));
   EXPECT_FALSE(myset.count(4));
   EXPECT_EQ(myset.count(9), 2);

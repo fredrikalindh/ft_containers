@@ -18,11 +18,9 @@ namespace ft
 		T *array_;
 		size_t size_;
 		size_t capacity_;
-		size_t multi_;
 
 		vector(const vector &x, size_t capacity) : array_(capacity ? new T[capacity] : nullptr),
-												   capacity_(capacity),
-												   multi_(x.multi_)
+												   capacity_(capacity)
 		{
 			size_type i = 0;
 			while (i < capacity_ && i < x.size_)
@@ -48,12 +46,10 @@ namespace ft
 
 		explicit vector() : array_(0),
 							size_(0),
-							capacity_(0),
-							multi_(1) {}
+							capacity_(0) {}
 		explicit vector(size_type n, const value_type &val = value_type()) : array_(new T[n]),
 																			 size_(n),
-																			 capacity_(n),
-																			 multi_(n)
+																			 capacity_(n)
 		{
 			for (size_type i = 0; i < n; i++)
 				array_[i] = val;
@@ -62,16 +58,14 @@ namespace ft
 		vector(InputIterator first, InputIterator last,
 			   typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0) : array_(0),
 																							   size_(0),
-																							   capacity_(0),
-																							   multi_(1)
+																							   capacity_(0)
 		{
 			while (first != last)
 				push_back(*first++);
 		}
 		vector(const vector &x) : array_(new T[x.capacity_]),
 								  size_(x.size_),
-								  capacity_(x.capacity_),
-								  multi_(x.multi_)
+								  capacity_(x.capacity_)
 		{
 			for (size_type i = 0; i < size_; i++)
 				array_[i] = x.array_[i];
@@ -95,7 +89,11 @@ namespace ft
 		reverse_iterator rend() { return reverse_iterator(begin()); }
 		const_reverse_iterator rend() const { return reverse_iterator(begin()); }
 		size_type size() const { return size_; }
-		size_type max_size() const { return 4611686018427387903; }
+		// size_type max_size() const { return std::numeric_limits<difference_type>::max() / sizeof(T) * 2; }
+		size_type max_size() const
+		{
+			return std::numeric_limits<difference_type>::max() / ((sizeof(T) / 2) < 1 ? 1 : (sizeof(T) / 2));
+		}
 		void resize(size_type n, value_type val = value_type())
 		{
 			if (n > max_size())
@@ -151,8 +149,7 @@ namespace ft
 		{
 			if (size_ >= capacity_)
 			{
-				vector tmp(*this, capacity_ + multi_);
-				capacity_ ? tmp.multi_ = multi_ * 2 : 0;
+				vector tmp(*this, !capacity_ ? 1 : capacity_ * 2);
 				swap(tmp);
 			}
 			array_[size_++] = val;
@@ -232,15 +229,12 @@ bool operator==(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
 {
 	if (lhs.size() != rhs.size())
 		return false;
-	typename ft::vector<T>::const_iterator l_it = lhs.begin(); // #########################   WHY TYPENAME?
+	typename ft::vector<T>::const_iterator l_it = lhs.begin();
 	typename ft::vector<T>::const_iterator r_it = rhs.begin();
 	while (l_it != lhs.end() && r_it != rhs.end())
 	{
 		if (*l_it != *r_it)
-		{
-			std::cout << *l_it << " != " << *r_it << '\n';
 			return false;
-		}
 		l_it++;
 		r_it++;
 	}
@@ -254,7 +248,7 @@ bool operator!=(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
 template <class T>
 bool operator<(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
 {
-	typename ft::vector<T>::const_iterator l_it = lhs.begin(); // #########################   WHY TYPENAME?
+	typename ft::vector<T>::const_iterator l_it = lhs.begin();
 	typename ft::vector<T>::const_iterator r_it = rhs.begin();
 	while (l_it != lhs.end() && r_it != rhs.end())
 	{
@@ -263,9 +257,11 @@ bool operator<(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
 		if (*l_it > *r_it)
 			return false;
 		l_it++;
+		if (l_it == lhs.end())
+			return true;
 		r_it++;
 	}
-	return true;
+	return false; // ??
 }
 template <class T>
 bool operator<=(const ft::vector<T> &lhs, const ft::vector<T> &rhs)

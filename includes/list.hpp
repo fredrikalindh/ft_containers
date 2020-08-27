@@ -200,7 +200,7 @@ namespace ft
 		}
 		//############################# MEMBER FUNCTIONS ###############################
 		inline size_type size() const { return size_; }
-		inline size_type max_size() const { return 768614336404564650; } // ?
+		inline size_type max_size() const { return std::numeric_limits<difference_type>::max() / sizeof(Node) * 2; } // ?
 		inline bool empty() const { return !size_; }
 		void resize(size_t n, T val = T())
 		{
@@ -713,9 +713,7 @@ bool operator==(const ft::list<T> &lhs, const ft::list<T> &rhs)
 	while (l_it != lhs.end() && r_it != rhs.end())
 	{
 		if (*l_it != *r_it)
-		{
 			return false;
-		}
 		l_it++;
 		r_it++;
 	}
@@ -738,10 +736,10 @@ bool operator<(const ft::list<T> &lhs, const ft::list<T> &rhs)
 		if (*l_it > *r_it)
 			return false;
 		l_it++;
+		if (l_it == lhs.end())
+			return true;
 		r_it++;
 	}
-	if (r_it != rhs.end())
-		return true;
 	return false;
 }
 template <class T>

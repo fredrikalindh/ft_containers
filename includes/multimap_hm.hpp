@@ -40,7 +40,7 @@ public:
 		}
 	};
 private:
-	typedef ft::RB_Tree<ft::pair<Key, T>, value_compare> RBT;
+	typedef ft::RB_Tree<Key, ft::deque<T>, value_compare> RBT;
 
 	RBT			tree_;
 	Compare		comp;
@@ -51,12 +51,12 @@ typedef	typename RBT::const_iterator			const_iterator;
 typedef	ft::reverse_iterator<iterator>			reverse_iterator;
 typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 //######################### CONSTRUCTORS #######################################
-	explicit multimap (const key_compare& comp = key_compare()):tree_(comp, true), comp(comp){}
+	explicit multimap (const key_compare& comp = key_compare()):tree_(comp, false), comp(comp){}
 	template <class InputIterator>
 	multimap (InputIterator first, InputIterator last, const key_compare& comp = key_compare()):
-	tree_(comp, true), comp(comp){
+	tree_(comp, false), comp(comp){
 		for ( ; first != last; first++)
-			tree_.add(*first);
+			tree_.add(*first)->second.push_back(first->second);
 	}
 	multimap (const multimap& x):tree_(x.tree_), comp(x.comp){}
 	~multimap(){}
@@ -77,22 +77,22 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 //########################### CAPACITY #######################################
 	bool					empty() const {return !tree_.size();}
 	size_type				size() const {return tree_.size();}
-	size_type				max_size() const { return std::numeric_limits<difference_type>::max() / sizeof(ft::pair<Key, T>); }
-	// size_type				max_size() const { return std::numeric_limits<difference_type>::max() / (sizeof(ft::pair<Key, T>) + 16); }
+	size_type				max_size() const {return 461168601842738790;}
 //########################### INSERT #######################################
 	iterator	insert (const value_type& val) {
-		return iterator(tree_.add(val), &tree_);
+		return iterator(tree_.add(val)->second.push_back(first->second);, &tree_);
 	}
 	iterator				insert (iterator, const value_type& val){
-		return iterator(tree_.add(val), &tree_);
+		return iterator(tree_.add(val)->second.push_back(first->second);, &tree_);
 	}
 	template <class InputIterator>
 	void					insert (InputIterator first, InputIterator last){
-		while (first != last) tree_.add(*first++);
+		while (first != last) 
+			tree_.add(*first++)->second.push_back(first->second);;
 	}
 //########################### ERASE #######################################
 	void					erase (iterator position){
-		return tree_.deleteKey(position.node_);
+		tree_.deleteKey(position);
 	}
 	size_type				erase (const key_type& k) {
 		return tree_.deleteKey(k);

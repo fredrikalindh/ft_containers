@@ -99,6 +99,9 @@ TEST(ListTest, MaxSize)
   LIBRARY::list<int> mylist;
   std::list<int> stdlist;
   EXPECT_EQ(mylist.max_size(), stdlist.max_size());
+  LIBRARY::list<char> mylist1;
+  std::list<char> stdlist1;
+  EXPECT_EQ(mylist1.max_size(), stdlist1.max_size());
 }
 
 TEST(ListTest, Front)

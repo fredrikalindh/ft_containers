@@ -211,7 +211,9 @@ namespace ft
 				size += arrays_[i].size_;
 			return size;
 		}
-		size_type max_size() const { return 4611686018427387903; }
+		size_type max_size() const { 
+			return std::numeric_limits<difference_type>::max() / ((sizeof(T) / 2) < 1 ? 1 : (sizeof(T) / 2)); 
+		}
 		void resize(size_type n, value_type val = value_type())
 		{
 			size_type sz = size();
