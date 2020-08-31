@@ -55,8 +55,8 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	template <class InputIterator>
 	multimap (InputIterator first, InputIterator last, const key_compare& comp = key_compare()):
 	tree_(comp, true), comp(comp){
-		for ( ; first != last; first++)
-			tree_.add(*first);
+		while (first != last)
+			tree_.add(*first++);
 	}
 	multimap (const multimap& x):tree_(x.tree_), comp(x.comp){}
 	~multimap(){}
@@ -101,12 +101,8 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		return i;
 	}
 	void					erase (iterator first, iterator last){ // CAN MAKE MORE EFFICIENT
-		iterator next = first;
-		while (first != last) {
-			++first;
-			tree_.deleteKey(next.node_);
-			next = first;
-		}
+		while (first != last)
+			first = tree_.deleteKey(first.node_, &last.node_);
 	}
 //########################### MODIFIERS #######################################
 	void					swap (multimap& x) {

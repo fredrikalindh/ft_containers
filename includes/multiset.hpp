@@ -35,8 +35,8 @@ namespace ft
 		template <class InputIterator>
 		multiset(InputIterator first, InputIterator last, const key_compare &comp = key_compare()) : tree_(value_compare(comp), true), comp(comp)
 		{
-			for (; first != last; first++)
-				tree_.add(*first);
+			while (first != last)
+				tree_.add(*first++);
 		}
 		multiset(const multiset &x) : tree_(x.tree_), comp(x.comp) {}
 		~multiset() {}
@@ -93,32 +93,8 @@ namespace ft
 		}
 		void erase(iterator first, iterator last)
 		{
-			// while (first != last) {
-			// 	// std::cout << *next << ", ";
-			// 	tree_.deleteKey(first.node_);
-			// 	++first;
-			// }
-			while (first != last) {
+			while (first != last) 
 				first = tree_.deleteKey(first.node_, &last.node_);
-			}
-			// iterator prev;
-			// while (first != last) {
-			// 	prev = first;
-			// 	// std::cout << "deleting " << *first << std::endl;
-			// 	first = tree_.deleteKey(first.node_);
-			// 	if (comp(*first, *prev))
-			// 		break;
-			// }
-			// iterator next = first;
-			// while (first != last) {
-			// 	// std::cout << *next << ", ";
-			// 	++first;
-			// 	tree_.deleteKey(next.node_);
-			// 	next = first;
-			// }
-			// multiset tmp(begin(), ++first);
-			// tmp.insert(last, end());
-			// swap(tmp);
 		}
 
 		void swap(multiset &x)
