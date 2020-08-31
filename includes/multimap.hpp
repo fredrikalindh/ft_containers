@@ -83,8 +83,8 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	iterator	insert (const value_type& val) {
 		return iterator(tree_.add(val), &tree_);
 	}
-	iterator				insert (iterator, const value_type& val){
-		return iterator(tree_.add(val), &tree_);
+	iterator				insert (iterator position, const value_type& val){
+		return iterator(tree_.add(position.node_, val), &tree_);
 	}
 	template <class InputIterator>
 	void					insert (InputIterator first, InputIterator last){
@@ -92,24 +92,21 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 //########################### ERASE #######################################
 	void					erase (iterator position){
-		return tree_.deleteKey(position.node_);
+		tree_.deleteKey(position.node_);
 	}
 	size_type				erase (const key_type& k) {
-		return tree_.deleteKey(k);
+		size_type i = 0;
+		while (tree_.deleteKey(k))
+			i++;
+		return i;
 	}
 	void					erase (iterator first, iterator last){ // CAN MAKE MORE EFFICIENT
-		size_t size = 0;
-		for (iterator trav = first; trav != last; trav++)
-			size++;
-		Key *keys = new Key[size];
-		for (size_t i = 0; i < size; i++){
-			keys[i] = first->first;
+		iterator next = first;
+		while (first != last) {
 			++first;
+			tree_.deleteKey(next.node_);
+			next = first;
 		}
-		for (size_t i = 0 ; i < size; i++){
-			tree_.deleteKey(keys[i]);
-		}
-		delete [] keys;
 	}
 //########################### MODIFIERS #######################################
 	void					swap (multimap& x) {
@@ -132,11 +129,6 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		return const_iterator(tree_.find(k), &tree_);
 	}
 	size_type				count (const key_type& k) const {
-		// size_type n = 0;
-		// for (iterator i(tree_.find(k), &tree_);
-		// 	i.node_ && !comp(i->first, k) && !comp(k, i->first);
-		// 	++i ) ++n;
-		// return n;
 		return tree_.count(k);
 	}
 	iterator				lower_bound (const key_type& k) {
@@ -164,7 +156,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	return !(lhs == rhs);
 	}
 	friend bool operator<  (const multimap &lhs, const multimap &rhs) {
-	return rhs.tree_.lesser(lhs.tree_, key_compare());
+	return lhs.tree_.lesser(rhs.tree_, key_compare());
 	}
 	friend bool operator>= (const multimap &lhs, const multimap &rhs) {
 	return !(lhs < rhs);

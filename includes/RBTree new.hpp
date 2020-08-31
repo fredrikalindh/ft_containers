@@ -121,7 +121,7 @@ namespace ft
 				{
 					iterator it(node, this);
 					iterator next(node, this);
-					for (--next; next.node_ && (!comp(*next, k) && !comp(k, *next)); --next)
+					for (next = --next; next.node_ && (!comp(*next, k) && !comp(k, *next)); --next)
 						--it;
 					return it.node_;
 				}
@@ -152,10 +152,181 @@ namespace ft
 		{
 			Node *added; // sending address to this pointer so that I can select it even with the recursive
 
-			root_ = add(0, root_, toAdd, true, &added);
+			if (!root_) {
+				++size_;
+				root_ = new Node(toAdd, 0, true);
+				added = root_;
+			}else
+				add(root_, toAdd, &added);
 			root_->color_ = BLACK;
 			return added;
 		}
+		// Node *add(value_type toAdd)
+		// {
+		// 	Node *added; // sending address to this pointer so that I can select it even with the recursive
+
+		// 	root_ = add(0, root_, toAdd, true, &added);
+		// 	root_->color_ = BLACK;
+		// 	return added;
+		// }
+
+		// Node *add(Node *parent, Node *x, value_type &value, bool left, Node **added)
+		// {
+		// 	if (!x)
+		// 	{
+		// 		++size_;
+		// 		*added = new Node(value, parent, left);
+		// 		checkColor(*added);
+		// 		return *added;
+		// 	}
+		// 	if (!comp(x->value_, value) && !comp(value, x->value_) && allowMulti == false) // ---> EQUAL
+		// 		*added = x;
+		// 	else if (!comp(value, x->value_))
+		// 		x->right_ = add(x, x->right_, value, false, added);
+		// 	else
+		// 		x->left_ = add(x, x->left_, value, true, added); // if comp gives false
+		// 	checkColor(x);
+		// 	return x;
+		// }
+		void add(Node *x, value_type &value, Node **added)
+		{
+			if (!comp(x->value_, value) && !comp(value, x->value_) && allowMulti == false){ // ---> EQUAL
+				*added = x;
+				return ;
+			}else if (!comp(value, x->value_)) {
+				*added = new Node(value, x, false);
+				x->right_ = *added;
+			} else{
+				*added = new Node(value, x, true);
+				x->left_ = *added; // if comp gives false
+			}
+			++size_;
+			checkColor(x);
+		}
+		void checkColor(Node *node)
+		{
+			if (node == root_)
+				return ;
+			if (isRed(node) || isRed(node->parent_))
+				correctTree(node);
+			checkColor(node->parent_);
+		}
+		void correctTree(Node *node)
+		{
+			if (isRed(aunt(node)))
+					return rotate(node);
+			node->parent_->parent_->color_ = BLACK;
+			node->parent_->color_ = BLACK;
+			if (Node *auntie = aunt(node))
+				auntie->color_ = RED;
+		}
+		Node *aunt(Node *node) {
+			if (node && node->parent_ && node->parent_->parent_){
+				if (node->parent_->isLeft)
+					return node->parent_->parent_->right_;
+				return node->parent_->parent_->left_;
+			}
+			return nullptr;
+		}
+		void rotate(Node *node) 
+		{
+			if (node->isLeft) {
+				if (node->parent_->isLeft) {
+					rightRotate(node->parent_->parent_);
+					node->color_ = RED;
+					node->parent_->color_ = BLACK;
+					(node->parent_->right_) ? node->parent_->right_->color_ = RED : 0;
+				}else {
+					rightLeftRotate(node->parent_->parent_);
+					node->color_ = BLACK;
+					node->right_->color_ = RED;
+					node->left_->color_ = RED;
+				}
+			}
+			else {
+				if (!node->parent_->isLeft) {
+					leftRotate(node->parent_->parent_);
+					node->color_ = RED;
+					node->parent_->color_ = BLACK;
+					(node->parent_->left_) ? node->parent_->left_->color_ = RED : 0;
+				}else {
+					leftRightRotate(node->parent_->parent_);
+					node->color_ = BLACK;
+					node->right_->color_ = RED;
+					node->left_->color_ = RED;
+				}
+			}
+		}
+		void leftRotate(Node *node)
+		{
+			Node *tmp = node->right_;
+			node->right_ = tmp->left_;
+			if (node->right_) {
+				node->right_->parent_ = node;
+				node->right_->isLeft = false;
+			}
+			tmp->parent_ = node->parent_;
+			tmp->isLeft = node->isLeft;
+			if (!node->parent_)
+				root_ = tmp;
+			else
+				tmp->isLeft ? node->parent_->left_ = tmp : node->parent_->right_ = tmp;
+			tmp->left_ = node;
+			node->isLeft = true;
+			node->parent_ = tmp;
+		}
+		void rightRotate(Node *node)
+		{
+			Node *tmp = node->left_;
+			node->left_ = tmp->right_;
+			if (node->left_) {
+				node->left_->parent_ = node;
+				node->left_->isLeft = true;
+			}
+			tmp->parent_ = node->parent_;
+			tmp->isLeft = node->isLeft;
+			if (!node->parent_)
+				root_ = tmp;
+			else
+				tmp->isLeft ? node->parent_->left_ = tmp : node->parent_->right_ = tmp;
+			tmp->right_ = node;
+			node->isLeft = false;
+			node->parent_ = tmp;
+		}
+		void leftRightRotate(Node *node)
+		{
+			leftRotate(node->left_);
+			rightRotate(node);
+		}
+		void rightLeftRotate(Node *node)
+		{
+			rightRotate(node->right_);
+			leftRotate(node);
+		}
+		// Node *add(Node *parent, Node *x, value_type &value, bool left, Node **added)
+		// {
+		// 	if (x == 0)
+		// 	{
+		// 		++size_;
+		// 		*added = new Node(value, parent, left);
+		// 		return *added;
+		// 	}
+		// 	if (!comp(x->value_, value) && !comp(value, x->value_) && allowMulti == false) // ---> EQUAL
+		// 		*added = x;
+		// 	else if (!comp(value, x->value_))
+		// 		x->right_ = add(x, x->right_, value, false, added);
+		// 	else
+		// 		x->left_ = add(x, x->left_, value, true, added); // if comp gives false
+
+		// 	if (isRed(x->right_) && !isRed(x->left_))
+		// 		x = rotateLeft(x);
+		// 	if (isRed(x->left_) && isRed(x->left_->left_))
+		// 		x = rotateRight(x);
+		// 	if (isRed(x->left_) && isRed(x->right_))
+		// 		colorFlip(x);
+
+		// 	return x;
+		// }
 		Node *add(Node *preceding, value_type value)
 		{
 			bool first = false;
@@ -175,8 +346,7 @@ namespace ft
 					else
 						root_ = added;
 					added->left_ = it.node_->left_;
-					if (added->left_)
-						added->left_->parent_ = added;
+					(added->left_) ? added->left_->parent_ = added : 0;
 					it.node_->left_ = 0;
 					it.node_->isLeft = false;
 					added->right_ = it.node_;
@@ -186,31 +356,6 @@ namespace ft
 				}
 			}
 			return add(value);
-		}
-		Node *add(Node *parent, Node *x, value_type &value, bool left, Node **added)
-		{
-			if (x == 0)
-			{
-				++size_;
-				*added = new Node(value, parent, left);
-				return *added;
-			}
-			if (!comp(x->value_, value) && !comp(value, x->value_) && allowMulti == false) // ---> EQUAL
-				*added = x;
-			else if (!comp(value, x->value_))
-				x->right_ = add(x, x->right_, value, false, added);
-			else
-				x->left_ = add(x, x->left_, value, true, added); // if comp gives false
-
-			if (isRed(x->right_) && !isRed(x->left_))
-				x = rotateLeft(x);
-			if (isRed(x->left_) && isRed(x->left_->left_))
-				x = rotateRight(x);
-			if (isRed(x->left_) && isRed(x->right_))
-				colorFlip(x);
-			// x->right_ ? x->right_->parent_ = x : 0;
-			// x->left_ ? x->left_->parent_ = x : 0;
-			return x;
 		}
 		bool deleteKey(value_type value)
 		{
@@ -260,97 +405,10 @@ namespace ft
 			}
 			return balance(x);
 		}
-		Node* deleteKey(Node *x, Node** last = 0)
+		void deleteKey(Node *x)
 		{
-			Node *ret = 0;
-			if (!x)
-				return x; 
-			if (size_ == 1)
-			{
-				delete x;
-				root_ = 0;
-			}
-			else if (!x->right_)
-			{
-				if (!x->parent_) {
-					root_ = x->left_;
-					root_->parent_ = 0;
-				} else {
-					if (!comp(x->parent_->value_, x->value_)) // how is it different from x->isLeft?
-						ret = x->parent_;
-					(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
-					if (x->left_) {
-						x->left_->isLeft = x->isLeft;
-						x->left_->parent_ = x->parent_;
-					}
-				}
-				delete x;
-			}
-			else
-			{
-				Node *h = min(x->right_);
-				if (last && h == *last)
-					*last = x;
-				x->value_ = h->value_;
-				h->isLeft ? h->parent_->left_ = 0: h->parent_->right_ = 0;
-				delete h;
-				ret = x;
-			}
-			--size_;
-			return ret;
+
 		}
-		// void deleteKey(Node *x)
-		// {
-		// 	if (!x)
-		// 		return ; 
-		// 	if (size_ == 1)
-		// 	{
-		// 		delete x;
-		// 		size_ = 0;
-		// 		root_ = 0;
-		// 	}
-		// 	else if (!x->right_)
-		// 	{
-		// 		std::cout << "no right child" << std::endl;
-		// 		if (!x->parent_) {
-		// 			std::cout << "1" << std::endl;
-		// 			root_ = x->left_;
-		// 			root_->parent_ = 0;
-		// 		} else {
-		// 			std::cout << "2" << std::endl;
-		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
-		// 			if (x->left_) {
-		// 				x->left_->isLeft = x->isLeft;
-		// 				x->left_->parent_ = x->parent_;
-		// 			}
-		// 		}
-		// 		std::cout << "3" << std::endl;
-		// 		--size_;
-		// 		delete x;
-		// 		std::cout << "4" << std::endl;
-		// 	}
-		// 	else
-		// 	{
-		// 		Node *h = min(x->right_);
-		// 		std::cout << "min = " << h->value_ << std::endl;
-		// 		if (x == root_) 
-		// 			root_ = h;
-		// 		else
-		// 			x->isLeft ? x->parent_->left_ = h : x->parent_->right_ = h;
-		// 		h->isLeft ? h->parent_->left_ = 0 : h->parent_->right_ = 0;
-		// 		h->parent_ = x->parent_;
-		// 		h->left_ = x->left_;
-		// 		if (h->left_)
-		// 			h->left_->parent_ = h;
-		// 		h->right_ = x->right_;
-		// 		if (h->right_)
-		// 			h->right_->parent_ = h;
-		// 		h->color_ = x->color_;
-		// 		h->isLeft = x->isLeft;
-		// 		delete x;
-		// 		--size_;
-		// 	}
-		// }
 		// ######################## HELPER FUNCTIONS ###################################
 		void deleteMin()
 		{
@@ -366,7 +424,7 @@ namespace ft
 		{
 			if (!h->left_)
 			{
-				// std::cout << "delete no left child "  << h->value_ << std::endl;
+				std::cout << "delete no left child "  << h->value_ << std::endl;
 				--size_;
 				delete h;
 				return 0;
@@ -607,8 +665,7 @@ namespace ft
 		rb_tree_iterator(rb_tree_iterator const &cpy) : node_(cpy.node_), tree_(cpy.tree_) {}
 		rb_tree_iterator &operator=(rb_tree_iterator const &cpy)
 		{
-			rb_tree_iterator tmp(cpy);
-			swap(tmp);
+			node_ = cpy.node_;
 			return *this;
 		}
 		rb_tree_iterator &operator++(void)
@@ -665,12 +722,6 @@ namespace ft
 		inline pointer operator->(void) const { return &(node_->value_); }
 		inline bool operator!=(rb_tree_iterator const &other) const { return node_ != other.node_; }
 		inline bool operator==(rb_tree_iterator const &other) const { return node_ == other.node_; }
-		void swap(rb_tree_iterator &x) {
-			char buffer[sizeof(rb_tree_iterator)];
-			memcpy(buffer, &x, sizeof(rb_tree_iterator));
-			memcpy(reinterpret_cast<char *>(&x), this, sizeof(rb_tree_iterator));
-			memcpy(reinterpret_cast<char *>(this), buffer, sizeof(rb_tree_iterator));
-		}
 	};
 
 } //namespace ft

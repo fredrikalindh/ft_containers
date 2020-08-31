@@ -41,7 +41,7 @@ struct classcomp
 #ifdef BONUS
 #include "DequeTest.cpp"
 #include "MultisetTest.cpp"
-// #include "MultimapTest.cpp"
+#include "MultimapTest.cpp"
 #endif
 
 int main(int argc, char **argv)

@@ -14,7 +14,6 @@ TEST(MultimapTest, Constructors)
   int i = 0;
   int result[] = {10, 15, 35, 20, 25, 10, 15, 35, 20, 25};
   for (LIBRARY::multimap<char, int>::iterator it = first.begin(); it != first.end(); ++it){
-  // std::cout << it->first << "=>" << it->second << ", ";
     EXPECT_EQ(it->second, result[i++]); 
   }
 
@@ -92,7 +91,6 @@ TEST(MultimapTest, Empty)
 
   while (!mymultimap.empty())
   {
-    // std::cout << "SIZE " << mymultimap.size() << ", " << mymultimap.begin()->first << std::endl;
     mymultimap.erase(mymultimap.begin());
   }
   EXPECT_EQ(mymultimap.size(), 0);
@@ -143,7 +141,6 @@ TEST(MultimapTest, Insert)
   int i = 0;
   int result1[] = {100, 75, 300, 400, 150};
   for (LIBRARY::multimap<char, int>::iterator it = mymultimap.begin(); it != mymultimap.end(); ++it){
-    std::cout << it->first << "=>" << it->second << ", ";
     EXPECT_EQ(it->second, result1[i++]);
 }
   i = 0;

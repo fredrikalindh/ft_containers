@@ -4,7 +4,7 @@
 namespace ft
 {
 
-	template <class T, class Compare = std::less<T>>
+	template <class T, class Compare = std::less<T> >
 	class multiset
 	{
 	public:
@@ -69,9 +69,9 @@ namespace ft
 			iterator ret(tree_.add(val), &tree_);
 			return ft::pair<iterator, bool>(ret, (*ret == val));
 		}
-		iterator insert(iterator, const value_type &val)
+		iterator insert(iterator position, const value_type &val)
 		{
-			return iterator(tree_.add(val), &tree_);
+			return iterator(tree_.add(position.node_, val), &tree_);
 		}
 		template <class InputIterator>
 		void insert(InputIterator first, InputIterator last)
@@ -82,28 +82,43 @@ namespace ft
 
 		void erase(iterator position)
 		{
-			tree_.deleteKey(*position);
+			tree_.deleteKey(position.node_);
 		}
 		size_type erase(const value_type &val)
 		{
-			return tree_.deleteKey(val);
+			size_type i = 0;
+			while (tree_.deleteKey(val))
+				i++;
+			return i;
 		}
 		void erase(iterator first, iterator last)
-		{ // CAN MAKE MORE EFFICIENT
-			size_t size = 0;
-			for (iterator trav = first; trav != last; trav++)
-				size++;
-			T *keys = new T[size];
-			for (size_t i = 0; i < size; i++)
-			{
-				keys[i] = *first;
-				++first;
+		{
+			// while (first != last) {
+			// 	// std::cout << *next << ", ";
+			// 	tree_.deleteKey(first.node_);
+			// 	++first;
+			// }
+			while (first != last) {
+				first = tree_.deleteKey(first.node_, &last.node_);
 			}
-			for (size_t i = 0; i < size; i++)
-			{
-				tree_.deleteKey(keys[i]);
-			}
-			delete[] keys;
+			// iterator prev;
+			// while (first != last) {
+			// 	prev = first;
+			// 	// std::cout << "deleting " << *first << std::endl;
+			// 	first = tree_.deleteKey(first.node_);
+			// 	if (comp(*first, *prev))
+			// 		break;
+			// }
+			// iterator next = first;
+			// while (first != last) {
+			// 	// std::cout << *next << ", ";
+			// 	++first;
+			// 	tree_.deleteKey(next.node_);
+			// 	next = first;
+			// }
+			// multiset tmp(begin(), ++first);
+			// tmp.insert(last, end());
+			// swap(tmp);
 		}
 
 		void swap(multiset &x)
