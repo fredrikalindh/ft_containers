@@ -94,7 +94,7 @@ namespace ft
 		void erase(iterator first, iterator last)
 		{
 			while (first != last) 
-				first = tree_.deleteKey(first.node_, &last.node_);
+				first = tree_.deleteKey(first.node_);
 		}
 
 		void swap(multiset &x)

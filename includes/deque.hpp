@@ -47,6 +47,25 @@ namespace ft
 			for (int i = index_first; i < size_ + index_first; ++i)
 				array_[i] = x.array_[i];
 		}
+		template <class InputIterator>
+		deque_array(int capacity, InputIterator first, InputIterator last,
+			  typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0): capacity_(capacity),
+											array_(new T[capacity_]),
+											index_first(0)
+		{
+			int i = 0;
+			while (first != last)
+				array_[i++] = *first++;
+			size_ = i;
+		}
+		deque_array(int capacity, int n, value_type const &val): capacity_(capacity),
+											array_(new T[capacity_]),
+											size_(n),
+											index_first(0)
+		{
+			for (int i = 0; i < size_; ++i)
+				array_[i] = val;
+		}
 		deque_array(deque_array const &x, int new_size) : capacity_(new_size),
 														  array_(new T[capacity_]),
 														  size_(x.size_),
@@ -109,14 +128,14 @@ namespace ft
 		}
 		void erase(int position)
 		{
-			for (int i = position; i + 1 < index_first + size_; ++i)
+			for (int i = position + index_first; i + 1 < index_first + size_; ++i)
 				array_[i] = array_[i + 1];
 			--size_;
 		}
 		void erase(int first, int last)
 		{
 			int dif = last - first;
-			for (int i = first; i + dif < index_first + size_; ++i)
+			for (int i = first + index_first; i + dif < index_first + size_; ++i)
 				array_[i] = array_[i + dif];
 			size_ -= dif;
 		}
@@ -126,12 +145,24 @@ namespace ft
 		}
 		void insert(int position, int n, const value_type &val)
 		{
-			int i = std::min(size_ + n, capacity_);
-			for (; i >= position + n; --i)
-				array_[i] = array_[i - n];
-			while (i >= position)
-				array_[i--] = val;
-			size_ += n;
+			position += index_first;
+			// IF POSITION IS NOT IN THE END, WE HAVE TO MOVE TO MAKE SPACE
+			// IF N + SIZE_ > CAPACITY_ MOVING ELEMENTS IS TAKEN CARE OF IN OUTER LAYER
+			if (position < size_) {
+				size_ = std::min(size_ + n, capacity_);
+				int i;
+				for (i = size_ - 1; i >= position + n; --i)
+					array_[i] = array_[i - n];
+				while (i >= position)
+					array_[i--] = val;
+			}
+			// OTHERWISE WE JUST PUSH BACK
+			else {
+				if (n > capacity_ - size_)
+					n = capacity_ - size_;
+				for (int i = 0; i < n; ++i)
+					push_back(val);
+			}
 		}
 	};
 
@@ -197,8 +228,16 @@ namespace ft
 		}
 		iterator begin() { return iterator(0, 0, &arrays_); }
 		const_iterator begin() const { return const_iterator(0, 0, &arrays_); }
-		iterator end() { return iterator(arrays_.size_ - 1, arrays_.back().size_, &arrays_); }
-		const_iterator end() const { return const_iterator(arrays_.size_ - 1, arrays_.back().size_, &arrays_); }
+		iterator end() { 
+			// if (arrays_.size_)
+				return iterator(arrays_.size_, 0, &arrays_);
+			// return iterator(0, 0, &arrays_); 
+		}
+		const_iterator end() const { 
+			// if (arrays_.size_)
+				return iterator(arrays_.size_, 0, &arrays_);
+			// return iterator(0, 0, &arrays_); 
+		}
 		reverse_iterator rbegin() { return reverse_iterator(end()); }
 		const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 		reverse_iterator rend() { return reverse_iterator(begin()); }
@@ -207,7 +246,7 @@ namespace ft
 		size_type size() const
 		{
 			size_type size = 0;
-			for (int i = arrays_.index_first; i < arrays_.index_first + arrays_.size_; ++i)
+			for (int i = 0; i < arrays_.size_; ++i)
 				size += arrays_[i].size_;
 			return size;
 		}
@@ -313,33 +352,89 @@ namespace ft
 		iterator insert(iterator position, const value_type &val)
 		{
 			insert(position, 1, val);
+			if (!position.i_in)
+				--position;
 			return position;
 		}
 		void insert(iterator position, size_type n, const value_type &val)
 		{
-			if (arrays_[position.i_out].size_ >= arrays_[position.i_out].capacity_)
-			{
-				deque_array<T> tmp(arrays_[position.i_out]);
-				arrays_[position.i_out].erase(position.i_in + 1, arrays_[position.i_out].size_);
-				tmp.erase(0, position.i_in + 1);
-				arrays_.insert(position.i_out, tmp);
+			if (!position.i_in) { // position == end()
+				for (int i = 0; i < n; ++i) 
+					push_back(val);
+				return ;
 			}
-			arrays_[position.i_out].insert(position.i_in, n, val);
+			// if there is space for insertion in current array
+			if (arrays_[position.i_out].size_ + n < arrays_[position.i_out].capacity_)
+				arrays_[position.i_out].insert(position.i_in, n, val);
+			else
+			{
+				// N_TO_ARR, ELEMENTS AFTER POSITION THAT WILL BE COPIED TO A NEW ARRAY TMP
+				deque_array<T> tmp;
+				int n_to_arr = std::min(ARRAY_SIZE - position.i_in, n);
+				if (int afterPos = arrays_[position.i_out].size_ - position.i_in) {
+					int startPos = ARRAY_SIZE - position.i_in - n;
+					startPos < 0 ? startPos = 0 : 0;
+					tmp =  deque_array<T>(ARRAY_SIZE, &(*position) + startPos, &(*position) + afterPos);
+				}// N_TO_ARR, ELEMENTS THAT NOW FIT IN CURRENT ARRAY, 
+				n -= n_to_arr;
+				// std::cout << "sizeeeeee " << arrays_[position.i_out].size_ << std::endl;
+				arrays_[position.i_out].insert(position.i_in, n_to_arr, val);
+				// std::cout << "sizeeeeee " << arrays_[position.i_out].size_ << std::endl;
+				// UNTIL ALL ELEMENTS ARE ADDED NEW ARRAYS WILL BE FILLED WITH MAX ARRAY_SIZE VAL
+				while (n) {
+					n_to_arr = (n < ARRAY_SIZE) ? n : ARRAY_SIZE;
+					if (!arrays_.space_back())
+						arrays_ = deque_array<deque_array<T> >(arrays_, arrays_.capacity_ + 2);
+					arrays_.insert(++position.i_out + 1, 1, deque_array<T>(ARRAY_SIZE, n_to_arr, val));
+					n -= n_to_arr;
+				}
+				int spaceInLast = ARRAY_SIZE - arrays_[position.i_out].size_;
+				if (tmp.size_) {
+					int elementsToInsert = (spaceInLast < tmp.size_) ? spaceInLast : tmp.size_;
+					for (int i = 0; i < elementsToInsert; ++i)
+						arrays_[position.i_out].push_back(tmp[i]);
+					// arrays_[position.i_out].insert(arrays_[position.i_out].size_, &tmp.front(), &tmp.front() + elementsToInsert);
+					if (elementsToInsert != tmp.size_) {
+						tmp.erase(0, elementsToInsert);
+						if (!arrays_.space_back())
+							arrays_ = deque_array<deque_array<T> >(arrays_, arrays_.capacity_ + 2);
+						arrays_.insert(++position.i_out + 1, 1, tmp);
+					}
+						
+				}
+			}
 		}
 		template <class InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last, typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
 		{
-			while (first != last)
+			while (first != last) {
 				position = insert(position, *first++);
+				++position;
+			}
 		}
 		iterator erase(iterator position)
 		{
-			arrays_[position.i_out].erase(position.i_in);
+			if (position == end() - 1) 
+				pop_back();
+			else if (position == begin())
+				pop_front();
+			else
+				arrays_[position.i_out].erase(position.i_in);
 			return position;
 		}
 		iterator erase(iterator first, iterator last)
 		{
-			if (first.i_out == last.i_out)
+			if (last == end()) {
+				arrays_.size_ = first.i_out + 1;
+				arrays_[first.i_out].size_ = first.i_in;
+			}
+			else if (first == begin()) {
+				arrays_.size_ -= (last.i_out - arrays_.index_first);
+				arrays_.index_first = last.i_out;
+				arrays_[0].size_ -= (last.i_in - arrays_[0].index_first);
+				arrays_[0].index_first = last.i_in;
+			}
+			else if (first.i_out == last.i_out)
 			{
 				arrays_[first.i_out].erase(first.i_in, last.i_in);
 			}
@@ -347,15 +442,38 @@ namespace ft
 			{
 				arrays_[first.i_out].erase(first.i_in, arrays_[first.i_out].size_);
 				arrays_[last.i_out].erase(0, last.i_in);
-				arrays_.erase(first.i_out + 1, last.i_out);
+				if (last.i_out - first.i_out > 0)
+					arrays_.erase(first.i_out + 1, last.i_out);
+				first.i_in = 0;
+				first.i_out++;
 			}
-			return last; /// DON'T REMEMBER
+			return first;
+			// return last; /// DON'T REMEMBER
 		}
+		// iterator erase(iterator first, iterator last)
+		// {
+		// 	if (last.i_in == 0){
+		// 		--last;
+		// 		++last.i_in;
+		// 	}
+		// 	if (first.i_out == last.i_out)
+		// 	{
+		// 		arrays_[first.i_out].erase(first.i_in, last.i_in);
+		// 	}
+		// 	else
+		// 	{
+		// 		arrays_[first.i_out].erase(first.i_in, arrays_[first.i_out].size_);
+		// 		arrays_[last.i_out].erase(0, last.i_in);
+		// 		if (last.i_out - first.i_out > 0)
+		// 			arrays_.erase(first.i_out + 1, last.i_out);
+		// 	}
+		// 	return last; /// DON'T REMEMBER
+		// }
 
 	private:
 		pointer get_position(size_t n) const
 		{
-			for (int i = arrays_.index_first; i < arrays_.index_first + arrays_.size_; ++i)
+			for (int i = 0; i < arrays_.size_; ++i)
 			{
 				if (n < arrays_[i].size_)
 					return &arrays_[i][n];
@@ -406,12 +524,13 @@ namespace ft
 		pointer operator->() const { return &(operator*()); }
 		reference operator[](difference_type n) const
 		{
-			for (int i = array_->i_out; i < array_->index_first + array_->size_; ++i)
-			{
-				if (n < (*array_)[i].size_)
-					return (*array_)[i][n];
-				n -= (*array_)[i].size_;
-			}
+			return *(*this + n);
+			// for (int i = array_->i_out; i < array_->index_first + array_->size_; ++i)
+			// {
+			// 	if (n < (*array_)[i].size_)
+			// 		return (*array_)[i][n];
+			// 	n -= (*array_)[i].size_;
+			// }
 		}
 		deque_iterator operator+(difference_type n) const
 		{
@@ -429,7 +548,7 @@ namespace ft
 					i_in += n;
 					break;
 				}
-				n -= i_in + (*array_)[i_out++].size_;
+				n -= ((*array_)[i_out++].size_- i_in); //????
 				i_in = 0;
 			}
 			return *this;
@@ -457,14 +576,11 @@ namespace ft
 		}
 		deque_iterator &operator++()
 		{
-			if (i_in == (*array_)[i_out].size_)
+			++i_in;
+			if (i_in && i_in == (*array_)[i_out].size_)
 			{
 				i_in = 0;
 				++i_out;
-			}
-			else
-			{
-				++i_in;
 			}
 
 			return *this;
@@ -482,10 +598,7 @@ namespace ft
 				--i_out;
 				i_in = (*array_)[i_out].size_;
 			}
-			else
-			{
-				--i_in;
-			}
+			--i_in;
 			return *this;
 		}
 		deque_iterator operator--(int)

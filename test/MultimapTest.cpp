@@ -111,13 +111,13 @@ TEST(MultimapTest, MaxSize)
 {
   LIBRARY::multimap<int, int> mymap;
   std::multimap<int, int> stdmap;
-  // EXPECT_EQ(mymap.max_size(), stdmap.max_size());
-  // LIBRARY::multimap<double, double> mymap2;
-  // std::multimap<double, double> stdmap2;
-  // EXPECT_EQ(mymap2.max_size(), stdmap2.max_size());
-  // LIBRARY::multimap<char, int> mymap3;
-  // std::multimap<char, int> stdmap3;
-  // EXPECT_EQ(mymap3.max_size(), stdmap3.max_size());
+  EXPECT_EQ(mymap.max_size(), stdmap.max_size()) << "int, int";
+  LIBRARY::multimap<double, double> mymap2;
+  std::multimap<double, double> stdmap2;
+  EXPECT_EQ(mymap2.max_size(), stdmap2.max_size()) << "double, double";
+  LIBRARY::multimap<char, int> mymap3;
+  std::multimap<char, int> stdmap3;
+  EXPECT_EQ(mymap3.max_size(), stdmap3.max_size()) << "char, int";
 }
 
 TEST(MultimapTest, Insert)
@@ -282,6 +282,66 @@ TEST(MultimapTest, EraseRange)
     EXPECT_EQ(it->second, result1[i++]);
 }
 
+TEST(MultimapTest, EraseRange2)
+{
+  LIBRARY::multimap<char, int> mymultimap;
+  LIBRARY::multimap<char, int>::iterator it;
+  LIBRARY::multimap<char, int>::iterator it2;
+
+  // insert some values:
+  mymultimap.insert(LIBRARY::pair<char, int>('a', 10));
+  mymultimap.insert(LIBRARY::pair<char, int>('b', 20));
+  mymultimap.insert(LIBRARY::pair<char, int>('b', 30));
+  mymultimap.insert(LIBRARY::pair<char, int>('c', 40));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 50));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 60));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 70));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 80));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 90));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 100));
+
+  it = mymultimap.find('c');
+  it2 = mymultimap.end();
+  advance(it2, -4);
+
+  mymultimap.erase(it, it2); // erasing by range
+  int i = 0;
+  int result2[] = {10, 20, 30, 70, 80, 90, 100};
+  ASSERT_EQ(mymultimap.size(), 7);
+  for (it = mymultimap.begin(); it != mymultimap.end(); ++it)
+    EXPECT_EQ(it->second, result2[i++]);
+}
+
+TEST(MultimapTest, EraseRange3)
+{
+  LIBRARY::multimap<char, int> mymultimap;
+  LIBRARY::multimap<char, int>::iterator it;
+  LIBRARY::multimap<char, int>::iterator it2;
+
+  // insert some values:
+  mymultimap.insert(LIBRARY::pair<char, int>('a', 10));
+  mymultimap.insert(LIBRARY::pair<char, int>('b', 20));
+  mymultimap.insert(LIBRARY::pair<char, int>('b', 30));
+  mymultimap.insert(LIBRARY::pair<char, int>('c', 40));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 50));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 60));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 70));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 80));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 90));
+  mymultimap.insert(LIBRARY::pair<char, int>('d', 100));
+
+  it = mymultimap.find('c');
+  it2 = mymultimap.end();
+  advance(it2, -5);
+
+  mymultimap.erase(it, it2); // erasing by range
+  int i = 0;
+  int result2[] = {10, 20, 30, 60, 70, 80, 90, 100};
+  ASSERT_EQ(mymultimap.size(), 8);
+  for (it = mymultimap.begin(); it != mymultimap.end(); ++it)
+    EXPECT_EQ(it->second, result2[i++]);
+}
+
 TEST(MultimapTest, Swap)
 {
   LIBRARY::multimap<char, int> foo, bar;
@@ -330,10 +390,6 @@ TEST(MultimapTest, KeyComp)
   mymultimap.insert(LIBRARY::make_pair('b', 200));
   mymultimap.insert(LIBRARY::make_pair('b', 211));
   mymultimap.insert(LIBRARY::make_pair('c', 300));
-  // mymultimap.insert (LIBRARY::make_pair('a',100));
-  // mymultimap.insert (LIBRARY::make_pair('b',200));
-  // mymultimap.insert (LIBRARY::make_pair('b',211));
-  // mymultimap.insert (LIBRARY::make_pair('c',300));
 
   char highest = mymultimap.rbegin()->first; // key value of last element
 

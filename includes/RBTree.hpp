@@ -108,6 +108,10 @@ namespace ft
 		{
 			return size_;
 		}
+		size_t max_size() const
+		{
+			return std::numeric_limits<difference_type>::max() / (sizeof(Node) / 2);
+		}
 		// ########################## MAIN FUNCTIONS ###################################
 		Node *find(const value_type &k) const
 		{
@@ -260,7 +264,7 @@ namespace ft
 			}
 			return balance(x);
 		}
-		Node* deleteKey(Node *x, Node** last = 0)
+		Node* deleteKey(Node *x)
 		{
 			Node *ret = 0;
 			if (!x)
@@ -275,30 +279,127 @@ namespace ft
 				if (!x->parent_) {
 					root_ = x->left_;
 					root_->parent_ = 0;
-				} else {
-					if (!comp(x->parent_->value_, x->value_)) // how is it different from x->isLeft?
-						ret = x->parent_;
+				}
+				else {
+					iterator it(x, this);
+					++it;
+					ret = it.node_;
 					(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
 					if (x->left_) {
 						x->left_->isLeft = x->isLeft;
 						x->left_->parent_ = x->parent_;
 					}
 				}
-				delete x;
+					std::cout << "1 DELETING " << x->value_.first << "=>" << x->value_.second << std::endl;
+					std::cout << "1 RETURNING " << ret->value_.first << "=>" << ret->value_.second << std::endl;
+					
+					--size_;
+					delete x;
 			}
 			else
 			{
 				Node *h = min(x->right_);
-				if (last && h == *last)
-					*last = x;
 				x->value_ = h->value_;
-				h->isLeft ? h->parent_->left_ = 0: h->parent_->right_ = 0;
+				std::cout << "2 DELETING " << x->value_.first << "=>" << x->value_.second << std::endl;
+				std::cout << "2 RETURNING " << h->value_.first << "=>" << h->value_.second << std::endl;
+				
+				h->isLeft ? h->parent_->left_ = 0: h->parent_->right_ = h->right_;
+				if (h->right_)
+					h->right_->parent_ = h->parent_;
 				delete h;
+				--size_;
+				
 				ret = x;
 			}
-			--size_;
 			return ret;
 		}
+		// Node* deleteKey(Node *x)
+		// {
+		// 	Node *ret = 0;
+		// 	if (!x)
+		// 		return x; 
+		// 	if (size_ == 1)
+		// 	{
+		// 		delete x;
+		// 		root_ = 0;
+		// 	}
+		// 	else if (!x->right_)
+		// 	{
+		// 		if (!x->parent_) {
+		// 			root_ = x->left_;
+		// 			root_->parent_ = 0;
+		// 		} else {
+		// 			iterator it(x, this);
+		// 			++it;
+		// 			ret = it.node_;
+		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
+		// 			if (x->left_) {
+		// 				x->left_->isLeft = x->isLeft;
+		// 				x->left_->parent_ = x->parent_;
+		// 			}
+		// 			std::cout << "1 DELETING " << x->value_.first << "=>" << x->value_.second << std::endl;
+		// 			std::cout << "1 RETURNING " << ret->value_.first << "=>" << ret->value_.second << std::endl;
+		// 		}
+		// 		--size_;
+		// 		delete x;
+		// 	}
+		// 	else
+		// 	{
+		// 		iterator it(x, this);
+		// 		++it;
+		// 		x->value_ = it.node_->value_;
+		// 		ret = x;
+		// 		std::cout << "2 DELETING " << x->value_.first << "=>" << x->value_.second << std::endl;
+		// 		std::cout << "2 RETURNING " << ret->value_.first << "=>" << ret->value_.second << std::endl;
+		// 		if (it.node_->right_)
+		// 			deleteKey(it.node_);
+		// 		else {
+		// 			it.node_->isLeft ? it.node_->parent_->left_ = 0: it.node_->parent_->right_ = 0;
+		// 			delete it.node_;
+		// 			--size_;
+		// 		}
+		// 	}
+		// 	return ret;
+		// }
+		// Node* deleteKey(Node *x, Node** last = 0)
+		// {
+		// 	Node *ret = 0;
+		// 	if (!x)
+		// 		return x; 
+		// 	if (size_ == 1)
+		// 	{
+		// 		delete x;
+		// 		root_ = 0;
+		// 	}
+		// 	else if (!x->right_)
+		// 	{
+		// 		if (!x->parent_) {
+		// 			root_ = x->left_;
+		// 			root_->parent_ = 0;
+		// 		} else {
+		// 			if (!comp(x->parent_->value_, x->value_)) // how is it different from x->isLeft?
+		// 				ret = x->parent_;
+		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
+		// 			if (x->left_) {
+		// 				x->left_->isLeft = x->isLeft;
+		// 				x->left_->parent_ = x->parent_;
+		// 			}
+		// 		}
+		// 		delete x;
+		// 	}
+		// 	else
+		// 	{
+		// 		Node *h = min(x->right_);
+		// 		if (last && h == *last)
+		// 			*last = x;
+		// 		x->value_ = h->value_;
+		// 		h->isLeft ? h->parent_->left_ = 0: h->parent_->right_ = 0;
+		// 		delete h;
+		// 		ret = x;
+		// 	}
+		// 	--size_;
+		// 	return ret;
+		// }
 		// void deleteKey(Node *x)
 		// {
 		// 	if (!x)

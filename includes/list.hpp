@@ -200,7 +200,7 @@ namespace ft
 		}
 		//############################# MEMBER FUNCTIONS ###############################
 		inline size_type size() const { return size_; }
-		inline size_type max_size() const { return std::numeric_limits<difference_type>::max() / sizeof(Node) * 2; } // ?
+		inline size_type max_size() const { return std::numeric_limits<difference_type>::max() / (sizeof(Node) / 2); } // ?
 		inline bool empty() const { return !size_; }
 		void resize(size_t n, T val = T())
 		{

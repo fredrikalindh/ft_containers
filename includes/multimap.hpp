@@ -77,8 +77,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 //########################### CAPACITY #######################################
 	bool					empty() const {return !tree_.size();}
 	size_type				size() const {return tree_.size();}
-	size_type				max_size() const { return std::numeric_limits<difference_type>::max() / sizeof(ft::pair<Key, T>); }
-	// size_type				max_size() const { return std::numeric_limits<difference_type>::max() / (sizeof(ft::pair<Key, T>) + 16); }
+	size_type				max_size() const { return tree_.max_size(); }
 //########################### INSERT #######################################
 	iterator	insert (const value_type& val) {
 		return iterator(tree_.add(val), &tree_);
@@ -102,7 +101,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 	void					erase (iterator first, iterator last){ // CAN MAKE MORE EFFICIENT
 		while (first != last)
-			first = tree_.deleteKey(first.node_, &last.node_);
+			first = tree_.deleteKey(first.node_);
 	}
 //########################### MODIFIERS #######################################
 	void					swap (multimap& x) {

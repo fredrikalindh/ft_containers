@@ -26,7 +26,7 @@ queue:
 map:
 	@ clang++ -lgtest -I ${INCLUDES} -D FLAGS=16 test/UnitTest.cpp -o ${NAME} 
 deque:
-	@ clang++ -lgtest -I ${INCLUDES} -D FLAGS=32 test/UnitTest.cpp -o ${NAME} 
+	@ clang++ -lgtest -fsanitize=address -I ${INCLUDES} -D FLAGS=32 test/UnitTest.cpp -o ${NAME} 
 set:
 	@ clang++ -lgtest -I ${INCLUDES} -D FLAGS=64 test/UnitTest.cpp -o ${NAME} 
 multiset:

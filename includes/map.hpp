@@ -80,7 +80,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 //########################### CAPACITY #######################################
 	bool					empty() const {return !tree_.size();}
 	size_type				size() const {return tree_.size();}
-	size_type				max_size() const {return std::numeric_limits<difference_type>::max() / (sizeof(T) + 16);}
+	size_type				max_size() const {return tree_.max_size();}
 //########################### INSERT #######################################
 	ft::pair<iterator,bool>	insert (const value_type& val){
 		iterator ret(tree_.add(val), &tree_);
