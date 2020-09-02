@@ -91,17 +91,21 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 //########################### ERASE #######################################
 	void					erase (iterator position){
+		// std::cout << position->first << std::endl;
 		tree_.deleteKey(position.node_);
 	}
 	size_type				erase (const key_type& k) {
+		// std::cout << "2" << std::endl;
 		size_type i = 0;
 		while (tree_.deleteKey(k))
 			i++;
 		return i;
 	}
 	void					erase (iterator first, iterator last){ // CAN MAKE MORE EFFICIENT
-		while (first != last)
+		while (first != end() && first != last && (last == end() || !comp(last->first, first->first))) {
+			// std::cout << "ERASING " << first->first << "=>" << first->second << "\n";
 			first = tree_.deleteKey(first.node_);
+		}
 	}
 //########################### MODIFIERS #######################################
 	void					swap (multimap& x) {
