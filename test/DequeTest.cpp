@@ -590,14 +590,14 @@ TEST(DequeTest, RelOps)
 }
 
 
-TEST(DequeTest, IteratorOP)
+TEST(DequeTest, IteratorOP1)
 {
   LIBRARY::deque<int> mydeque;
   LIBRARY::deque<int>::iterator it;
   std::deque<int> stddeque;
   std::deque<int>::iterator stdit;
 
-  for (int i = 0; i < 3000; ++i){
+  for (int i = 0; i < 20; ++i){
     mydeque.push_front(i);
     stddeque.push_front(i);
   }
@@ -614,9 +614,47 @@ TEST(DequeTest, IteratorOP)
   it -= 5;
   stdit -= 5;
   EXPECT_EQ(*it, *stdit);
-  // it -= 10;
-  // stdit -= 10;
-  // EXPECT_EQ(*it, *stdit);
+  it -= 5;
+  stdit -= 5;
+  EXPECT_EQ(*it, *stdit);
   EXPECT_EQ(*(it + 10), *(stdit + 10));
+  EXPECT_EQ(it[10], stdit[10]);
+}
+TEST(DequeTest, IteratorOP2)
+{
+  LIBRARY::deque<std::pair<int, int> > mydeque2;
+  LIBRARY::deque<std::pair<int, int> >::iterator it2;
+  std::deque<std::pair<int, int> > stddeque2;
+  std::deque<std::pair<int, int> >::iterator stdit2;
 
+  std::pair<int, int> p(1, 2);
+  mydeque2.push_back(p);
+  stddeque2.push_back(p);
+  it2 = mydeque2.begin();
+  stdit2 = stddeque2.begin();
+  EXPECT_EQ(it2->first, stdit2->first);
+  EXPECT_EQ(it2->second, stdit2->second);
+}
+TEST(DequeTest, IteratorOP3)
+{
+  LIBRARY::deque<int> mydeque;
+  LIBRARY::deque<int>::iterator it;
+  std::deque<int> stddeque;
+  std::deque<int>::iterator stdit;
+
+  for (int i = 0; i < 3000; ++i){
+    mydeque.push_front(i);
+    stddeque.push_front(i);
+  }
+  int i = 3000;
+  LIBRARY::deque<int>::iterator it2 = mydeque.end() - 1;
+  for (it = mydeque.begin(); it < mydeque.end(); ++it)
+    EXPECT_EQ(--i, *it);
+  EXPECT_EQ(i, 0);
+  i = 3000;
+  for (it = mydeque.begin(); it <= it2; ++it)
+    EXPECT_EQ(--i, *it);
+  EXPECT_EQ(i, 0);
+  for (; it2 > mydeque.begin(); --it2)
+    EXPECT_EQ(i++, *it2);
 }

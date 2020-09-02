@@ -525,12 +525,6 @@ namespace ft
 		reference operator[](difference_type n) const
 		{
 			return *(*this + n);
-			// for (int i = array_->i_out; i < array_->index_first + array_->size_; ++i)
-			// {
-			// 	if (n < (*array_)[i].size_)
-			// 		return (*array_)[i][n];
-			// 	n -= (*array_)[i].size_;
-			// }
 		}
 		deque_iterator operator+(difference_type n) const
 		{
@@ -563,7 +557,7 @@ namespace ft
 		{
 			while (n)
 			{
-				if (i_in - n > 0)
+				if (i_in - n >= 0)
 				{
 					i_in -= n;
 					break;
@@ -632,7 +626,7 @@ namespace ft
 		template <class it>
 		friend bool operator<=(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
 		{
-			return !(lhs < rhs);
+			return !(rhs < lhs);
 		}
 		template <class it>
 		friend bool operator>(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
@@ -642,7 +636,7 @@ namespace ft
 		template <class it>
 		friend bool operator>=(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
 		{
-			return !(rhs < lhs);
+			return !(lhs < rhs);
 		}
 	};
 	template <class T>
