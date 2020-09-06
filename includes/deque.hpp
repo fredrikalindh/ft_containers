@@ -3,7 +3,7 @@
 
 namespace ft
 {
-	template <class T>
+	template <class T, bool isconst = false>
 	class deque_iterator;
 
 	/*
@@ -19,8 +19,8 @@ namespace ft
 	{
 		template <class U>
 		friend class deque;
-		// template <class U>
-		friend class deque_iterator<T>;
+		template <class U, bool isconst>
+		friend class deque_iterator;
 
 		int capacity_;
 		T *array_;
@@ -180,8 +180,10 @@ namespace ft
 	template <class T>
 	class deque
 	{
-	protected:
-		static const size_t ARRAY_SIZE = 1024;
+		template <class U, bool isconst>
+		friend class deque_iterator;
+
+		static const int ARRAY_SIZE = 1024;
 
 		deque_array<deque_array<T> > arrays_;
 
@@ -193,8 +195,8 @@ namespace ft
 		typedef const value_type &const_reference;
 		typedef value_type *pointer;
 		typedef const value_type *const_pointer;
-		typedef deque_iterator<T> iterator;
-		typedef deque_iterator<T> const_iterator; // #########################################
+		typedef ft::deque_iterator<T> iterator;
+		typedef ft::deque_iterator<T, true> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -228,16 +230,8 @@ namespace ft
 		}
 		iterator begin() { return iterator(0, 0, &arrays_); }
 		const_iterator begin() const { return const_iterator(0, 0, &arrays_); }
-		iterator end() { 
-			// if (arrays_.size_)
-				return iterator(arrays_.size_, 0, &arrays_);
-			// return iterator(0, 0, &arrays_); 
-		}
-		const_iterator end() const { 
-			// if (arrays_.size_)
-				return iterator(arrays_.size_, 0, &arrays_);
-			// return iterator(0, 0, &arrays_); 
-		}
+		iterator end() { return iterator(arrays_.size_, 0, &arrays_); }
+		const_iterator end() const { return const_iterator(arrays_.size_, 0, &arrays_); }
 		reverse_iterator rbegin() { return reverse_iterator(end()); }
 		const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 		reverse_iterator rend() { return reverse_iterator(begin()); }
@@ -259,7 +253,7 @@ namespace ft
 			if (n < sz)
 				erase(begin() + n, end());
 			else if (n > sz)
-				insert(end(), n - sz, val);
+				insert(end(), size_t(n - sz), val);
 		}
 		bool empty() const { return !size(); }
 		void swap(deque &x)
@@ -356,8 +350,9 @@ namespace ft
 				--position;
 			return position;
 		}
-		void insert(iterator position, size_type n, const value_type &val)
+		void insert(iterator position, size_type n2, const value_type &val)
 		{
+			int n = n2;
 			if (!position.i_in) { // position == end()
 				for (int i = 0; i < n; ++i) 
 					push_back(val);
@@ -450,30 +445,11 @@ namespace ft
 			return first;
 			// return last; /// DON'T REMEMBER
 		}
-		// iterator erase(iterator first, iterator last)
-		// {
-		// 	if (last.i_in == 0){
-		// 		--last;
-		// 		++last.i_in;
-		// 	}
-		// 	if (first.i_out == last.i_out)
-		// 	{
-		// 		arrays_[first.i_out].erase(first.i_in, last.i_in);
-		// 	}
-		// 	else
-		// 	{
-		// 		arrays_[first.i_out].erase(first.i_in, arrays_[first.i_out].size_);
-		// 		arrays_[last.i_out].erase(0, last.i_in);
-		// 		if (last.i_out - first.i_out > 0)
-		// 			arrays_.erase(first.i_out + 1, last.i_out);
-		// 	}
-		// 	return last; /// DON'T REMEMBER
-		// }
 
 	private:
-		pointer get_position(size_t n) const
+		pointer get_position(int n) const
 		{
-			for (int i = 0; i < arrays_.size_; ++i)
+			for (int i = 0; n >= 0 && i < arrays_.size_; ++i)
 			{
 				if (n < arrays_[i].size_)
 					return &arrays_[i][n];
@@ -482,39 +458,44 @@ namespace ft
 			return nullptr;
 		}
 	};
-
 	/*
 	* DEQUE_ITERATOR: a double layered array_, index for the outer array and 
 	* index for the inner. It will try to do all operations on the inner index
 	* if fail it will go out one layer
 	*/
-	template <class T>
+	template <class T, bool isconst>
 	class deque_iterator
 	{
 		friend class deque<T>;
+		friend class deque_iterator<T, false>;
+		friend class deque_iterator<T, true>;
 
-		int i_out;								   // index for array
-		int i_in;								   // index inside array
-		const deque_array<deque_array<T> > *array_; // pointer to the container
+		typedef typename choose<isconst, 
+		const deque_array<deque_array<T> > *, 
+		deque_array<deque_array<T> > *>::type dequeptr;
+
+		int i_out;			// index for array
+		int i_in;			// index inside array
+		dequeptr array_;	// pointer to the container
 
 	public:
 		typedef ft::random_access_iterator_tag iterator_category;
 		typedef std::ptrdiff_t difference_type;
 		typedef T value_type;
-		typedef T *pointer;
-		typedef T &reference;
+		typedef typename choose<isconst, const T &, T &>::type reference;
+		typedef typename choose<isconst, const T *, T *>::type pointer;
 
 		deque_iterator() : i_out(0),
 						   i_in(0),
 						   array_(0) {}
-		deque_iterator(int out, int in, const deque_array<deque_array<T> > *d) : i_out(out),
-																				i_in(in),
-																				array_(d) {}
-		deque_iterator(deque_iterator const &x) : i_out(x.i_out),
+		deque_iterator(int out, int in, dequeptr d) : i_out(out),
+														i_in(in),
+														array_(d) {}
+		deque_iterator(deque_iterator<T, false> const &x) : i_out(x.i_out),
 												  i_in(x.i_in),
 												  array_(x.array_) {}
 		~deque_iterator() {}
-		deque_iterator &operator=(deque_iterator const &x)
+		deque_iterator &operator=(deque_iterator<T, false> const &x)
 		{
 			deque_iterator tmp(x);
 			swap(tmp);
@@ -522,10 +503,7 @@ namespace ft
 		}
 		reference operator*() const { return (*array_)[i_out][i_in]; }
 		pointer operator->() const { return &(operator*()); }
-		reference operator[](difference_type n) const
-		{
-			return *(*this + n);
-		}
+		reference operator[](difference_type n) const { return *(*this + n); }
 		deque_iterator operator+(difference_type n) const
 		{
 			deque_iterator tmp(*this);
@@ -608,44 +586,41 @@ namespace ft
 			memcpy(reinterpret_cast<char *>(&x), this, sizeof(deque_iterator));
 			memcpy(reinterpret_cast<char *>(this), buffer, sizeof(deque_iterator));
 		}
-		template <class it>
-		friend bool operator==(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
+		friend bool operator==(deque_iterator const &lhs, deque_iterator const &rhs)
 		{
 			return lhs.i_out == rhs.i_out && lhs.i_in == rhs.i_in && lhs.array_ == rhs.array_;
 		}
-		template <class it>
-		friend bool operator!=(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
+		friend bool operator!=(deque_iterator const &lhs, deque_iterator const &rhs)
 		{
 			return !(lhs == rhs);
 		}
-		template <class it>
-		friend bool operator<(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
+		friend bool operator<(deque_iterator const &lhs, deque_iterator const &rhs)
 		{
 			return lhs.i_out < rhs.i_out || lhs.i_in < rhs.i_in || lhs.array_ < rhs.array_;
 		}
-		template <class it>
-		friend bool operator<=(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
+		friend bool operator<=(deque_iterator const &lhs, deque_iterator const &rhs)
 		{
 			return !(rhs < lhs);
 		}
-		template <class it>
-		friend bool operator>(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
+		friend bool operator>(deque_iterator const &lhs, deque_iterator const &rhs)
 		{
 			return rhs < lhs;
 		}
-		template <class it>
-		friend bool operator>=(const ft::deque_iterator<it> &lhs, const ft::deque_iterator<it> &rhs)
+		friend bool operator>=(deque_iterator const &lhs, deque_iterator const &rhs)
 		{
 			return !(lhs < rhs);
 		}
 	};
+
+} //namespace ft
+
 	template <class T>
 	void swap(ft::deque<T> &a, ft::deque<T> &b)
 	{
 		a.swap(b);
 	}
 	template <class T>
-	bool operator==(deque<T> const &lhs, deque<T> const &rhs)
+	bool operator==(ft::deque<T> const &lhs, ft::deque<T> const &rhs)
 	{
 		if (lhs.size() != rhs.size())
 			return false;
@@ -696,7 +671,5 @@ namespace ft
 	{
 		return !(lhs < rhs);
 	}
-
-} //namespace ft
 
 #endif

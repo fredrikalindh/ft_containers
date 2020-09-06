@@ -10,16 +10,16 @@ TEST(DequeTest, Constructors)
   int myints[] = {16, 2, 77, 29, 20};
   LIBRARY::deque<int> fifth(myints, myints + sizeof(myints) / sizeof(int));
 
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 4);
-  EXPECT_EQ(third.size(), 4);
-  EXPECT_EQ(fourth.size(), 4000);
-  EXPECT_EQ(fifth.size(), 5);
-  EXPECT_EQ(sixth.size(), 4000);
+  EXPECT_EQ(first.size(),size_t(0));
+  EXPECT_EQ(second.size(),size_t(4));
+  EXPECT_EQ(third.size(),size_t(4));
+  EXPECT_EQ(fourth.size(),size_t(4000));
+  EXPECT_EQ(fifth.size(),size_t(5));
+  EXPECT_EQ(sixth.size(),size_t(4000));
 
   for (LIBRARY::deque<int>::iterator it = second.begin(); it != second.end(); ++it)
     EXPECT_EQ(*it, 100);
-  for (int i = 0; i < fifth.size(); ++i)
+  for (size_t i = 0; i < fifth.size(); ++i)
     EXPECT_EQ(myints[i], fifth[i]);
 }
 
@@ -31,8 +31,8 @@ TEST(DequeTest, Assignment)
   second = first;
   first = LIBRARY::deque<int>();
 
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 3);
+  EXPECT_EQ(first.size(),size_t(0));
+  EXPECT_EQ(second.size(),size_t(3));
 }
 
 TEST(DequeTest, Begin)
@@ -95,14 +95,14 @@ TEST(DequeTest, Empty)
 TEST(DequeTest, Size)
 {
   LIBRARY::deque<int> myints;
-  EXPECT_EQ(myints.size(), 0);
+  EXPECT_EQ(myints.size(),size_t(0));
   for (int i = 0; i < 5; i++)
     myints.push_back(i);
-  EXPECT_EQ(myints.size(), 5);
+  EXPECT_EQ(myints.size(),size_t(5));
   myints.insert(myints.begin(), 5, 100);
-  EXPECT_EQ(myints.size(), 10);
+  EXPECT_EQ(myints.size(),size_t(10));
   myints.pop_back();
-  EXPECT_EQ(myints.size(), 9);
+  EXPECT_EQ(myints.size(),size_t(9));
 }
 
 TEST(DequeTest, MaxSize)
@@ -115,32 +115,32 @@ TEST(DequeTest, MaxSize)
   EXPECT_EQ(mydeque2.max_size(), stddeque2.max_size());
 }
 
-// TEST(DequeTest, Resize)
-// {
-//   LIBRARY::deque<int> mydeque;
-//   int myints[] = {1, 2, 3, 4, 5, 100, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+TEST(DequeTest, Resize)
+{
+  LIBRARY::deque<int> mydeque;
+  int myints[] = {1, 2, 3, 4, 5, 100, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-//   // set some initial content:
-//   for (int i = 1; i < 10; ++i)
-//     mydeque.push_back(i);
-//   mydeque.resize(5);
-//   EXPECT_EQ(mydeque.size(), 5);
-//   mydeque.resize(8, 100);
-//   EXPECT_EQ(mydeque.size(), 8);
-//   mydeque.resize(1300);
-//   for (int i = 0; i < 17; ++i)
-//     EXPECT_EQ(mydeque[i], myints[i]);
-//   EXPECT_EQ(mydeque.size(), 1300);
-//   for (int i = 0; i < 17; ++i)
-//     EXPECT_EQ(mydeque[i], myints[i]);
-//   mydeque.resize(12);
+  // set some initial content:
+  for (int i = 1; i < 10; ++i)
+    mydeque.push_back(i);
+  mydeque.resize(5);
+  EXPECT_EQ(mydeque.size(),size_t(5));
+  mydeque.resize(8, 100);
+  EXPECT_EQ(mydeque.size(),size_t(8));
+  mydeque.resize(1300);
+  for (int i = 0; i < 17; ++i)
+    EXPECT_EQ(mydeque[i], myints[i]);
+  EXPECT_EQ(mydeque.size(),size_t(1300));
+  for (int i = 0; i < 17; ++i)
+    EXPECT_EQ(mydeque[i], myints[i]);
+  mydeque.resize(12);
 
-//   int i = 0;
-//   for (LIBRARY::deque<int>::iterator it = mydeque.begin(); i < 12; ++it)
-//   {
-//     EXPECT_EQ(*it, myints[i++]);
-//   }
-// }
+  int i = 0;
+  for (LIBRARY::deque<int>::iterator it = mydeque.begin(); i < 12; ++it)
+  {
+    EXPECT_EQ(*it, myints[i++]);
+  }
+}
 
 TEST(DequeTest, Bracket)
 {
@@ -220,9 +220,9 @@ TEST(DequeTest, Assign)
 
   int myints[] = {1776, 7, 4};
   third.assign(myints, myints + 3); // assigning from array.
-  EXPECT_EQ(first.size(), 7);
-  EXPECT_EQ(second.size(), 5);
-  EXPECT_EQ(third.size(), 3);
+  EXPECT_EQ(first.size(),size_t(7));
+  EXPECT_EQ(second.size(),size_t(5));
+  EXPECT_EQ(third.size(),size_t(3));
 }
 
 TEST(DequeTest, PushBack)
@@ -234,8 +234,8 @@ TEST(DequeTest, PushBack)
     mydeque.push_back(i);
   mydeque2.push_back(20);
   mydeque2.push_back(30);
-  EXPECT_EQ(mydeque.size(), 1300);
-  EXPECT_EQ(mydeque2.size(), 1025);
+  EXPECT_EQ(mydeque.size(),size_t(1300));
+  EXPECT_EQ(mydeque2.size(),size_t(1025));
   EXPECT_EQ(mydeque2.back(), 30);
 }
 
@@ -248,8 +248,8 @@ TEST(DequeTest, PushFront)
     mydeque.push_front(i);
   mydeque2.push_front(20);
   mydeque2.push_front(30);
-  EXPECT_EQ(mydeque.size(), 1300);
-  EXPECT_EQ(mydeque2.size(), 1025);
+  EXPECT_EQ(mydeque.size(),size_t(1300));
+  EXPECT_EQ(mydeque2.size(),size_t(1025));
   EXPECT_EQ(mydeque2.front(), 30);
 }
 
@@ -266,7 +266,7 @@ TEST(DequeTest, PopBack)
     sum += mydeque.back();
     mydeque.pop_back();
   }
-  EXPECT_EQ(mydeque.size(), 1016);
+  EXPECT_EQ(mydeque.size(),size_t(1016));
   while (!mydeque.empty())
   {
     sum += mydeque.back();
@@ -286,7 +286,7 @@ TEST(DequeTest, PopFront)
   {
     mydeque.pop_front();
   }
-  EXPECT_EQ(mydeque.size(), 0);
+  EXPECT_EQ(mydeque.size(),size_t(0));
 }
 
 // TEST(DequeTest, InsertIterator)
@@ -321,7 +321,7 @@ TEST(DequeTest, PopFront)
 
 //   it = mydeque.begin() + 5;
 //   mydeque.insert(it, 1030, 100);
-//   EXPECT_EQ(mydeque.size(), 1040);
+//   EXPECT_EQ(mydeque.size(),size_t( )1040);
 //   EXPECT_EQ(mydeque.front(), 1);
 //   EXPECT_EQ(mydeque.back(), 5);
 //   EXPECT_EQ(*(mydeque.begin() + 6), 100);
@@ -378,7 +378,7 @@ TEST(DequeTest, InsertN)
   EXPECT_EQ(mydeque.front(), stddeque.front());
   EXPECT_EQ(mydeque.back(), stddeque.back());
   EXPECT_EQ(mydeque.size(), stddeque.size()) << "AFTER INSERT 1000";
-  for (int i = 0; i < mydeque.size(); ++i)
+  for (size_t i = 0; i < mydeque.size(); ++i)
   {
     EXPECT_EQ(mydeque[i], stddeque[i]) << i;
     // std::cout << mydeque[i] << " == " << stddeque[i] << " ";
@@ -398,7 +398,7 @@ TEST(DequeTest, InsertN)
   EXPECT_EQ(*it, *stdit);
   mydeque.insert(it , 300, 50);   // 1 10 2 3 4 5
   stddeque.insert(stdit, 300, 50); // 1 10 2 3 4 5
-   for (int i = 0; i < mydeque.size(); ++i)
+   for (size_t i = 0; i < mydeque.size(); ++i)
   {
     EXPECT_EQ(mydeque[i], stddeque[i]) << i;
     // std::cout << mydeque[i] << " == " << stddeque[i] << " ";
@@ -480,7 +480,7 @@ TEST(DequeTest, EraseElement)
   EXPECT_EQ(mydeque.front(), stddeque.front());
   EXPECT_EQ(mydeque.back(), stddeque.back());
   EXPECT_EQ(mydeque.size(), stddeque.size());
-  for (int i = 0; i < mydeque.size(); ++i)
+  for (size_t i = 0; i < mydeque.size(); ++i)
       EXPECT_EQ(mydeque[i], stddeque[i]);
 }
 
@@ -503,7 +503,7 @@ TEST(DequeTest, EraseRange)
   EXPECT_EQ(mydeque.front(), stddeque.front());
   EXPECT_EQ(mydeque.back(), stddeque.back());
   EXPECT_EQ(mydeque.size(), stddeque.size());
-  for (int i = 0; i < mydeque.size(); ++i)
+  for (size_t i = 0; i < mydeque.size(); ++i)
       EXPECT_EQ(mydeque[i], stddeque[i]);
 
   for (int i = 1; i <= 30; i++){
@@ -518,7 +518,7 @@ TEST(DequeTest, EraseRange)
   EXPECT_EQ(mydeque.front(), stddeque.front());
   EXPECT_EQ(mydeque.back(), stddeque.back());
   EXPECT_EQ(mydeque.size(), stddeque.size());
-  for (int i = 0; i < mydeque.size(); ++i)
+  for (size_t i = 0; i < mydeque.size(); ++i)
       EXPECT_EQ(mydeque[i], stddeque[i]);
 
   for (int i = 1; i <= 3000; i++){
@@ -530,7 +530,7 @@ TEST(DequeTest, EraseRange)
   stdit = stddeque.end();
   it = mydeque.erase(it - 1000, it - 500);
   stdit = stddeque.erase(stdit - 1000, stdit - 500);
-  for (int i = 0; i < mydeque.size(); ++i)
+  for (size_t i = 0; i < mydeque.size(); ++i)
       EXPECT_EQ(mydeque[i], stddeque[i]);
   EXPECT_EQ(*it, *stdit);
   EXPECT_EQ(mydeque.front(), stddeque.front());
@@ -541,7 +541,7 @@ TEST(DequeTest, EraseRange)
   stdit = stddeque.begin();
   it = mydeque.erase(it + 10, it + 20);
   stdit = stddeque.erase(stdit + 10, stdit + 20);
-  for (int i = 0; i < mydeque.size(); ++i)
+  for (size_t i = 0; i < mydeque.size(); ++i)
       EXPECT_EQ(mydeque[i], stddeque[i]);
   EXPECT_EQ(*it, *stdit);
   EXPECT_EQ(mydeque.front(), stddeque.front());
@@ -555,11 +555,11 @@ TEST(DequeTest, Swap)
   LIBRARY::deque<int> foo(3, 100); // three ints with a value of 100
   LIBRARY::deque<int> bar(5, 200); // five ints with a value of 200
 
-  EXPECT_EQ(foo.size(), 3);
-  EXPECT_EQ(bar.size(), 5);
+  EXPECT_EQ(foo.size(), size_t(3));
+  EXPECT_EQ(bar.size(), size_t(5));
   foo.swap(bar);
-  EXPECT_EQ(foo.size(), 5);
-  EXPECT_EQ(bar.size(), 3);
+  EXPECT_EQ(foo.size(), size_t(5));
+  EXPECT_EQ(bar.size(), size_t(3));
 }
 
 TEST(DequeTest, Clear)
@@ -569,10 +569,10 @@ TEST(DequeTest, Clear)
   mydeque.push_back(200);
   mydeque.push_back(300);
   mydeque.clear();
-  EXPECT_EQ(mydeque.size(), 0);
+  EXPECT_EQ(mydeque.size(), size_t(0));
   mydeque.push_back(1101);
   mydeque.push_back(2202);
-  EXPECT_EQ(mydeque.size(), 2);
+  EXPECT_EQ(mydeque.size(), size_t(2));
 }
 
 TEST(DequeTest, RelOps)
@@ -657,4 +657,21 @@ TEST(DequeTest, IteratorOP3)
   EXPECT_EQ(i, 0);
   for (; it2 > mydeque.begin(); --it2)
     EXPECT_EQ(i++, *it2);
+}
+
+TEST(DequeTest, ConstIterator)
+{
+  LIBRARY::deque<int> deque(3, 100); // three ints with a value of 100
+  LIBRARY::deque<int>::const_iterator it;
+  LIBRARY::deque<int>::const_iterator it3(it);
+  LIBRARY::deque<int>::iterator it2;
+
+  for (it = deque.begin(); it != deque.end(); ++it)
+  {
+    // *it += 5;
+  }
+  it2 = --deque.end();
+  it = it2;
+  it3 = it2;
+  // it2 = it;
 }

@@ -8,6 +8,96 @@
 
 namespace ft
 {
+
+template <class T, bool isconst = false>
+class vector_iterator
+{
+	friend class vector_iterator<T, false>;
+	friend class vector_iterator<T, true>;
+	
+public:
+	typedef ft::random_access_iterator_tag iterator_category;
+	typedef T value_type;
+	typedef typename choose<isconst, const T &, T &>::type reference;
+	typedef typename choose<isconst, const T *, T *>::type pointer;
+    typedef std::ptrdiff_t difference_type;
+protected:
+	pointer p;
+public:
+	vector_iterator(): p(nullptr) {}
+	vector_iterator(pointer p): p(p) {}
+	vector_iterator(vector_iterator<T, false> const &x): p(x.p) {}
+	virtual ~vector_iterator() {}
+
+	vector_iterator &operator=(vector_iterator<T, false> const &x) {
+		p = x.p;
+		return *this;
+	}
+	reference operator*() const {
+		return *p;
+	}
+	pointer operator->() const {
+		return p;
+	}
+    reference operator[](int val) const {
+		return *(p + val);
+	}
+	vector_iterator operator++(int) {
+		vector_iterator tmp(*this);
+		++p;
+		return tmp;
+	}
+	vector_iterator &operator++() {
+		++p;
+		return *this;
+	}
+	vector_iterator operator--(int) {
+		vector_iterator tmp(*this);
+		--p;
+		return tmp;
+	}
+	vector_iterator &operator--() {
+		--p;
+		return *this;
+	}
+	vector_iterator &operator+=(int value) {
+		p += value;
+		return *this;
+	}
+	vector_iterator operator+(int value) const {
+		vector_iterator tmp(*this);
+		return tmp += value;
+	}
+	vector_iterator &operator-=(int value) {
+		p -= value;
+		return *this;
+	}
+	vector_iterator operator-(int value) const {
+		vector_iterator tmp(*this);
+		return tmp -= value;
+	}
+	difference_type operator-(vector_iterator const &x) const {
+		return p - x.p;
+	}
+	bool operator==(vector_iterator const &x) const {
+		return p == x.p;
+	}
+	bool operator!=(vector_iterator const &x) const {
+		return p != x.p;
+	}
+	bool operator<(vector_iterator const &x) const {
+		return p < x.p;
+	}
+	bool operator<=(vector_iterator const &x) const {
+		return p <= x.p;
+	}
+	bool operator>(vector_iterator const &x) const {
+		return p > x.p;
+	}
+	bool operator>=(vector_iterator const &x) const {
+		return p >= x.p;
+	}
+};
 	/*
 	* VECTOR: dynamic array optimized for insertion in the back.
 	*/
@@ -38,10 +128,10 @@ namespace ft
 		typedef const value_type &const_reference;
 		typedef value_type *pointer;
 		typedef const value_type *const_pointer;
-		typedef T *iterator;
-		typedef const T *const_iterator;
+		typedef vector_iterator<T> iterator;
+		typedef vector_iterator<T, true> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
-		typedef ft::reverse_iterator<const T *> const_reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 		typedef std::ptrdiff_t difference_type;
 
 		explicit vector() : array_(0),

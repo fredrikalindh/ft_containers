@@ -3,7 +3,20 @@
 
 namespace ft
 {
+	template <bool flag, class IsTrue, class IsFalse>
+	struct choose;
 
+	template <class IsTrue, class IsFalse>
+	struct choose<true, IsTrue, IsFalse>
+	{
+		typedef IsTrue type;
+	};
+
+	template <class IsTrue, class IsFalse>
+	struct choose<false, IsTrue, IsFalse>
+	{
+		typedef IsFalse type;
+	};
 // ITERATOR TAGS ###############################################################
 	struct input_iterator_tag {};
 	///  Marking output iterators.
@@ -104,6 +117,11 @@ namespace ft
 		template <class Iter>
 		reverse_iterator (const reverse_iterator<Iter>& rev_it):base_(rev_it.base_){}
 
+		iterator_type base() {
+			Iterator ret(base_);
+			++ret;
+			return ret;
+		}
 		iterator_type base() const {
 			Iterator ret(base_);
 			++ret;
@@ -111,7 +129,7 @@ namespace ft
 		}
 
 		reference	operator*() const { return *base_; }
-		pointer		operator->() const { return &(operator*()); }
+		pointer	operator->() const { return &(operator*()); }
 		reference	operator[](difference_type n) const { return base_[-n - 1];}
 
 		reverse_iterator	operator+ (difference_type n) const {

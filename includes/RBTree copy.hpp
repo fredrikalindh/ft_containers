@@ -5,13 +5,13 @@
 
 namespace ft
 {
-	template <class T, class Compare>
+	template <class T, class Compare, bool isconst = false>
 	class rb_tree_iterator;
 
 	template <class T, class Compare>
 	class RB_Tree
 	{
-		template <class U, class Cmp>
+		template <class U, class Cmp, bool isconst>
 		friend class rb_tree_iterator;
 
 		static const bool RED = true;
@@ -60,8 +60,7 @@ namespace ft
 		typedef value_type *pointer;
 		typedef const value_type *const_pointer;
 		typedef rb_tree_iterator<T, Compare> iterator;
-		typedef rb_tree_iterator<T, Compare> const_iterator;
-		// typedef	rb_tree_iterator<const T, Compare>		const_iterator; ???????????????????????????????????
+		typedef rb_tree_iterator<T, Compare, true> const_iterator;
 		//######################### CONSTRUCTORS #######################################
 		explicit RB_Tree(const Compare &comp, bool allow = false) : root_(0),
 																	size_(0),
@@ -108,56 +107,34 @@ namespace ft
 		{
 			return size_;
 		}
+		size_t max_size() const
+		{
+			return std::numeric_limits<difference_type>::max() / (sizeof(Node) / 2);
+		}
 		// ########################## MAIN FUNCTIONS ###################################
 		Node *find(const value_type &k) const
 		{
 			return find(root_, k);
 		}
-		// Node *find(Node *node, const value_type &k) const
-		// {
-		// 	  std::cout << "FIND " << k << "###########################" << std::endl;
-
-		// 	if (!node)
-		// 		return node;
-		// 	rb_tree_iterator<T, Compare> it(min(root_), this);
-		// 	while (it.node_ && (comp(*it, k) || comp(k, *it))) {
-		// 		std::cout << *it << std::endl;
-		// 		++it;
-		// 	 }std::cout << "FIND ###########################" << std::endl;
-		// 	return it.node_;
-		// }
 		Node *find(Node *node, const value_type &k) const
 		{
 			while (node)
 			{
 				if (!comp(node->value_, k) && !comp(k, node->value_))
-					break;
+				{
+					iterator it(node, this);
+					iterator next(node, this);
+					for (--next; next.node_ && (!comp(*next, k) && !comp(k, *next)); --next)
+						--it;
+					return it.node_;
+				}
 				if (!comp(node->value_, k))
 					node = node->left_;
 				else
 					node = node->right_;					
 			}
-			iterator it(node, this);
-			while (it.node_ && (!comp(*it, k) && !comp(k, *it)))
-				--it;
-			if (it.node_)
-				++it;
-			return it.node_;
+			return nullptr;
 		}
-		// Node *find(Node *node, const value_type &k) const
-		// {
-		// 	while (node)
-		// 	{
-		// 		if (!comp(node->value_, k) && !comp(k, node->value_) && (!node->left_  || 
-		// 		!(!comp(node->left_->value_, k) && !comp(k, node->left_->value_)))) // --> IF LEFT IS NOT ALSO EQUAL
-		// 			return node;
-		// 		if (!comp(node->value_, k))
-		// 			node = node->left_;
-		// 		else
-		// 			node = node->right_;					
-		// 	}
-		// 	return 0;
-		// }
 		Node *find_upper(const value_type k) const
 		{
 			rb_tree_iterator<T, Compare> it(find(root_, k), this);
@@ -217,23 +194,16 @@ namespace ft
 		{
 			if (x == 0)
 			{
-				std::cout << "ADDING " << value;
-				if (parent) 
-					std::cout << " PARENT :  " << parent->value_;
-				std::cout << std::endl;
 				++size_;
 				*added = new Node(value, parent, left);
 				return *added;
 			}
 			if (!comp(x->value_, value) && !comp(value, x->value_) && allowMulti == false) // ---> EQUAL
 				*added = x;
-			else if (!comp(value, x->value_)) {
+			else if (!comp(value, x->value_))
 				x->right_ = add(x, x->right_, value, false, added);
-				x->right_->parent_ = x;
-			}else{
+			else
 				x->left_ = add(x, x->left_, value, true, added); // if comp gives false
-				x->left_->parent_ = x;
-			}
 
 			if (isRed(x->right_) && !isRed(x->left_))
 				x = rotateLeft(x);
@@ -241,16 +211,11 @@ namespace ft
 				x = rotateRight(x);
 			if (isRed(x->left_) && isRed(x->right_))
 				colorFlip(x);
-			std::cout << "ADDING " << value;
-			if (parent) 
-				std::cout << " PARENT :  " << parent->value_;
-			std::cout << std::endl;
 			return x;
 		}
 		bool deleteKey(value_type value)
 		{
 			if (!find(root_, value)){
-				std::cout << "not found :)" << std::endl;
 				return false;
 			}if (size_ < 2)
 			{
@@ -261,7 +226,6 @@ namespace ft
 			if (!isRed(root_->left_) && !isRed(root_->right_))
 				root_->color_ = RED;
 			root_ = deleteKey(root_, value);
-			std::cout << "###########################" << std::endl;
 			if (root_)
 				root_->color_ = BLACK;
 			return true;
@@ -297,136 +261,64 @@ namespace ft
 			}
 			return balance(x);
 		}
-		void deleteKey(Node *x)
+		Node* deleteKey(Node *x)
 		{
-			// std::cout << "DELETING : " << x->value_ << " LEFT : ";
-			// (x->left_) ? std::cout << x->left_->value_ : std::cout << "no child ";
-			// std::cout << " RIGHT : ";
-			// (x->right_) ? std::cout << x->right_->value_ : std::cout << "no child ";
-			// std::cout << " PARENT : ";
-			// (x->parent_) ? std::cout << x->parent_->value_ : std::cout << "no parent";
-			// std::cout << std::endl;
-
+			Node *ret = 0;
 			if (!x)
-				return ; 
+				return x; 
 			if (size_ == 1)
-			{
-				delete x;
-				size_ = 0;
 				root_ = 0;
-			}
-			else if (x && !x->right_)
+			else if (!x->right_)
 			{
-				std::cout << "no right child" << std::endl;
-				if (x == root_) {
-					std::cout << "1" << std::endl;
+				if (!x->parent_) {
 					root_ = x->left_;
 					root_->parent_ = 0;
-				}else {
-					std::cout << "2" << std::endl;
-					(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = 0;
-					x->left_ ? x->left_->parent_ = x->parent_ : 0;
 				}
-				--size_;
-				delete x;
+				else {
+					(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
+					if (x->left_) {
+						x->left_->isLeft = x->isLeft;
+						x->left_->parent_ = x->parent_;
+					}
+					if (x->isLeft) 
+						ret = x->parent_;
+					else {
+						iterator it(x, this);
+						++it;
+						ret = it.node_;
+					}
+				}
 			}
 			else
-			{
-				std::cout << "right child" << std::endl;
+				ret = eraseRight(x);
+			--size_;
+			delete x;
+			return ret;
+		}
+		Node *eraseRight(Node *x) {
 				Node *h = min(x->right_);
-				if (x == root_) 
+				
+				h->isLeft ? h->parent_->left_ = h->right_ : h->parent_->right_ = h->right_;
+				if (h->parent_->left_){
+					h->parent_->left_->parent_ = h->parent_;
+					h->parent_->left_->isLeft = true;
+				}if (h->parent_->right_)
+					h->parent_->right_->parent_ = h->parent_;
+				h->isLeft = x->isLeft;
+				h->color_ = x->color_;
+				h->parent_ = x->parent_;
+				if (!h->parent_)
 					root_ = h;
 				else
-					x->isLeft ? x->parent_->left_ = h : x->parent_->right_ = h;
-				h->isLeft ? h->parent_->left_ = 0 : h->parent_->right_ = 0;
-				h->parent_ = x->parent_;
+					x->isLeft ? h->parent_->left_ = h : h->parent_->right_ = h;
+				if (x->right_) { // x->right wasn't h or it was but h had a right child
+					h->right_ = x->right_;
+					h->right_->parent_ = h;
+				}
 				h->left_ = x->left_;
-				h->right_ = x->right_;
-				h->color_ = x->color_;
-				h->isLeft = x->isLeft;
-				delete x;
-				--size_;
-			}
+				h->left_ ? h->left_->parent_ = h : 0;
+				return h;
 		}
-		// void deleteKey(Node *x)
-		// {
-		// 	std::cout << "DELETING : " << x->value_ << " LEFT : ";
-		// 	(x->left_) ? std::cout << x->left_->value_ : std::cout << "no child ";
-		// 	std::cout << " RIGHT : ";
-		// 	(x->right_) ? std::cout << x->right_->value_ : std::cout << "no child ";
-		// 	std::cout << " PARENT : ";
-		// 	(x->parent_) ? std::cout << x->parent_->value_ : std::cout << "no parent";
-		// 	std::cout << std::endl;
-
-		// 	if (!x)
-		// 		return ; 
-		// 	if (size_ == 1)
-		// 	{
-		// 		delete x;
-		// 		size_ = 0;
-		// 		root_ = 0;
-		// 	}
-		// 	else if (x && !x->right_)
-		// 	{
-		// 		std::cout << "no right child" << std::endl;
-		// 		if (x == root_) {
-		// 			root_ = x->left_;
-		// 			root_->parent_ = 0;
-		// 		}else {
-		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = 0;
-		// 			x->left_ ? x->left_->parent_ = x->parent_ : 0;
-		// 		}
-		// 		--size_;
-		// 		// delete x;
-		// 	}
-		// 	else
-		// 	{
-		// 		Node *h = min(x->right_);
-		// 		x->value_ = h->value_;
-		// 		x->right_ = deleteMin(x->right_);
-		// 		if (x->right_) 
-		// 			x->right_->parent_ = x;
-		// 		else
-		// 			std::cout << "no rightttt" << std::endl;
-		// 	}
-		// }
-		// void deleteKey(Node *x)
-		// {
-		// 	std::cout << "DELETING : " << x->value_ << " LEFT : ";
-		// 	(x->left_) ? std::cout << x->left_->value_ : std::cout << "no child ";
-		// 	std::cout << " RIGHT : ";
-		// 	(x->right_) ? std::cout << x->right_->value_ : std::cout << "no child ";
-		// 	std::cout << " PARENT : ";
-		// 	(x->parent_) ? std::cout << x->parent_->value_ : std::cout << "no parent";
-		// 	std::cout << std::endl;
-
-		// 	if (!x)
-		// 		return ; 
-		// 	if (size_ == 1)
-		// 	{
-		// 		delete x;
-		// 		size_ = 0;
-		// 		root_ = 0;
-		// 	}
-		// 	else if (x && !x->right_)
-		// 	{
-		// 		if (x == root_) {
-		// 			root_ = x->left_;
-		// 			root_->parent_ = 0;
-		// 		}else{
-		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = 0;
-		// 			x->left_ ? x->left_->parent_ = x->parent_ : 0;
-		// 		}
-		// 		--size_;
-		// 		// delete x;
-		// 	}
-		// 	else
-		// 	{
-		// 		Node *h = min(x->right_);
-		// 		x->value_ = h->value_;
-		// 		x->right_ = deleteMin(x->right_);
-		// 	}
-		// }	
 		// ######################## HELPER FUNCTIONS ###################################
 		void deleteMin()
 		{
@@ -442,7 +334,7 @@ namespace ft
 		{
 			if (!h->left_)
 			{
-				std::cout << "delete no left child "  << h->value_ << std::endl;
+				// std::cout << "delete no left child "  << h->value_ << std::endl;
 				--size_;
 				delete h;
 				return 0;
@@ -585,7 +477,7 @@ namespace ft
 		}
 		inline Node *min(Node *trav) const
 		{
-			while (trav->left_)
+			while (trav && trav->left_)
 				trav = trav->left_;
 			return trav;
 		}
@@ -595,7 +487,7 @@ namespace ft
 		}
 		inline Node *max(Node *trav) const
 		{
-			while (trav->right_)
+			while (trav && trav->right_)
 				trav = trav->right_;
 			return trav;
 		}
@@ -660,30 +552,33 @@ namespace ft
 		}
 	};
 	// ############################## ITERATOR #####################################
-	template <class T, class Compare>
+	template <class T, class Compare, bool isconst>
 	class rb_tree_iterator
 	{
-	public:
 		friend class RB_Tree<T, Compare>;
+		friend class rb_tree_iterator<T, Compare, false>;
+		friend class rb_tree_iterator<T, Compare, true>;
 
-		typedef typename RB_Tree<T, Compare>::Node Node;
-		typedef RB_Tree<T, Compare> Tree;
+		typedef typename choose<isconst, typename RB_Tree<T, Compare>::Node const, typename RB_Tree<T, Compare>::Node >::type Node;
+		typedef typename choose<isconst, const RB_Tree<T, Compare>, RB_Tree<T, Compare> >::type Tree;
 
 		Node *node_;
 		Tree const *tree_;
 
-		// public:
+	public:
 		typedef ft::bidirectional_iterator_tag iterator_category;
 		typedef std::ptrdiff_t difference_type;
 		typedef T value_type;
-		typedef T *pointer;
-		typedef T &reference;
+		typedef typename choose<isconst, const T &, T &>::type reference;
+		typedef typename choose<isconst, const T *, T *>::type pointer;
 
 		rb_tree_iterator(Node *node = 0, Tree const *tree = 0) : node_(node), tree_(tree) {}
-		rb_tree_iterator(rb_tree_iterator const &cpy) : node_(cpy.node_), tree_(cpy.tree_) {}
-		rb_tree_iterator &operator=(rb_tree_iterator const &cpy)
+		rb_tree_iterator(rb_tree_iterator<T, Compare, false> const &cpy) : node_(cpy.node_), tree_(cpy.tree_) {}
+		// rb_tree_iterator(rb_tree_iterator const &cpy) : node_(cpy.node_), tree_(cpy.tree_) {}
+		rb_tree_iterator &operator=(rb_tree_iterator<T, Compare, false> const &cpy)
 		{
-			node_ = cpy.node_;
+			rb_tree_iterator tmp(cpy);
+			swap(tmp);
 			return *this;
 		}
 		rb_tree_iterator &operator++(void)
@@ -740,6 +635,12 @@ namespace ft
 		inline pointer operator->(void) const { return &(node_->value_); }
 		inline bool operator!=(rb_tree_iterator const &other) const { return node_ != other.node_; }
 		inline bool operator==(rb_tree_iterator const &other) const { return node_ == other.node_; }
+		void swap(rb_tree_iterator &x) {
+			char buffer[sizeof(rb_tree_iterator)];
+			memcpy(buffer, &x, sizeof(rb_tree_iterator));
+			memcpy(reinterpret_cast<char *>(&x), this, sizeof(rb_tree_iterator));
+			memcpy(reinterpret_cast<char *>(this), buffer, sizeof(rb_tree_iterator));
+		}
 	};
 
 } //namespace ft

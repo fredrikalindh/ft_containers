@@ -5,13 +5,13 @@
 
 namespace ft
 {
-	template <class T, class Compare>
+	template <class T, class Compare, bool isconst = false>
 	class rb_tree_iterator;
 
 	template <class T, class Compare>
 	class RB_Tree
 	{
-		template <class U, class Cmp>
+		template <class U, class Cmp, bool isconst>
 		friend class rb_tree_iterator;
 
 		static const bool RED = true;
@@ -60,8 +60,7 @@ namespace ft
 		typedef value_type *pointer;
 		typedef const value_type *const_pointer;
 		typedef rb_tree_iterator<T, Compare> iterator;
-		typedef rb_tree_iterator<T, Compare> const_iterator;
-		// typedef	rb_tree_iterator<const T, Compare>		const_iterator; ???????????????????????????????????
+		typedef rb_tree_iterator<T, Compare, true> const_iterator;
 		//######################### CONSTRUCTORS #######################################
 		explicit RB_Tree(const Compare &comp, bool allow = false) : root_(0),
 																	size_(0),
@@ -160,6 +159,7 @@ namespace ft
 			root_->color_ = BLACK;
 			return added;
 		}
+		Node* add(iterator it, value_type value) {return add(it.node_, value);}
 		Node *add(Node *preceding, value_type value)
 		{
 			bool first = false;
@@ -212,8 +212,6 @@ namespace ft
 				x = rotateRight(x);
 			if (isRed(x->left_) && isRed(x->right_))
 				colorFlip(x);
-			// x->right_ ? x->right_->parent_ = x : 0;
-			// x->left_ ? x->left_->parent_ = x : 0;
 			return x;
 		}
 		bool deleteKey(value_type value)
@@ -264,9 +262,9 @@ namespace ft
 			}
 			return balance(x);
 		}
+		Node* deleteKey(iterator it) { return deleteKey(it.node_); }
 		Node* deleteKey(Node *x)
 		{
-			// std::cout << "SIZE = " << size_ << std::endl;
 			Node *ret = 0;
 			if (!x)
 				return x; 
@@ -274,23 +272,13 @@ namespace ft
 				root_ = 0;
 			else if (!x->right_)
 			{
-				// if (x->isLeft)
-				// 	std::cout << "ISLEFT" << std::endl;
-				// if (x->parent_)
-				// 	std::cout << "#PARENT: " << x->parent_->value_.second << std::endl;
-				// if (x->right_)
-				// 	std::cout << "#RIGHT: " << x->right_->value_.second << std::endl;
-				// if (x->left_)
-				// 	std::cout << "#LEFT: " << x->left_->value_.second << std::endl;
 				if (!x->parent_) {
-					// std::cout << "1" << std::endl;
 					root_ = x->left_;
 					root_->parent_ = 0;
 				}
 				else {
 					(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
 					if (x->left_) {
-						// std::cout << "2" << std::endl;
 						x->left_->isLeft = x->isLeft;
 						x->left_->parent_ = x->parent_;
 					}
@@ -311,20 +299,7 @@ namespace ft
 		}
 		Node *eraseRight(Node *x) {
 				Node *h = min(x->right_);
-				// if (x->parent_)
-				// 	std::cout << "PARENT: " << x->parent_->value_.second << std::endl;
-				// if (x->right_)
-				// 	std::cout << "RIGHT: " << x->right_->value_.second << std::endl;
-				// if (x->left_)
-				// 	std::cout << "LEFT: " << x->left_->value_.second << std::endl;
-				// std::cout << "H : " << h->value_.second << std::endl;
-				// if (h->parent_)
-				// 	std::cout << "H PARENT: " << h->parent_->value_.second << std::endl;
-				// if (h->right_)
-				// 	std::cout << "H RIGHT: " << h->right_->value_.second << std::endl;
-				// if (h->left_)
-				// 	std::cout << "H LEFT: " << h->left_->value_.second << std::endl;
-
+				
 				h->isLeft ? h->parent_->left_ = h->right_ : h->parent_->right_ = h->right_;
 				if (h->parent_->left_){
 					h->parent_->left_->parent_ = h->parent_;
@@ -344,206 +319,8 @@ namespace ft
 				}
 				h->left_ = x->left_;
 				h->left_ ? h->left_->parent_ = h : 0;
-				// if (h->right_)
-				// 	std::cout << "H2 RIGHT: " << h->right_->value_.second << std::endl;
-				// if (h->right_->right_)
-				// 	std::cout << "H2 RR: " << h->right_->right_->value_.second << std::endl;
-				// if (h->right_->left_)
-				// 	std::cout << "H2 RL: " << h->right_->left_->value_.second << std::endl;
 				return h;
 		}
-		// Node* deleteKey(Node *x)
-		// {
-		// 	std::cout << "SIZE = " << size_ << std::endl;
-		// 	Node *ret = 0;
-		// 	if (!x)
-		// 		return x; 
-		// 	if (size_ == 1)
-		// 	{
-		// 		delete x;
-		// 		root_ = 0;
-		// 		// --size_;
-		// 	}
-		// 	else if (!x->right_)
-		// 	{
-		// 		if (!x->parent_) {
-		// 			std::cout << "1" << std::endl;
-		// 			root_ = x->left_;
-		// 			root_->parent_ = 0;
-		// 		}
-		// 		else {
-		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
-		// 			if (x->left_) {
-		// 				std::cout << "2" << std::endl;
-		// 				x->left_->isLeft = x->isLeft;
-		// 				x->left_->parent_ = x->parent_;
-		// 				ret = x->parent_;
-		// 			}
-		// 			else {
-		// 				std::cout << "3" << std::endl;
-		// 				for (ret = x->parent_; ret && !ret->isLeft; ret = ret->parent_) ;
-		// 				// ret = x->parent_;
-		// 			}
-		// 		}
-		// 			// std::cout << "1 DELETING " << x->value_.first << "=>" << x->value_.second << std::endl;
-		// 			// std::cout << "1 RETURNING " << ret->value_.first << "=>" << ret->value_.second << std::endl;
-		// 			// --size_;
-		// 			delete x;
-		// 	}
-		// 	else
-		// 	{
-		// 		Node *h = min(x->right_);
-		// 		x->value_ = h->value_;
-				
-		// 		h->isLeft ? h->parent_->left_ = 0: h->parent_->right_ = h->right_;
-		// 		if (h->right_)
-		// 			h->right_->parent_ = h->parent_;
-		// 		delete h;
-		// 		// --size_;
-		// 		ret = (x->isLeft) ? x->parent_ : x;
-		// 	}
-		// 	--size_;
-		// 	return ret;
-		// }
-		// Node* deleteKey(Node *x)
-		// {
-		// 	Node *ret = 0;
-		// 	if (!x)
-		// 		return x; 
-		// 	if (size_ == 1)
-		// 	{
-		// 		delete x;
-		// 		root_ = 0;
-		// 	}
-		// 	else if (!x->right_)
-		// 	{
-		// 		if (!x->parent_) {
-		// 			root_ = x->left_;
-		// 			root_->parent_ = 0;
-		// 		} else {
-		// 			iterator it(x, this);
-		// 			++it;
-		// 			ret = it.node_;
-		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
-		// 			if (x->left_) {
-		// 				x->left_->isLeft = x->isLeft;
-		// 				x->left_->parent_ = x->parent_;
-		// 			}
-		// 			std::cout << "1 DELETING " << x->value_.first << "=>" << x->value_.second << std::endl;
-		// 			std::cout << "1 RETURNING " << ret->value_.first << "=>" << ret->value_.second << std::endl;
-		// 		}
-		// 		--size_;
-		// 		delete x;
-		// 	}
-		// 	else
-		// 	{
-		// 		iterator it(x, this);
-		// 		++it;
-		// 		x->value_ = it.node_->value_;
-		// 		ret = x;
-		// 		std::cout << "2 DELETING " << x->value_.first << "=>" << x->value_.second << std::endl;
-		// 		std::cout << "2 RETURNING " << ret->value_.first << "=>" << ret->value_.second << std::endl;
-		// 		if (it.node_->right_)
-		// 			deleteKey(it.node_);
-		// 		else {
-		// 			it.node_->isLeft ? it.node_->parent_->left_ = 0: it.node_->parent_->right_ = 0;
-		// 			delete it.node_;
-		// 			--size_;
-		// 		}
-		// 	}
-		// 	return ret;
-		// }
-		// Node* deleteKey(Node *x, Node** last = 0)
-		// {
-		// 	Node *ret = 0;
-		// 	if (!x)
-		// 		return x; 
-		// 	if (size_ == 1)
-		// 	{
-		// 		delete x;
-		// 		root_ = 0;
-		// 	}
-		// 	else if (!x->right_)
-		// 	{
-		// 		if (!x->parent_) {
-		// 			root_ = x->left_;
-		// 			root_->parent_ = 0;
-		// 		} else {
-		// 			if (!comp(x->parent_->value_, x->value_)) // how is it different from x->isLeft?
-		// 				ret = x->parent_;
-		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
-		// 			if (x->left_) {
-		// 				x->left_->isLeft = x->isLeft;
-		// 				x->left_->parent_ = x->parent_;
-		// 			}
-		// 		}
-		// 		delete x;
-		// 	}
-		// 	else
-		// 	{
-		// 		Node *h = min(x->right_);
-		// 		if (last && h == *last)
-		// 			*last = x;
-		// 		x->value_ = h->value_;
-		// 		h->isLeft ? h->parent_->left_ = 0: h->parent_->right_ = 0;
-		// 		delete h;
-		// 		ret = x;
-		// 	}
-		// 	--size_;
-		// 	return ret;
-		// }
-		// void deleteKey(Node *x)
-		// {
-		// 	if (!x)
-		// 		return ; 
-		// 	if (size_ == 1)
-		// 	{
-		// 		delete x;
-		// 		size_ = 0;
-		// 		root_ = 0;
-		// 	}
-		// 	else if (!x->right_)
-		// 	{
-		// 		std::cout << "no right child" << std::endl;
-		// 		if (!x->parent_) {
-		// 			std::cout << "1" << std::endl;
-		// 			root_ = x->left_;
-		// 			root_->parent_ = 0;
-		// 		} else {
-		// 			std::cout << "2" << std::endl;
-		// 			(x->isLeft) ? x->parent_->left_ = x->left_ : x->parent_->right_ = x->left_;
-		// 			if (x->left_) {
-		// 				x->left_->isLeft = x->isLeft;
-		// 				x->left_->parent_ = x->parent_;
-		// 			}
-		// 		}
-		// 		std::cout << "3" << std::endl;
-		// 		--size_;
-		// 		delete x;
-		// 		std::cout << "4" << std::endl;
-		// 	}
-		// 	else
-		// 	{
-		// 		Node *h = min(x->right_);
-		// 		std::cout << "min = " << h->value_ << std::endl;
-		// 		if (x == root_) 
-		// 			root_ = h;
-		// 		else
-		// 			x->isLeft ? x->parent_->left_ = h : x->parent_->right_ = h;
-		// 		h->isLeft ? h->parent_->left_ = 0 : h->parent_->right_ = 0;
-		// 		h->parent_ = x->parent_;
-		// 		h->left_ = x->left_;
-		// 		if (h->left_)
-		// 			h->left_->parent_ = h;
-		// 		h->right_ = x->right_;
-		// 		if (h->right_)
-		// 			h->right_->parent_ = h;
-		// 		h->color_ = x->color_;
-		// 		h->isLeft = x->isLeft;
-		// 		delete x;
-		// 		--size_;
-		// 	}
-		// }
 		// ######################## HELPER FUNCTIONS ###################################
 		void deleteMin()
 		{
@@ -777,28 +554,30 @@ namespace ft
 		}
 	};
 	// ############################## ITERATOR #####################################
-	template <class T, class Compare>
+	template <class T, class Compare, bool isconst>
 	class rb_tree_iterator
 	{
-	public:
 		friend class RB_Tree<T, Compare>;
+		friend class rb_tree_iterator<T, Compare, false>;
+		friend class rb_tree_iterator<T, Compare, true>;
 
-		typedef typename RB_Tree<T, Compare>::Node Node;
-		typedef RB_Tree<T, Compare> Tree;
+		typedef typename choose<isconst, typename RB_Tree<T, Compare>::Node const, typename RB_Tree<T, Compare>::Node >::type Node;
+		typedef typename choose<isconst, const RB_Tree<T, Compare>, RB_Tree<T, Compare> >::type Tree;
 
 		Node *node_;
 		Tree const *tree_;
 
-		// public:
+	public:
 		typedef ft::bidirectional_iterator_tag iterator_category;
 		typedef std::ptrdiff_t difference_type;
 		typedef T value_type;
-		typedef T *pointer;
-		typedef T &reference;
+		typedef typename choose<isconst, const T &, T &>::type reference;
+		typedef typename choose<isconst, const T *, T *>::type pointer;
 
 		rb_tree_iterator(Node *node = 0, Tree const *tree = 0) : node_(node), tree_(tree) {}
-		rb_tree_iterator(rb_tree_iterator const &cpy) : node_(cpy.node_), tree_(cpy.tree_) {}
-		rb_tree_iterator &operator=(rb_tree_iterator const &cpy)
+		rb_tree_iterator(rb_tree_iterator<T, Compare, false> const &cpy) : node_(cpy.node_), tree_(cpy.tree_) {}
+		// rb_tree_iterator(rb_tree_iterator const &cpy) : node_(cpy.node_), tree_(cpy.tree_) {}
+		rb_tree_iterator &operator=(rb_tree_iterator<T, Compare, false> const &cpy)
 		{
 			rb_tree_iterator tmp(cpy);
 			swap(tmp);

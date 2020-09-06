@@ -13,10 +13,10 @@ TEST(SetTest, Constructors)
 
   bool (*fn_pt)(int, int) = fncomp;
   LIBRARY::set<int, bool (*)(int, int)> sixth(fn_pt); // function pointer as Compare
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 5);
-  EXPECT_EQ(third.size(), 5);
-  EXPECT_EQ(fourth.size(), 5);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(5));
+  EXPECT_EQ(third.size(), size_t(5));
+  EXPECT_EQ(fourth.size(), size_t(5));
 }
 
 TEST(SetTest, Assignment)
@@ -28,8 +28,8 @@ TEST(SetTest, Assignment)
   second = first;              // now second contains the 5 ints
   first = LIBRARY::set<int>(); // and first is empty
 
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 5);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(5));
 }
 
 TEST(SetTest, Begin)
@@ -71,20 +71,20 @@ TEST(SetTest, Empty)
     i += 10;
     myset.erase(myset.begin());
   }
-  EXPECT_EQ(myset.size(), 0);
+  EXPECT_EQ(myset.size(), size_t(0));
 }
 
 TEST(SetTest, Size)
 {
   LIBRARY::set<int> myints;
-  EXPECT_EQ(myints.size(), 0);
+  EXPECT_EQ(myints.size(), size_t(0));
   for (int i = 0; i < 10; ++i)
     myints.insert(i);
-  EXPECT_EQ(myints.size(), 10);
+  EXPECT_EQ(myints.size(), size_t(10));
   myints.insert(100);
-  EXPECT_EQ(myints.size(), 11);
+  EXPECT_EQ(myints.size(), size_t(11));
   myints.erase(5);
-  EXPECT_EQ(myints.size(), 10);
+  EXPECT_EQ(myints.size(), size_t(10));
 }
 
 TEST(SetTest, MaxSize)
@@ -148,7 +148,7 @@ TEST(SetTest, Erase)
 
   int i = 0;
   int result[] = {10, 30, 50};
-  ASSERT_EQ(myset.size(), 3);
+  ASSERT_EQ(myset.size(), size_t(3));
   for (it = myset.begin(); it != myset.end(); ++it)
     EXPECT_EQ(*it, result[i++]);
 }
@@ -162,13 +162,13 @@ TEST(SetTest, Swap)
 
   int i = 0;
   int result1[] = {20, 25, 32};
-  ASSERT_EQ(first.size(), 3);
+  ASSERT_EQ(first.size(), size_t(3));
   for (it = first.begin(); it != first.end(); ++it)
     EXPECT_EQ(*it, result1[i++]);
 
   i = 0;
   int result2[] = {10, 12, 75};
-  ASSERT_EQ(second.size(), 3);
+  ASSERT_EQ(second.size(), size_t(3));
   for (it = second.begin(); it != second.end(); ++it)
     EXPECT_EQ(*it, result2[i++]);
 }
@@ -181,12 +181,12 @@ TEST(SetTest, Clear)
   myset.insert(200);
   myset.insert(300);
 
-  ASSERT_EQ(myset.size(), 3);
+  ASSERT_EQ(myset.size(), size_t(3));
   myset.clear();
-  ASSERT_EQ(myset.size(), 0);
+  ASSERT_EQ(myset.size(), size_t(0));
   myset.insert(1101);
   myset.insert(2202);
-  ASSERT_EQ(myset.size(), 2);
+  ASSERT_EQ(myset.size(), size_t(2));
 }
 
 TEST(SetTest, KeyComp)
@@ -235,7 +235,7 @@ TEST(SetTest, Find)
   myset.erase(myset.find(40));
   int i = 0;
   int result[] = {10, 30, 50};
-  ASSERT_EQ(myset.size(), 3);
+  ASSERT_EQ(myset.size(), size_t(3));
   for (it = myset.begin(); it != myset.end(); ++it)
     EXPECT_EQ(*it, result[i++]);
 }
@@ -265,7 +265,7 @@ TEST(SetTest, Bound)
   itup = myset.upper_bound(60);  //                   ^
 
   myset.erase(itlow, itup); // 10 20 70 80 90
-  EXPECT_EQ(myset.size(), 5);
+  EXPECT_EQ(myset.size(), size_t(5));
   EXPECT_FALSE(myset.count(50));
   EXPECT_TRUE(myset.count(90));
 }

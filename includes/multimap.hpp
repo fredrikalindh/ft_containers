@@ -91,11 +91,9 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 //########################### ERASE #######################################
 	void					erase (iterator position){
-		// std::cout << position->first << std::endl;
 		tree_.deleteKey(position.node_);
 	}
 	size_type				erase (const key_type& k) {
-		// std::cout << "2" << std::endl;
 		size_type i = 0;
 		while (tree_.deleteKey(k))
 			i++;
@@ -114,9 +112,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		memcpy(reinterpret_cast<char *>(&x), this, sizeof(multimap));
 		memcpy(reinterpret_cast<char *>(this), buffer, sizeof(multimap));
 	}
-	void					clear(){
-		tree_.clear();
-	}
+	void					clear(){ tree_.clear(); }
 //########################### OBSERVERS #######################################
 	key_compare				key_comp() const {return comp;}
 	value_compare			value_comp() const {return value_compare(comp);}

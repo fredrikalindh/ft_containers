@@ -8,10 +8,10 @@ TEST(QueueTest, Constructor)
 
   LIBRARY::queue<int, LIBRARY::list<int> > third; // empty queue with list as underlying container
   LIBRARY::queue<int, LIBRARY::list<int> > fourth(mylist);
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 3);
-  EXPECT_EQ(third.size(), 0);
-  EXPECT_EQ(fourth.size(), 2);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(3));
+  EXPECT_EQ(third.size(), size_t(0));
+  EXPECT_EQ(fourth.size(), size_t(2));
 }
 
 TEST(QueueTest, Empty)
@@ -47,12 +47,12 @@ TEST(QueueTest, PushPop)
 TEST(QueueTest, Size)
 {
   LIBRARY::queue<int> myints;
-  EXPECT_EQ(myints.size(), 0);
+  EXPECT_EQ(myints.size(), size_t(0));
   for (int i = 0; i < 5; i++)
     myints.push(i);
-  EXPECT_EQ(myints.size(), 5);
+  EXPECT_EQ(myints.size(), size_t(5));
   myints.pop();
-  EXPECT_EQ(myints.size(), 4);
+  EXPECT_EQ(myints.size(), size_t(4));
 }
 
 TEST(QueueTest, FrontBack)

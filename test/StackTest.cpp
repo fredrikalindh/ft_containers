@@ -8,10 +8,10 @@ TEST(StackTest, Constructor)
 
   LIBRARY::stack<int, LIBRARY::vector<int> > third; // empty stack using vector
   LIBRARY::stack<int, LIBRARY::vector<int> > fourth(myvector);
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 3);
-  EXPECT_EQ(third.size(), 0);
-  EXPECT_EQ(fourth.size(), 2);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(3));
+  EXPECT_EQ(third.size(), size_t(0));
+  EXPECT_EQ(fourth.size(), size_t(2));
 }
 
 TEST(StackTest, Empty)
@@ -48,12 +48,12 @@ TEST(StackTest, Push)
 TEST(StackTest, Size)
 {
   LIBRARY::stack<int> myints;
-  EXPECT_EQ(myints.size(), 0);
+  EXPECT_EQ(myints.size(), size_t(0));
   for (int i = 0; i < 5; i++)
     myints.push(i);
-  EXPECT_EQ(myints.size(), 5);
+  EXPECT_EQ(myints.size(), size_t(5));
   myints.pop();
-  EXPECT_EQ(myints.size(), 4);
+  EXPECT_EQ(myints.size(), size_t(4));
 }
 
 TEST(StackTest, Top)

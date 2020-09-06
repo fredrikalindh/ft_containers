@@ -10,11 +10,11 @@ TEST(ListTest, Constructor)
   int myints[] = {16, 2, 77, 29, 22};
   LIBRARY::list<int> fifth(myints, myints + sizeof(myints) / sizeof(int));
 
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 4);
-  EXPECT_EQ(third.size(), 4);
-  EXPECT_EQ(fourth.size(), 4);
-  EXPECT_EQ(fifth.size(), 5);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(4));
+  EXPECT_EQ(third.size(), size_t(4));
+  EXPECT_EQ(fourth.size(), size_t(4));
+  EXPECT_EQ(fifth.size(), size_t(5));
   for (LIBRARY::list<int>::iterator it = second.begin(); it != second.end(); ++it)
     EXPECT_EQ(*it, 100);
   int i = 0;
@@ -30,8 +30,8 @@ TEST(ListTest, AssignmentOp)
   second = first;
   first = LIBRARY::list<int>();
 
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 3);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(3));
 }
 
 TEST(ListTest, Begin)
@@ -81,17 +81,17 @@ TEST(ListTest, Empty)
 TEST(ListTest, Size)
 {
   LIBRARY::list<int> myints;
-  EXPECT_EQ(myints.size(), 0);
+  EXPECT_EQ(myints.size(), size_t(0));
 
   for (int i = 0; i < 10; i++)
     myints.push_back(i);
-  EXPECT_EQ(myints.size(), 10);
+  EXPECT_EQ(myints.size(), size_t(10));
 
   myints.insert(myints.begin(), 10, 100);
-  EXPECT_EQ(myints.size(), 20);
+  EXPECT_EQ(myints.size(), size_t(20));
 
   myints.pop_back();
-  EXPECT_EQ(myints.size(), 19);
+  EXPECT_EQ(myints.size(), size_t(19));
 }
 
 TEST(ListTest, MaxSize)
@@ -114,7 +114,6 @@ TEST(ListTest, Front)
   mylist.push_back(77);
   mylist.push_back(22);
 
-  // now front equals 77, and back 22
   EXPECT_EQ(mylist.front(), 77);
   mylist.front() -= mylist.back();
   EXPECT_EQ(mylist.front(), 55);
@@ -141,13 +140,13 @@ TEST(ListTest, Assign)
   LIBRARY::list<int> second;
 
   first.assign(7, 100); // 7 ints with value 100
-  EXPECT_EQ(first.size(), 7);
+  EXPECT_EQ(first.size(), size_t(7));
   second.assign(first.begin(), first.end()); // a copy of first
 
   int myints[] = {1776, 7, 4};
   first.assign(myints, myints + 3); // assigning from array
-  EXPECT_EQ(second.size(), 7);
-  EXPECT_EQ(first.size(), 3);
+  EXPECT_EQ(second.size(), size_t(7));
+  EXPECT_EQ(first.size(), size_t(3));
 }
 
 TEST(ListTest, PushFront)
@@ -157,7 +156,7 @@ TEST(ListTest, PushFront)
   for (int i = 0; i < 1300; ++i)
     mylist.push_front(i);
 
-  EXPECT_EQ(mylist.size(), 1302);
+  EXPECT_EQ(mylist.size(), size_t(1302));
 }
 
 TEST(ListTest, PopFront)
@@ -171,7 +170,7 @@ TEST(ListTest, PopFront)
   {
     mylist.pop_front();
   }
-  EXPECT_EQ(mylist.size(), 0);
+  EXPECT_EQ(mylist.size(), size_t(0));
 }
 
 TEST(ListTest, PushBack)
@@ -180,7 +179,7 @@ TEST(ListTest, PushBack)
   for (int i = 0; i < 1300; ++i)
     mylist.push_back(i);
 
-  EXPECT_EQ(mylist.size(), 1300);
+  EXPECT_EQ(mylist.size(), size_t(1300));
 }
 
 TEST(ListTest, PopBack)
@@ -228,6 +227,93 @@ TEST(ListTest, Insert)
     EXPECT_EQ(*it, result[i++]);
 }
 
+TEST(ListTest, InsertPosition)
+{
+  LIBRARY::list<int> mylist;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist;
+  std::list<int>::iterator stdit;
+
+  it = mylist.insert(mylist.end(), 1);
+  stdit = stdlist.insert(stdlist.end(), 1);
+  EXPECT_EQ(*it, *stdit);
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  mylist.insert(it, 0);
+  stdlist.insert(stdit, 0);
+  EXPECT_EQ(*it, *stdit);
+  it = mylist.insert(mylist.begin(), -1);
+  stdit = stdlist.insert(stdlist.begin(), -1);
+  EXPECT_EQ(*it, *stdit);
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it++, *stdit++);
+  }
+}
+
+TEST(ListTest, InsertN)
+{
+  LIBRARY::list<int> mylist;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist;
+  std::list<int>::iterator stdit;
+
+  mylist.insert(mylist.end(), 100, 1);
+  stdit = stdlist.insert(stdlist.end(), 100, 1);
+  mylist.insert(mylist.begin(), 50, 0);
+  stdlist.insert(stdlist.begin(), 50, 0);
+  mylist.insert(mylist.end(), 2, -1);
+  stdlist.insert(stdlist.end(), 2, -1);
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it++, *stdit++);
+  }
+}
+
+TEST(ListTest, InsertRange)
+{
+  LIBRARY::list<int> mylist;
+  LIBRARY::list<int> mylist2;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist;
+  std::list<int> stdlist2;
+  std::list<int>::iterator stdit;
+
+  for (int i = 0; i < 100; ++i)
+  {
+    mylist.insert(mylist.end(), i);
+    stdlist.insert(stdlist.end(), i);
+  }
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    // std::cout << "[" << *it++ << "," << *stdit++ << "] ";
+    EXPECT_EQ(*it++, *stdit++);
+  }
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  ++it;
+  ++stdit;
+  mylist2.insert(mylist2.begin(), it, mylist.end());
+  stdlist2.insert(stdlist2.begin(), stdit, stdlist.end());
+  mylist2.insert(mylist2.end(), mylist.begin(), ++it);
+  stdlist2.insert(stdlist2.end(), stdlist.begin(), ++stdit);
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist2.begin();
+  stdit = stdlist2.begin();
+  while (it != mylist2.end())
+  {
+    // std::cout << "[" << *it++ << "," << *stdit++ << "] ";
+    EXPECT_EQ(*it++, *stdit++);
+  }
+}
+
 TEST(ListTest, Erase)
 {
   LIBRARY::list<int> mylist;
@@ -260,22 +346,110 @@ TEST(ListTest, Erase)
     EXPECT_EQ(*it, result[i++]);
 }
 
+TEST(ListTest, ErasePosition)
+{
+  LIBRARY::list<int> mylist;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist;
+  std::list<int>::iterator stdit;
+
+  mylist.push_back(1);
+  mylist.push_back(2);
+  stdlist.push_back(1);
+  stdlist.push_back(2);
+
+  it = mylist.erase(mylist.begin());
+  stdit = stdlist.erase(stdlist.begin());
+  EXPECT_EQ(*it, *stdit);
+  it = mylist.erase(mylist.begin());
+  stdit = stdlist.erase(stdlist.begin());
+  EXPECT_EQ(it, mylist.end());
+
+  for (int i = 0; i < 10; ++i)
+  {
+    mylist.push_front(i);
+    stdlist.push_front(i);
+  }
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  advance(it, 5);
+  advance(stdit, 5);
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it, *stdit);
+    it = mylist.erase(it);
+    stdit = stdlist.erase(stdit);
+  }
+  EXPECT_EQ(mylist.size(), stdlist.size());
+}
+
+TEST(ListTest, EraseRange)
+{
+  LIBRARY::list<int> mylist;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist;
+  std::list<int>::iterator stdit;
+
+  for (int i = 0; i < 20; ++i)
+  {
+    mylist.push_front(i);
+    stdlist.push_front(i);
+  }
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  advance(it, 5);
+  advance(stdit, 5);
+  mylist.erase(mylist.begin(), it);
+  stdlist.erase(stdlist.begin(), stdit);
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it++, *stdit++);
+  }
+  it = mylist.end();
+  stdit = stdlist.end();
+  advance(it, -5);
+  advance(stdit, -5);
+  mylist.erase(it, mylist.end());
+  stdlist.erase(stdit, stdlist.end());
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it++, *stdit++);
+  }
+
+  mylist.erase(mylist.begin(), mylist.end());
+  stdlist.erase(stdlist.begin(), stdlist.end());
+  EXPECT_EQ(mylist.size(), stdlist.size());
+}
+
 TEST(ListTest, Swap)
 {
   LIBRARY::list<int> foo(3, 100); // three ints with a value of 100
   LIBRARY::list<int> bar(5, 200); // five ints with a value of 200
 
-  EXPECT_EQ(foo.size(), 3);
-  EXPECT_EQ(bar.size(), 5);
+  EXPECT_EQ(foo.size(), size_t(3));
+  EXPECT_EQ(bar.size(), size_t(5));
   foo.swap(bar);
-  EXPECT_EQ(foo.size(), 5);
-  EXPECT_EQ(bar.size(), 3);
+  EXPECT_EQ(foo.size(), size_t(5));
+  EXPECT_EQ(bar.size(), size_t(3));
+
+  EXPECT_EQ(foo.size(), size_t(5));
+  foo.swap(foo);
+  EXPECT_EQ(foo.size(), size_t(5));
+  EXPECT_EQ(foo.front(), 200);
 }
 
 TEST(ListTest, Resize)
 {
   LIBRARY::list<int> mylist;
-
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist;
+  std::list<int>::iterator stdit;
   // set some initial content:
   for (int i = 1; i < 10; ++i)
     mylist.push_back(i);
@@ -286,8 +460,39 @@ TEST(ListTest, Resize)
 
   int myints[] = {1, 2, 3, 4, 5, 100, 100, 100, 0, 0, 0, 0};
   int i = 0;
-  for (LIBRARY::list<int>::iterator it = mylist.begin(); it != mylist.end(); ++it)
+  for (it = mylist.begin(); it != mylist.end(); ++it)
     EXPECT_EQ(*it, myints[i++]);
+  mylist.resize(0);
+
+  mylist.resize(10, 1);
+  stdlist.resize(10, 1);
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it++, *stdit++);
+  }
+
+  mylist.resize(100, 10);
+  stdlist.resize(100, 10);
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it++, *stdit++);
+  }
+
+  mylist.resize(12);
+  stdlist.resize(12);
+  EXPECT_EQ(mylist.size(), stdlist.size());
+  it = mylist.begin();
+  stdit = stdlist.begin();
+  while (it != mylist.end())
+  {
+    EXPECT_EQ(*it++, *stdit++);
+  }
 }
 
 TEST(ListTest, Clear)
@@ -300,10 +505,10 @@ TEST(ListTest, Clear)
   mylist.push_back(300);
 
   mylist.clear();
-  EXPECT_EQ(mylist.size(), 0);
+  EXPECT_EQ(mylist.size(), size_t(0));
   mylist.push_back(1101);
   mylist.push_back(2202);
-  EXPECT_EQ(mylist.size(), 2);
+  EXPECT_EQ(mylist.size(), size_t(2));
 }
 
 TEST(ListTest, Splice)
@@ -342,6 +547,167 @@ TEST(ListTest, Splice)
   i = 0;
   for (LIBRARY::list<int>::iterator it = mylist1.begin(); it != mylist1.end(); ++it)
     EXPECT_EQ(*it, myints2[i++]);
+}
+
+TEST(ListTest, SpliceItList)
+{
+  LIBRARY::list<int> mylist1, mylist2;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist1, stdlist2;
+  std::list<int>::iterator stdit;
+
+  for (int i = 0; i < 10; ++i)
+  {
+    mylist1.push_back(i);
+    stdlist1.push_back(i);
+    mylist2.push_back(100 - i);
+    stdlist2.push_back(100 - i);
+  }
+  it = mylist1.end();
+  stdit = stdlist1.end();
+  mylist1.splice(it, mylist2);
+  stdlist1.splice(stdit, stdlist2);
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  while (it != mylist1.end())
+    EXPECT_EQ(*it++, *stdit++);
+
+  it = mylist2.begin();
+  stdit = stdlist2.begin();
+  mylist2.splice(it, mylist1);
+  stdlist2.splice(stdit, stdlist1);
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist2.begin();
+  stdit = stdlist2.begin();
+  while (it != mylist2.end())
+    EXPECT_EQ(*it++, *stdit++);
+
+  for (int i = 50; i < 60; ++i)
+  {
+    mylist1.push_back(i);
+    stdlist1.push_back(i);
+  }
+  it = mylist2.begin();
+  stdit = stdlist2.begin();
+  advance(it, 10);
+  advance(stdit, 10);
+  mylist2.splice(it, mylist1);
+  stdlist2.splice(stdit, stdlist1);
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist2.begin();
+  stdit = stdlist2.begin();
+  while (it != mylist2.end())
+    EXPECT_EQ(*it++, *stdit++);
+}
+
+TEST(ListTest, SpliceItIt)
+{
+  LIBRARY::list<int> mylist1, mylist2;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist1, stdlist2;
+  std::list<int>::iterator stdit;
+
+  for (int i = 0; i < 10; ++i)
+  {
+    mylist1.push_back(i);
+    stdlist1.push_back(i);
+    mylist2.push_back(100 - i);
+    stdlist2.push_back(100 - i);
+  }
+  it = mylist1.end();
+  stdit = stdlist1.end();
+  mylist1.splice(it, mylist2, mylist2.begin());
+  stdlist1.splice(stdit, stdlist2, stdlist2.begin());
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  while (it != mylist1.end())
+    EXPECT_EQ(*it++, *stdit++);
+
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  mylist1.splice(it, mylist2, --mylist2.end());
+  stdlist1.splice(stdit, stdlist2, --stdlist2.end());
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  while (it != mylist1.end())
+    EXPECT_EQ(*it++, *stdit++);
+
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  advance(it, 7);
+  advance(stdit, 7);
+  mylist1.splice(it, mylist2, --mylist2.end());
+  stdlist1.splice(stdit, stdlist2, --stdlist2.end());
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  while (it != mylist1.end())
+    EXPECT_EQ(*it++, *stdit++);
+}
+
+TEST(ListTest, SpliceItRange)
+{
+  LIBRARY::list<int> mylist1, mylist2;
+  LIBRARY::list<int>::iterator it;
+  std::list<int> stdlist1, stdlist2;
+  std::list<int>::iterator stdit;
+
+  for (int i = 0; i < 10; ++i)
+  {
+    mylist1.push_back(i);
+    stdlist1.push_back(i);
+    mylist2.push_back(100 - i);
+    stdlist2.push_back(100 - i);
+  }
+  it = mylist2.end();
+  stdit = stdlist2.end();
+  advance(it, -6);
+  advance(stdit, -6);
+  mylist1.splice(mylist1.end(), mylist2, it, mylist2.end());
+  stdlist1.splice(stdlist1.end(), stdlist2, stdit, stdlist2.end());
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  while (it != mylist1.end())
+    EXPECT_EQ(*it++, *stdit++);
+
+  it = mylist2.begin();
+  stdit = stdlist2.begin();
+  advance(it, 2);
+  advance(stdit, 2);
+  mylist1.splice(mylist1.begin(), mylist2, mylist2.begin(), it);
+  stdlist1.splice(stdlist1.begin(), stdlist2, stdlist2.begin(), stdit);
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  while (it != mylist1.end())
+    EXPECT_EQ(*it++, *stdit++);
+
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  advance(it, 7);
+  advance(stdit, 7);
+  mylist1.splice(it, mylist2, mylist2.begin(), mylist2.end());
+  stdlist1.splice(stdit, stdlist2, stdlist2.begin(), stdlist2.end());
+  EXPECT_EQ(mylist1.size(), stdlist1.size());
+  EXPECT_EQ(mylist2.size(), stdlist2.size());
+  it = mylist1.begin();
+  stdit = stdlist1.begin();
+  while (it != mylist1.end())
+    EXPECT_EQ(*it++, *stdit++);
+  while (it != mylist1.begin())
+    EXPECT_EQ(*--it, *--stdit);
 }
 
 TEST(ListTest, Remove)
@@ -466,7 +832,7 @@ TEST(ListTest, Merge)
     EXPECT_EQ(*it, test1[i++]);
 
   // (second is now empty)
-  EXPECT_EQ(second.size(), 0);
+  EXPECT_EQ(second.size(), size_t(0));
   second.push_back(2.1);
 
   first.merge(second, mycomparison);
@@ -475,6 +841,57 @@ TEST(ListTest, Merge)
   for (LIBRARY::list<double>::iterator it = first.begin(); it != first.end(); ++it)
     EXPECT_EQ(*it, final[i++]);
 }
+
+TEST(ListTest, Merge2)
+{
+  LIBRARY::list<double> first, second;
+  LIBRARY::list<double>::iterator it, it2;
+  std::list<double> sfirst, ssecond;
+  std::list<double>::iterator sit, sit2;
+
+  for (int i = 0; i < 10; ++i)
+  {
+    first.push_back(i);
+    sfirst.push_back(i);
+    second.push_back(i + 5);
+    ssecond.push_back(i + 5);
+  }
+  first.merge(first);
+  sfirst.merge(sfirst);
+  EXPECT_EQ(first.size(), sfirst.size());
+  it = first.begin();
+  sit = sfirst.begin();
+  while (it != first.end())
+    EXPECT_EQ(*it++, *sit++);
+
+  first.merge(second);
+  sfirst.merge(ssecond);
+  EXPECT_EQ(first.size(), sfirst.size());
+  EXPECT_EQ(second.size(), ssecond.size());
+  it = first.begin();
+  sit = sfirst.begin();
+  while (it != first.end())
+    EXPECT_EQ(*it++, *sit++);
+  while (sit != sfirst.begin())
+    EXPECT_EQ(*--it, *--sit);
+
+  for (int i = -10; i < 0; ++i)
+  {
+    second.push_back(i + 5);
+    ssecond.push_back(i + 5);
+  }
+  first.merge(second);
+  sfirst.merge(ssecond);
+  EXPECT_EQ(first.size(), sfirst.size());
+  EXPECT_EQ(second.size(), ssecond.size());
+  it = first.begin();
+  sit = sfirst.begin();
+  while (sit != sfirst.end())
+    EXPECT_EQ(*it++, *sit++);
+  while (sit != sfirst.begin())
+    EXPECT_EQ(*--it, *--sit);
+}
+
 // comparison, not case sensitive.
 bool compare_nocase(const std::string &first, const std::string &second)
 {
@@ -510,6 +927,27 @@ TEST(ListTest, Sort)
   EXPECT_EQ(mylist.front(), stdlist.front());
 }
 
+TEST(ListTest, Sort2)
+{
+  LIBRARY::list<int> mylist;
+  std::list<int> stdlist;
+  LIBRARY::list<int>::iterator it;
+  std::list<int>::iterator sit;
+  int random;
+  for (int i = 0; i < 10000; ++i)
+  {
+    random = rand();
+    mylist.push_back(random);
+    stdlist.push_back(random);
+  }
+  mylist.sort();
+  stdlist.sort();
+  it = mylist.begin();
+  sit = stdlist.begin();
+  while (sit != stdlist.end())
+    EXPECT_EQ(*it++, *sit++);
+}
+
 TEST(ListTest, Reverse)
 {
   LIBRARY::list<int> mylist;
@@ -535,4 +973,21 @@ TEST(ListTest, RelationalOp)
   EXPECT_TRUE(foo < bar);
   EXPECT_FALSE(foo >= bar);
   EXPECT_TRUE(foo <= bar);
+}
+
+TEST(ListTest, ConstIterator)
+{
+  LIBRARY::list<int> list(3, 100); // three ints with a value of 100
+  LIBRARY::list<int>::const_iterator it;
+  LIBRARY::list<int>::const_iterator it3(it);
+  LIBRARY::list<int>::iterator it2;
+
+  for (it = list.begin(); it != list.end(); ++it)
+  {
+    // *it += 5;
+  }
+  it2 = --list.end();
+  it = it2;
+  it3 = it2;
+  // it2 = it;
 }

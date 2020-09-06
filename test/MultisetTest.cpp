@@ -34,10 +34,10 @@ TEST(Multiset, Constructors)
   bool (*fn_pt)(int, int) = fncomp;
   LIBRARY::multiset<int, bool (*)(int, int)> sixth(fn_pt); // function pointer as Compare
 
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 5);
-  EXPECT_EQ(third.size(), 5);
-  EXPECT_EQ(fourth.size(), 5);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(5));
+  EXPECT_EQ(third.size(), size_t(5));
+  EXPECT_EQ(fourth.size(), size_t(5));
 }
 
 TEST(Multiset, Assignment)
@@ -48,8 +48,8 @@ TEST(Multiset, Assignment)
 
   second = first;                   // now second contains the 5 ints
   first = LIBRARY::multiset<int>(); // and first is empty
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 5);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(5));
 }
 
 TEST(Multiset, Begin)
@@ -59,7 +59,7 @@ TEST(Multiset, Begin)
 
   int i = 0;
   int result[] = {13, 23, 42, 65, 75};
-  ASSERT_EQ(myset.size(), 5);
+  ASSERT_EQ(myset.size(), size_t(5));
   for (LIBRARY::multiset<int>::iterator it = myset.begin(); it != myset.end(); ++it)
     EXPECT_EQ(*it, result[i++]);
 }
@@ -72,7 +72,7 @@ TEST(Multiset, RBegin)
   LIBRARY::multiset<int>::reverse_iterator it;
   int i = 0;
   int result[] = {78, 64, 49, 21, 17};
-  ASSERT_EQ(myset.size(), 5);
+  ASSERT_EQ(myset.size(), size_t(5));
   for (it = myset.rbegin(); i < 5; ++it)
     EXPECT_EQ(*it, result[i++]);
     EXPECT_EQ(i, 5);
@@ -113,14 +113,14 @@ TEST(Multiset, Empty)
 TEST(Multiset, Size)
 {
   LIBRARY::multiset<int> myints;
-  EXPECT_EQ(myints.size(), 0);
+  EXPECT_EQ(myints.size(), size_t(0));
   for (int i = 0; i < 10; ++i)
     myints.insert(i);
-  EXPECT_EQ(myints.size(), 10);
+  EXPECT_EQ(myints.size(), size_t(10));
   myints.insert(10);
-  EXPECT_EQ(myints.size(), 11);
+  EXPECT_EQ(myints.size(), size_t(11));
   myints.erase(5);
-  EXPECT_EQ(myints.size(), 10);
+  EXPECT_EQ(myints.size(), size_t(10));
 }
 
 TEST(Multiset, MaxSize)
@@ -171,7 +171,7 @@ TEST(Multiset, Insert)
 
   i = 0;
   int result[] = {5, 10, 10, 15, 20, 20, 24, 25, 26, 30, 40, 50};
-  ASSERT_EQ(myset.size(), 12);
+  ASSERT_EQ(myset.size(), size_t(12));
   for (LIBRARY::multiset<int>::iterator it = myset.begin(); it != myset.end(); ++it)
     EXPECT_EQ(*it, result[i++]);
 }
@@ -209,17 +209,17 @@ TEST(Multiset, Erase1)
   ++it; // "it" points now to 20
   myset.erase(it);
   EXPECT_FALSE(myset.count(20));
-  EXPECT_EQ(myset.size(), 9);
+  EXPECT_EQ(myset.size(), size_t(9));
   it = myset.begin();
   myset.erase(it);
   EXPECT_FALSE(myset.count(10));
-  EXPECT_EQ(myset.size(), 8);
+  EXPECT_EQ(myset.size(), size_t(8));
   it = myset.end();
   --it;
   EXPECT_EQ(*it, 90);
   myset.erase(it);
   EXPECT_TRUE(myset.count(90));
-  // EXPECT_EQ(myset.size(), 7);
+  // EXPECT_EQ(myset.size(), size_t(7));
   int i = 0;
   int result[] = {30, 40, 50, 60, 70, 80, 90};
   for (it = myset.begin(); it != myset.end(); ++it){
@@ -238,14 +238,14 @@ TEST(Multiset, Erase2)
     myset.insert(i * 10); // 10 20 30 40 50 60 70 80 90
   myset.insert(40);
   myset.erase(40);
-  EXPECT_EQ(myset.count(40), 0);
-  EXPECT_EQ(myset.size(), 8);
+  EXPECT_EQ(myset.count(40), size_t(0));
+  EXPECT_EQ(myset.size(), size_t(8));
   myset.erase(90);
-  EXPECT_EQ(myset.count(90), 0);
-  EXPECT_EQ(myset.size(), 7);
+  EXPECT_EQ(myset.count(90), size_t(0));
+  EXPECT_EQ(myset.size(), size_t(7));
   myset.erase(10);
-  EXPECT_EQ(myset.count(10), 0);
-  EXPECT_EQ(myset.size(), 6);
+  EXPECT_EQ(myset.count(10), size_t(0));
+  EXPECT_EQ(myset.size(), size_t(6));
   int i = 0;
   int result[] = {20, 30, 50, 60, 70, 80};
   for (LIBRARY::multiset<int>::iterator it = myset.begin(); it != myset.end(); ++it){
@@ -265,8 +265,8 @@ TEST(Multiset, Erase3)
   it = myset.find(60);
   // std::cout << "DELETING 60 -> 90" << std::endl;
   myset.erase(it, myset.end());
-  EXPECT_EQ(myset.count(70), 0);
-  EXPECT_EQ(myset.size(), 5);
+  EXPECT_EQ(myset.count(70), size_t(0));
+  EXPECT_EQ(myset.size(), size_t(5));
 
   int i = 0;
   int result[] = {10, 20, 30, 40, 50};
@@ -288,13 +288,13 @@ TEST(Multiset, Swap)
 
   int i = 0;
   int result1[] = {10, 20, 25, 32};
-  ASSERT_EQ(first.size(), 4);
+  ASSERT_EQ(first.size(), size_t(4));
   for (it = first.begin(); it != first.end(); ++it)
     EXPECT_EQ(*it, result1[i++]);
 
   i = 0;
   int result2[] = {10, 12, 75};
-  ASSERT_EQ(second.size(), 3);
+  ASSERT_EQ(second.size(), size_t(3));
   for (it = second.begin(); it != second.end(); ++it)
     EXPECT_EQ(*it, result2[i++]);
 }
@@ -307,12 +307,12 @@ TEST(Multiset, Clear)
   myset.insert(200);
   myset.insert(300);
 
-  ASSERT_EQ(myset.size(), 3);
+  ASSERT_EQ(myset.size(), size_t(3));
   myset.clear();
-  ASSERT_EQ(myset.size(), 0);
+  ASSERT_EQ(myset.size(), size_t(0));
   myset.insert(1101);
   myset.insert(2202);
-  ASSERT_EQ(myset.size(), 2);
+  ASSERT_EQ(myset.size(), size_t(2));
 }
 
 TEST(Multiset, KeyComp)
@@ -369,12 +369,9 @@ TEST(Multiset, Find)
 
   int i = 0;
   int result[] = {10, 20, 30, 50};
-  ASSERT_EQ(myset.size(), 4);
-  // for (LIBRARY::multiset<int>::reverse_iterator rit = myset.rbegin(); rit != myset.rend(); ++rit)
-  //   std::cout << *rit << std::endl;
-  // for (LIBRARY::multiset<int>::iterator it = myset.begin(); it != myset.end(); ++it)
-  //   std::cout << *it << std::endl;
-    // EXPECT_EQ(*it, result[i++]);
+  ASSERT_EQ(myset.size(), size_t(4));
+  for (LIBRARY::multiset<int>::iterator it = myset.begin(); it != myset.end(); ++it)
+    EXPECT_EQ(*it, result[i++]);
 }
 
 TEST(Multiset, Count)
@@ -392,8 +389,8 @@ TEST(Multiset, Count)
       // std::cout << *it << ", ";
   EXPECT_TRUE(myset.count(3));
   EXPECT_FALSE(myset.count(4));
-  EXPECT_EQ(myset.count(9), 3);
-  EXPECT_EQ(myset.count(12), 2);
+  EXPECT_EQ(myset.count(9), size_t(3));
+  EXPECT_EQ(myset.count(12), size_t(2));
 }
 
 TEST(Multiset, Bound)
@@ -412,7 +409,7 @@ TEST(Multiset, Bound)
   mymultiset.erase(40); // 10 20 50 60 70
   int i = 0;
   int result[] = {10, 20, 50, 60, 70};
-  ASSERT_EQ(mymultiset.size(), 5);
+  ASSERT_EQ(mymultiset.size(), size_t(5));
   for (LIBRARY::multiset<int>::iterator it = mymultiset.begin(); it != mymultiset.end(); ++it)
     EXPECT_EQ(*it, result[i++]);
 }
@@ -424,11 +421,11 @@ TEST(Multiset, EqualRange)
 
   LIBRARY::pair<LIBRARY::multiset<int>::iterator, LIBRARY::multiset<int>::iterator> ret = mymultiset.equal_range(30); //      ^        ^
 
-  EXPECT_EQ(mymultiset.count(30), 3);
+  EXPECT_EQ(mymultiset.count(30), size_t(3));
   for (LIBRARY::multiset<int>::iterator it = ret.first; it != ret.second; ++it)
     EXPECT_EQ(*it, 30);
   mymultiset.erase(ret.first, ret.second);
-  EXPECT_EQ(mymultiset.size(), 3);
+  EXPECT_EQ(mymultiset.size(), size_t(3));
 }
 
 TEST(Multiset, RelOps)

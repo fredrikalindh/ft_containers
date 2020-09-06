@@ -8,117 +8,46 @@
 
 namespace ft
 {
+	template <class T, bool isconst = false>
+	class list_iterator;
 
+	/*
+	* NODE: structure that builds up the doubly linked list. Stores the previous and next
+	* node along with the data.
+	*/
+	template <class T>
+	struct list_node
+	{
+		list_node *prev;
+		list_node *next;
+		T value;
+
+		list_node(T value = T()) : next(0), prev(0), value(value) {}
+		list_node(list_node *prev, list_node *next, T value) : prev(prev), next(next), value(value) {}
+		list_node(list_node const &cpy) : prev(cpy.prev), next(cpy.next), value(cpy.value) {}
+	};
 	template <class T>
 	class list
 	{
-	protected:
-		/*
-		* NODE: structure that builds up the doubly linked list. Stores the previous and next
-		* node along with the data.
-		*/
-		struct Node
-		{
-			Node *prev;
-			Node *next;
-			T value;
+		template <class U, bool isconst>
+		friend class list_iterator;
 
-			Node(T value = T()) : next(0), prev(0), value(value) {}
-			Node(Node *prev, Node *next, T value) : prev(prev), next(next), value(value) {}
-			Node(Node const &cpy) : prev(cpy.prev), next(cpy.next), value(cpy.value) {}
-		};
+		typedef ft::list_node<T> Node;
+
+	protected:
 		Node *first_;
 		Node *last_;
 		size_t size_;
 
 	public:
-		/*
-		* BIDIRECTIONAL ITERATOR: 
-		*/
-		class bidirectional_iterator
-		{
-			friend class list<T>;
-
-			Node *node_;
-			const list *container_;
-
-		public:
-			typedef ft::bidirectional_iterator_tag iterator_category;
-			typedef T value_type;
-			typedef std::ptrdiff_t difference_type;
-			typedef T *pointer;
-			typedef T &reference;
-
-			explicit bidirectional_iterator(Node *node = 0) : node_(node),
-															  container_(0) {}
-			bidirectional_iterator(Node *node, const list *container) : node_(node),
-																		container_(container) {}
-			bidirectional_iterator(bidirectional_iterator const &cpy) : node_(cpy.node_),
-																		container_(cpy.container_) {}
-			~bidirectional_iterator() {}
-			bidirectional_iterator &operator=(bidirectional_iterator const &cpy)
-			{
-				bidirectional_iterator tmp(cpy);
-				swap(tmp);
-				return *this;
-			}
-			bidirectional_iterator &operator++(void)
-			{
-				if (node_)
-					node_ = node_->next;
-				else if (container_)
-					node_ = container_->first_;
-				return *this;
-			}
-			bidirectional_iterator operator++(int)
-			{
-				bidirectional_iterator old(*this);
-				if (node_)
-					node_ = node_->next;
-				else if (container_)
-					node_ = container_->first_;
-				return old;
-			}
-			bidirectional_iterator &operator--(void)
-			{
-				if (node_)
-					node_ = node_->prev;
-				else if (container_)
-					node_ = container_->last_;
-				return *this;
-			}
-			bidirectional_iterator operator--(int)
-			{
-				bidirectional_iterator old(*this);
-				if (node_)
-					node_ = node_->prev;
-				else if (container_)
-					node_ = container_->last_;
-				return old;
-			}
-			inline reference operator*(void) { return node_->value; }
-			inline pointer operator->(void) { return &(node_->value); }
-			inline reference operator*(void) const { return node_->value; }
-			inline pointer operator->(void) const { return &(node_->value); }
-			inline bool operator!=(bidirectional_iterator const &other) const { return node_ != other.node_; }
-			inline bool operator==(bidirectional_iterator const &other) const { return node_ == other.node_; }
-
-			void swap(bidirectional_iterator &other)
-			{
-				char buffer[sizeof(bidirectional_iterator)];
-				memcpy(buffer, &other, sizeof(bidirectional_iterator));
-				memcpy(reinterpret_cast<char *>(&other), this, sizeof(bidirectional_iterator));
-				memcpy(reinterpret_cast<char *>(this), buffer, sizeof(bidirectional_iterator));
-			}
-		};
 		// TYPEDEFS ####################################################################
 		typedef T value_type;
 		typedef value_type &reference;
 		typedef const value_type &const_reference;
 		typedef value_type *pointer;
 		typedef const value_type *const_pointer;
-		typedef bidirectional_iterator iterator;
-		typedef bidirectional_iterator const_iterator;
+		typedef list_iterator<T> iterator;
+		typedef list_iterator<T, true> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 		typedef size_t size_type;
@@ -286,20 +215,27 @@ namespace ft
 				position.node_->prev = toAdd;
 			}
 			size_++;
+			position.node_ = toAdd;
 			return position;
 			// return iterator(toAdd, this);
 		}
 		void insert(iterator position, size_type n, const T &val)
 		{
 			while (n--)
+			{
 				position = insert(position, val);
+				++position;
+			}
 		}
 		template <class InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last,
 					typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
 		{
 			while (first != last)
+			{
 				position = insert(position, *first++);
+				++position;
+			}
 		}
 		//################################ ERASE ######################################
 		iterator erase(iterator position)
@@ -372,6 +308,11 @@ namespace ft
 		{
 			if (x.empty())
 				return;
+			if (empty())
+			{
+				swap(x);
+				return;
+			}
 			if (position.node_ == first_)
 			{
 				first_->prev = x.last_;
@@ -452,7 +393,7 @@ namespace ft
 				position.node_->prev->next = first.node_;
 				first.node_->prev = position.node_->prev;
 				position.node_->prev = nlast;
-				last.node_->next = position.node_;
+				nlast->next = position.node_;
 			}
 		}
 		//################################ REMOVE ######################################
@@ -509,50 +450,34 @@ namespace ft
 		{ //sorted merge
 			iterator a(first_, this);
 			iterator b(x.first_, &x);
-			iterator insert;
+			if (this == &x)
+				return;
 			while (a.node_ != 0 && b.node_ != 0)
 			{
 				if (*b < *a)
-				{
-					insert = b;
-					b++;
-					splice(a, x, insert);
-				}
+					splice(a, x, b++);
 				else
 					a++;
 			}
 			if (!x.empty())
-			{
-				last_->next = x.first_;
-				x.first_->prev = last_;
-			}
-			x.first_ = x.last_ = 0;
-			x.size_ = 0;
+				splice(a, x, b, x.end());
 		}
 		template <class Compare>
 		void merge(list &x, Compare comp)
 		{
 			iterator a(first_, this);
 			iterator b(x.first_, &x);
-			iterator insert;
+			if (this == &x)
+				return;
 			while (a.node_ != 0 && b.node_ != 0)
 			{
 				if (comp(*b, *a) > 0)
-				{
-					insert = b;
-					b++;
-					splice(a, x, insert);
-				}
+					splice(a, x, b++);
 				else
 					a++;
 			}
 			if (!x.empty())
-			{
-				last_->next = x.first_;
-				x.first_->prev = last_;
-			}
-			x.first_ = x.last_ = 0;
-			x.size_ = 0;
+				splice(a, x, b, x.end());
 		}
 		//############################## SORT ##########################################
 		void sort()
@@ -699,6 +624,93 @@ namespace ft
 			mergesort(first, comp);
 			mergesort(&middle, comp);
 			*first = sort_merge(*first, middle, comp);
+		}
+	};
+	/*
+	* BIDIRECTIONAL ITERATOR: 
+	*/
+	template <class T, bool isconst>
+	class list_iterator
+	{
+		friend class list<T>;
+		friend class list_iterator<T, false>;
+		friend class list_iterator<T, true>;
+		typedef typename choose<isconst, const list_node<T>, list_node<T> >::type Node;
+		typedef typename choose<isconst, const list<T> *, list<T> *>::type listptr;
+
+		Node *node_;
+		listptr container_;
+
+	public:
+		typedef ft::bidirectional_iterator_tag iterator_category;
+		typedef T value_type;
+		typedef std::ptrdiff_t difference_type;
+		typedef typename choose<isconst, const T &, T &>::type reference;
+		typedef typename choose<isconst, const T *, T *>::type pointer;
+
+		list_iterator(Node *node = 0) : node_(node),
+												 container_(0) {}
+		list_iterator(Node *node, listptr container) : node_(node),
+													   container_(container) {}
+		// list_iterator(list_iterator const &cpy) : node_(cpy.node_),
+		// 										  container_(cpy.container_) {}
+		list_iterator(list_iterator<T, false> const &cpy) : node_(cpy.node_),
+															container_(cpy.container_) {}
+		~list_iterator() {}
+
+		list_iterator &operator=(list_iterator const &cpy)
+		{
+			list_iterator tmp(cpy);
+			swap(tmp);
+			return *this;
+		}
+		list_iterator &operator++(void)
+		{
+			if (node_)
+				node_ = node_->next;
+			else if (container_)
+				node_ = container_->first_;
+			return *this;
+		}
+		list_iterator operator++(int)
+		{
+			list_iterator old(*this);
+			if (node_)
+				node_ = node_->next;
+			else if (container_)
+				node_ = container_->first_;
+			return old;
+		}
+		list_iterator &operator--(void)
+		{
+			if (node_)
+				node_ = node_->prev;
+			else if (container_)
+				node_ = container_->last_;
+			return *this;
+		}
+		list_iterator operator--(int)
+		{
+			list_iterator old(*this);
+			if (node_)
+				node_ = node_->prev;
+			else if (container_)
+				node_ = container_->last_;
+			return old;
+		}
+		inline reference operator*(void) { return (node_) ? node_->value : *(reinterpret_cast<T *>(0)); }
+		inline pointer operator->(void) { return (0) ? &(node_->value) : 0; }
+		inline reference operator*(void) const { return (node_) ? node_->value : *(reinterpret_cast<T *>(0)); }
+		inline pointer operator->(void) const { return (node_) ? &(node_->value) : 0; }
+		inline bool operator!=(list_iterator const &other) const { return node_ != other.node_; }
+		inline bool operator==(list_iterator const &other) const { return node_ == other.node_; }
+
+		void swap(list_iterator &other)
+		{
+			char buffer[sizeof(list_iterator)];
+			memcpy(buffer, &other, sizeof(list_iterator));
+			memcpy(reinterpret_cast<char *>(&other), this, sizeof(list_iterator));
+			memcpy(reinterpret_cast<char *>(this), buffer, sizeof(list_iterator));
 		}
 	};
 } // namespace ft

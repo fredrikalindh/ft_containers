@@ -13,10 +13,10 @@ TEST(MapTest, Constructors)
 
   LIBRARY::map<char,int,classcomp> fourth;                 // class as Compare
 
-  EXPECT_EQ(first.size(), 4);
-  EXPECT_EQ(second.size(), 4);
-  EXPECT_EQ(third.size(), 4);
-  EXPECT_EQ(fourth.size(), 0);
+  EXPECT_EQ(first.size(), size_t(4));
+  EXPECT_EQ(second.size(), size_t(4));
+  EXPECT_EQ(third.size(), size_t(4));
+  EXPECT_EQ(fourth.size(), size_t(0));
   bool(*fn_pt)(char,char) = fncomp;
   LIBRARY::map<char,int,bool(*)(char,char)> fifth (fn_pt); // function pointer as Compare
 }
@@ -33,8 +33,8 @@ TEST(MapTest, Assignment)
   second=first;                // second now contains 3 ints
   first=LIBRARY::map<char,int>();  // and first is now empty
 
-  EXPECT_EQ(first.size(), 0);
-  EXPECT_EQ(second.size(), 3);
+  EXPECT_EQ(first.size(), size_t(0));
+  EXPECT_EQ(second.size(), size_t(3));
 }
 
 TEST(MapTest, Begin)
@@ -80,7 +80,7 @@ TEST(MapTest, Empty)
     // std::cout << mymap.begin()->first << " => " << mymap.begin()->second << '\n';
     mymap.erase(mymap.begin());
   }
-	EXPECT_EQ(mymap.size(), 0);
+	EXPECT_EQ(mymap.size(), size_t(0));
 }
   TEST(MapTest, Size)
 {
@@ -89,7 +89,7 @@ TEST(MapTest, Empty)
   mymap['b']=202;
   mymap['c']=302;
 
-  EXPECT_EQ(mymap.size(), 3);
+  EXPECT_EQ(mymap.size(), size_t(3));
 }
 
 TEST(MapTest, MaxSize)
@@ -120,7 +120,7 @@ TEST(MapTest, Brackets)
   EXPECT_EQ(mymap['b'], "another element");
   EXPECT_EQ(mymap['c'], "another element");
   EXPECT_EQ(mymap['d'], "");
-   EXPECT_EQ(mymap.size(), 4);
+   EXPECT_EQ(mymap.size(), size_t(4));
 }
 TEST(MapTest, Insert)
 {
@@ -177,7 +177,7 @@ TEST(MapTest, Erase)
 
   EXPECT_EQ(mymap['d'], 40);
   EXPECT_EQ(mymap['a'], 10);
-  EXPECT_EQ(mymap.size(), 2);
+  EXPECT_EQ(mymap.size(), size_t(2));
 }
 
 TEST(MapTest, Swap)
@@ -191,17 +191,17 @@ TEST(MapTest, Swap)
   bar['b']=22;
   bar['c']=33;
 
-EXPECT_EQ(foo.size(), 2);
-EXPECT_EQ(bar.size(), 3);
+EXPECT_EQ(foo.size(), size_t(2));
+EXPECT_EQ(bar.size(), size_t(3));
   foo.swap(bar);
 EXPECT_EQ(foo['a'], 11);
-EXPECT_EQ(foo.size(), 3);
-EXPECT_EQ(bar.size(), 2);
+EXPECT_EQ(foo.size(), size_t(3));
+EXPECT_EQ(bar.size(), size_t(2));
 
   swap(bar, foo);
   EXPECT_EQ(foo['x'], 100);
-EXPECT_EQ(foo.size(), 2);
-EXPECT_EQ(bar.size(), 3);
+EXPECT_EQ(foo.size(), size_t(2));
+EXPECT_EQ(bar.size(), size_t(3));
 }
 
 TEST(MapTest, Clear)
@@ -213,10 +213,10 @@ TEST(MapTest, Clear)
   mymap['z']=300;
 
   mymap.clear();
-  EXPECT_EQ(mymap.size(), 0);
+  EXPECT_EQ(mymap.size(), size_t(0));
   mymap['a']=1101;
   mymap['b']=2202;
-  EXPECT_EQ(mymap.size(), 2);
+  EXPECT_EQ(mymap.size(), size_t(2));
 }
 
 TEST(MapTest, KeyComp)
@@ -268,17 +268,16 @@ TEST(MapTest, Find)
   if (it != mymap.end())
     mymap.erase (it);
 
-  EXPECT_EQ(mymap.size(), 3);
+  EXPECT_EQ(mymap.size(), size_t(3));
   EXPECT_EQ(mymap.find('a')->second, 50);
   EXPECT_EQ(mymap.find('b'), mymap.end());
   EXPECT_EQ(mymap.find('c')->second, 150);
   EXPECT_EQ(mymap.find('d')->second, 200);
-  EXPECT_EQ(mymap.size(), 3);
+  EXPECT_EQ(mymap.size(), size_t(3));
 }
 TEST(MapTest, Count)
 {
   LIBRARY::map<char,int> mymap;
-  char c;
 
   mymap ['a']=101;
   mymap ['c']=202;
@@ -305,7 +304,7 @@ TEST(MapTest, Bound)
   EXPECT_EQ(itup->second, 80);
   mymap.erase(itlow,itup);        // erases [itlow,itup)
 
-  EXPECT_EQ(mymap.size(), 3);
+  EXPECT_EQ(mymap.size(), size_t(3));
   EXPECT_FALSE(mymap.count('b'));
   EXPECT_TRUE(mymap.count('d'));
 }
@@ -345,4 +344,70 @@ TEST(MapTest, RelOps)
   EXPECT_TRUE(foo > bar);
   EXPECT_FALSE(foo <= bar);
   EXPECT_TRUE(foo >= bar);
+}
+
+
+TEST(MapTest, Glagan)
+{
+  LIBRARY::map<int, int> mp;
+  std::map<int, int> stdmp;
+  LIBRARY::map<int, int>::iterator it;
+  std::map<int, int>::iterator sit;
+	mp[5] = 42;
+	mp[7] = 28;
+	mp[9] = 44;
+
+	EXPECT_EQ(mp.size(), size_t(3));
+	it = mp.begin();
+  EXPECT_EQ((*it).first, 5);
+  EXPECT_EQ(it->second, 42);
+	EXPECT_EQ(mp[5], 42);
+	it = --mp.end();
+  EXPECT_EQ((*it).first, 9);
+  EXPECT_EQ(it->second, 44);
+	EXPECT_EQ(mp[9], 44);
+}
+
+TEST(MapTest, Glagan2)
+{
+  LIBRARY::map<std::string, int> mp;
+  std::map<std::string, int> stdmp;
+  LIBRARY::map<std::string, int>::iterator it;
+  std::map<std::string, int>::iterator sit;
+
+  mp[std::string("hej")] = 1;
+  mp[std::string("bonjour")] = 2;
+  mp[std::string("hello")] = 3;
+  mp[std::string("ciao")] = 4;
+  EXPECT_EQ(mp.size(), size_t(4));
+
+  it = mp.begin();
+  EXPECT_EQ(it->second, 2);
+  it++;
+  EXPECT_EQ(it->second, 4);
+  it++;
+  EXPECT_EQ(it->second, 1);
+  it++;
+  EXPECT_EQ(it->second, 3);
+  it = mp.find(std::string("hej"));
+}
+
+TEST(MapTest, ConstIterator)
+{
+  LIBRARY::map<int, int> map; // three ints with a value of 100
+  map[5] = 42;
+	map[7] = 28;
+	map[9] = 44;
+  LIBRARY::map<int, int>::const_iterator it;
+  LIBRARY::map<int, int>::const_iterator it3(it);
+  LIBRARY::map<int, int>::iterator it2;
+
+  for (it = map.begin(); it != map.end(); ++it)
+  {
+    // it->second += 5;
+  }
+  it2 = --map.end();
+  it = it2;
+  it3 = it2;
+  // it2 = it;
 }
