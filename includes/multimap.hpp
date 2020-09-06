@@ -83,7 +83,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		return iterator(tree_.add(val), &tree_);
 	}
 	iterator				insert (iterator position, const value_type& val){
-		return iterator(tree_.add(position.node_, val), &tree_);
+		return iterator(tree_.add(position, val), &tree_);
 	}
 	template <class InputIterator>
 	void					insert (InputIterator first, InputIterator last){
@@ -91,7 +91,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 //########################### ERASE #######################################
 	void					erase (iterator position){
-		tree_.deleteKey(position.node_);
+		tree_.deleteKey(position);
 	}
 	size_type				erase (const key_type& k) {
 		size_type i = 0;
@@ -102,7 +102,7 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	void					erase (iterator first, iterator last){ // CAN MAKE MORE EFFICIENT
 		while (first != end() && first != last && (last == end() || !comp(last->first, first->first))) {
 			// std::cout << "ERASING " << first->first << "=>" << first->second << "\n";
-			first = tree_.deleteKey(first.node_);
+			first = tree_.deleteKey(first);
 		}
 	}
 //########################### MODIFIERS #######################################

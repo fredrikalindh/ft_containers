@@ -71,7 +71,7 @@ namespace ft
 		}
 		iterator insert(iterator position, const value_type &val)
 		{
-			return iterator(tree_.add(position.node_, val), &tree_);
+			return iterator(tree_.add(position, val), &tree_);
 		}
 		template <class InputIterator>
 		void insert(InputIterator first, InputIterator last)
@@ -79,10 +79,9 @@ namespace ft
 			while (first != last)
 				tree_.add(*first++);
 		}
-
 		void erase(iterator position)
 		{
-			tree_.deleteKey(position.node_);
+			tree_.deleteKey(position);
 		}
 		size_type erase(const value_type &val)
 		{
@@ -94,7 +93,7 @@ namespace ft
 		void erase(iterator first, iterator last)
 		{
 			while (first != last) 
-				first = tree_.deleteKey(first.node_);
+				first = tree_.deleteKey(first);
 		}
 
 		void swap(multiset &x)
