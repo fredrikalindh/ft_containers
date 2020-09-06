@@ -991,3 +991,23 @@ TEST(ListTest, ConstIterator)
   it3 = it2;
   // it2 = it;
 }
+
+TEST(ListTest, ReverseConstIterator)
+{
+  LIBRARY::list<int> list(3, 100); // three ints with a value of 100
+  std::list<int> slist(3, 100); // three ints with a value of 100
+
+  LIBRARY::list<int>::const_reverse_iterator rit;
+  std::list<int>::const_reverse_iterator srit;
+  LIBRARY::list<int>::reverse_iterator rit2;
+
+  srit = slist.rbegin();
+  rit = list.rbegin();
+  while (rit != list.rend()) {
+    // *rit += 5;
+    EXPECT_EQ(*srit++, *rit++);
+  }
+  rit2 = list.rbegin();
+  rit = rit2;
+  // rit2 = rit;
+}

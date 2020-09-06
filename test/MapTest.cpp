@@ -411,3 +411,31 @@ TEST(MapTest, ConstIterator)
   it3 = it2;
   // it2 = it;
 }
+
+TEST(MapTest, ReverseConstIterator)
+{
+  LIBRARY::map<int, int> map; // three ints with a value of 100
+  std::map<int, int> smap; // three ints with a value of 100
+  map[5] = 42;
+	map[7] = 28;
+	map[9] = 44;
+  smap[5] = 42;
+	smap[7] = 28;
+	smap[9] = 44;
+  LIBRARY::map<int, int>::const_reverse_iterator rit;
+  LIBRARY::map<int, int>::const_reverse_iterator rit2(rit);
+  std::map<int, int>::const_reverse_iterator srit;
+
+  srit = smap.rbegin();
+  rit = map.rbegin();
+  while (rit != map.rend()) {
+    // *rit += 5;
+    EXPECT_EQ(srit->first, rit->first);
+    EXPECT_EQ(srit->second, rit->second);
+    srit++;
+    rit++;
+  }
+  rit2 = map.rbegin();
+  rit = rit2;
+  // rit2 = rit;
+}

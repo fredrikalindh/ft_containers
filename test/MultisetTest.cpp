@@ -18,15 +18,18 @@ TEST(Multiset, Constructors)
   EXPECT_EQ(i, 0);
   LIBRARY::multiset<int> third(second); // a copy of second
 
-   for (it = third.begin(); it != third.end(); ++it)
+  for (it = third.begin(); it != third.end(); ++it)
+    // std::cout << *it << ' ';
       EXPECT_EQ(*it, myints[i++]);
-    for (rit = third.rbegin(); rit != third.rend(); ++rit)
-      EXPECT_EQ(*rit, myints[--i]);
-    EXPECT_EQ(i, 0);
+    // std::cout << std::endl;
+  for (rit = third.rbegin(); rit != third.rend(); ++rit)
+    EXPECT_EQ(*rit, myints[--i]);
+  EXPECT_EQ(i, 0);
   LIBRARY::multiset<int> fourth(second.begin(), second.end()); // iterator ctor.
-   for (it = fourth.begin(); it != fourth.end(); ++it)
+  for (it = fourth.begin(); it != fourth.end(); ++it)
       EXPECT_EQ(*it, myints[i++]);
-    for (rit = fourth.rbegin(); rit != fourth.rend(); ++rit)
+  ASSERT_EQ(i, 5);
+  for (rit = fourth.rbegin(); rit != fourth.rend(); ++rit)
       EXPECT_EQ(*rit, myints[--i]);
     EXPECT_EQ(i, 0);
   LIBRARY::multiset<int, classcomp> fifth; // class as Compare
@@ -446,4 +449,58 @@ TEST(Multiset, RelOps)
   EXPECT_TRUE(foo < bar);
   EXPECT_FALSE(foo >= bar);
   EXPECT_TRUE(foo <= bar);
+}
+
+TEST(Multiset, ConstIterator)
+{
+  LIBRARY::multiset<int> multiset; // three ints with a value of 100
+  std::multiset<int> smultiset; // three ints with a value of 100
+  for (int i = 0; i < 10000; ++i) {
+    multiset.insert(i);
+    smultiset.insert(i);
+    multiset.insert(i);
+    smultiset.insert(i);
+  }
+
+  std::multiset<int>::const_iterator sit;
+  LIBRARY::multiset<int>::const_iterator it;
+  LIBRARY::multiset<int>::const_iterator it3(it);
+  LIBRARY::multiset<int>::iterator it2;
+
+  sit =  smultiset.begin();
+  it = multiset.begin();
+  while (it != multiset.end())
+  {
+    EXPECT_EQ(*sit++, *it++);
+    // *it += 5;
+  }
+  it2 = --multiset.end();
+  it = it2;
+  it3 = it2;
+  // it2 = it;
+}
+
+TEST(Multiset, ReverseConstIterator)
+{
+  LIBRARY::multiset<int> multiset; // three ints with a value of 100
+  std::multiset<int> smultiset; // three ints with a value of 100
+  for (int i = 0; i < 10000; ++i) {
+    multiset.insert(i);
+    smultiset.insert(i);
+    multiset.insert(i);
+    smultiset.insert(i);
+  }
+  LIBRARY::multiset<int>::const_reverse_iterator rit;
+  LIBRARY::multiset<int>::const_reverse_iterator rit2(rit);
+  std::multiset<int>::const_reverse_iterator srit;
+
+  srit = smultiset.rbegin();
+  rit = multiset.rbegin();
+  while (rit != multiset.rend()) {
+    // *rit += 5;
+    EXPECT_EQ(*srit++, *rit++);
+  }
+  rit2 = multiset.rbegin();
+  rit = rit2;
+  // rit2 = rit;
 }

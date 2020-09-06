@@ -14,7 +14,7 @@ class vector_iterator
 {
 	friend class vector_iterator<T, false>;
 	friend class vector_iterator<T, true>;
-	
+
 public:
 	typedef ft::random_access_iterator_tag iterator_category;
 	typedef T value_type;
@@ -175,9 +175,9 @@ public:
 		iterator end() { return &array_[size_]; }
 		const_iterator end() const { return &array_[size_]; }
 		reverse_iterator rbegin() { return reverse_iterator(end()); }
-		const_reverse_iterator rbegin() const { return reverse_iterator(end()); }
+		const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 		reverse_iterator rend() { return reverse_iterator(begin()); }
-		const_reverse_iterator rend() const { return reverse_iterator(begin()); }
+		const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 		size_type size() const { return size_; }
 		// size_type max_size() const { return std::numeric_limits<difference_type>::max() / sizeof(T) * 2; }
 		size_type max_size() const

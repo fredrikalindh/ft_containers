@@ -1,3 +1,29 @@
+TEST(VectorTest, ReverseConstIterator)
+{
+  LIBRARY::vector<int> vector; // three ints with a value of 100
+  std::vector<int> svector; // three ints with a value of 100
+  for (int i = 0; i < 10000; ++i) {
+    vector.push_back(i);
+    svector.push_back(i);
+    vector.push_back(i);
+    svector.push_back(i);
+  }
+  LIBRARY::vector<int>::const_reverse_iterator rit;
+  LIBRARY::vector<int>::const_reverse_iterator rit2(rit);
+  std::vector<int>::const_reverse_iterator srit;
+
+  srit = svector.rbegin();
+  rit = vector.rbegin();
+  while (rit != vector.rend()) {
+    // *rit += 5;
+    EXPECT_EQ(*srit++, *rit++);
+  }
+  rit2 = vector.rbegin();
+  rit = rit2;
+  // rit2 = rit;
+}
+
+
 TEST(VectorTest, ConstIterator)
 {
   LIBRARY::vector<int> vector(3, 100); // three ints with a value of 100

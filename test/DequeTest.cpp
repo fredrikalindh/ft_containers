@@ -49,8 +49,9 @@ TEST(DequeTest, Begin)
   std::deque<int>::iterator stdit = stddeque.begin();
   int a = 0;
   int b = 0;
-  for (it = mydeque.begin(); it != mydeque.end(); ++it)
+  for (it = mydeque.begin(); it != mydeque.end(); ++it){
     ++a;
+  }
   for (stdit = stddeque.begin(); stdit != stddeque.end(); ++stdit)
     ++b;
   EXPECT_EQ(a, b);
@@ -674,4 +675,24 @@ TEST(DequeTest, ConstIterator)
   it = it2;
   it3 = it2;
   // it2 = it;
+}
+
+TEST(DequeTest, ReverseConstIterator)
+{
+  LIBRARY::deque<int> deque(3, 100); // three ints with a value of 100
+  std::deque<int> sdeque(3, 100); // three ints with a value of 100
+
+  LIBRARY::deque<int>::const_reverse_iterator rit;
+  std::deque<int>::const_reverse_iterator srit;
+  LIBRARY::deque<int>::reverse_iterator rit2;
+
+  srit = sdeque.rbegin();
+  rit = deque.rbegin();
+  while (rit != deque.rend()) {
+    // *rit += 5;
+    EXPECT_EQ(*srit++, *rit++);
+  }
+  rit2 = deque.rbegin();
+  rit = rit2;
+  // rit2 = rit;
 }

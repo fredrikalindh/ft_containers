@@ -299,3 +299,57 @@ TEST(SetTest, RelOps)
   EXPECT_FALSE(foo >= bar);
   EXPECT_TRUE(foo <= bar);
 }
+
+TEST(SetTest, ConstIterator)
+{
+  LIBRARY::set<int> set; // three ints with a value of 100
+  std::set<int> sset; // three ints with a value of 100
+  for (int i = 0; i < 10000; ++i) {
+    set.insert(i);
+    sset.insert(i);
+    set.insert(i);
+    sset.insert(i);
+  }
+
+  std::set<int>::const_iterator sit;
+  LIBRARY::set<int>::const_iterator it;
+  LIBRARY::set<int>::const_iterator it3(it);
+  LIBRARY::set<int>::iterator it2;
+
+  sit =  sset.begin();
+  it = set.begin();
+  while (it != set.end())
+  {
+    EXPECT_EQ(*sit++, *it++);
+    // *it += 5;
+  }
+  it2 = --set.end();
+  it = it2;
+  it3 = it2;
+  // it2 = it;
+}
+
+TEST(SetTest, ReverseConstIterator)
+{
+  LIBRARY::set<int> set; // three ints with a value of 100
+  std::set<int> sset; // three ints with a value of 100
+  for (int i = 0; i < 10000; ++i) {
+    set.insert(i);
+    sset.insert(i);
+    set.insert(i);
+    sset.insert(i);
+  }
+  LIBRARY::set<int>::const_reverse_iterator rit;
+  LIBRARY::set<int>::const_reverse_iterator rit2(rit);
+  std::set<int>::const_reverse_iterator srit;
+
+  srit = sset.rbegin();
+  rit = set.rbegin();
+  while (rit != set.rend()) {
+    // *rit += 5;
+    EXPECT_EQ(*srit++, *rit++);
+  }
+  rit2 = set.rbegin();
+  rit = rit2;
+  // rit2 = rit;
+}
