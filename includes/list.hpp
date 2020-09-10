@@ -250,6 +250,8 @@ namespace ft
 		}
 		iterator erase(iterator first, iterator last)
 		{
+			if (first == last)
+				return first;
 			Node *toDel;
 			unlink(first.node_, last.node_);
 			while (first.node_ != 0 && first != last)
@@ -424,21 +426,20 @@ namespace ft
 		void unique()
 		{
 			iterator it2;
-			for (Node *it1 = first_; it1->next != 0; it1 = it1->next)
+			for (Node *it1 = first_; it1 && it1->next != 0; it1 = it1->next)
 			{
-				it2 = iterator(it1->next);
-				while (it2.node_ != 0 && *it2 == it1->value)
+				for (it2 = iterator(it1->next); it2 != end() && *it2 == it1->value;)
 					it2 = erase(it2);
 			}
 		}
+		
 		template <class BinaryPredicate>
 		void unique(BinaryPredicate binary_pred)
 		{
 			iterator it2;
-			for (Node *it1 = first_; it1 != 0; it1 = it1->next)
+			for (Node *it1 = first_; it1 && it1->next != 0; it1 = it1->next)
 			{
-				it2 = iterator(it1->next);
-				while (it2.node_ != 0 && binary_pred(*it2, it1->value))
+				for (it2 = iterator(it1->next); it2 != end() && binary_pred(*it2, it1->value); )
 					it2 = erase(it2);
 			}
 		}
@@ -450,8 +451,13 @@ namespace ft
 		{ //sorted merge
 			iterator a(first_, this);
 			iterator b(x.first_, &x);
-			if (this == &x)
+			if (this == &x || x.empty())
 				return;
+			if (empty())
+			{
+				swap(x);
+				return ;
+			}
 			while (a.node_ != 0 && b.node_ != 0)
 			{
 				if (*b < *a)
@@ -467,8 +473,13 @@ namespace ft
 		{
 			iterator a(first_, this);
 			iterator b(x.first_, &x);
-			if (this == &x)
+			if (this == &x || x.empty())
 				return;
+			if (empty())
+			{
+				swap(x);
+				return ;
+			}
 			while (a.node_ != 0 && b.node_ != 0)
 			{
 				if (comp(*b, *a) > 0)
@@ -485,6 +496,9 @@ namespace ft
 			if (size_ < 2)
 				return;
 			mergesort(&first_, std::less<value_type>());
+			Node *trav;
+			for (trav = last_; trav && trav->next; trav = trav->next);
+			last_ = trav;
 		}
 
 		template <class Compare>
@@ -493,6 +507,9 @@ namespace ft
 			if (size_ < 2)
 				return;
 			mergesort(&first_, comp);
+			Node *trav;
+			for (trav = last_; trav && trav->next; trav = trav->next);
+			last_ = trav;
 		}
 		//############################## REVERSE #######################################
 		void reverse()
@@ -649,7 +666,7 @@ namespace ft
 		typedef typename choose<isconst, const T *, T *>::type pointer;
 
 		list_iterator(Node *node = 0) : node_(node),
-												 container_(0) {}
+										container_(0) {}
 		list_iterator(Node *node, listptr container) : node_(node),
 													   container_(container) {}
 		// list_iterator(list_iterator const &cpy) : node_(cpy.node_),
@@ -698,10 +715,10 @@ namespace ft
 				node_ = container_->last_;
 			return old;
 		}
-		inline reference operator*(void) { return (node_) ? node_->value : *(reinterpret_cast<T *>(0)); }
-		inline pointer operator->(void) { return (0) ? &(node_->value) : 0; }
-		inline reference operator*(void) const { return (node_) ? node_->value : *(reinterpret_cast<T *>(0)); }
-		inline pointer operator->(void) const { return (node_) ? &(node_->value) : 0; }
+		inline reference operator*(void) { return node_->value; }
+		inline pointer operator->(void) { return &(node_->value); }
+		inline reference operator*(void) const { return node_->value; }
+		inline pointer operator->(void) const { return &(node_->value); }
 		inline bool operator!=(list_iterator const &other) const { return node_ != other.node_; }
 		inline bool operator==(list_iterator const &other) const { return node_ == other.node_; }
 
@@ -713,6 +730,7 @@ namespace ft
 			memcpy(reinterpret_cast<char *>(this), buffer, sizeof(list_iterator));
 		}
 	};
+	
 } // namespace ft
 
 template <class T>
@@ -729,7 +747,9 @@ bool operator==(const ft::list<T> &lhs, const ft::list<T> &rhs)
 		l_it++;
 		r_it++;
 	}
-	return true;
+	if (l_it == lhs.end() && r_it == rhs.end())
+		return true;
+	return false;
 }
 template <class T>
 bool operator!=(const ft::list<T> &lhs, const ft::list<T> &rhs)
@@ -745,13 +765,13 @@ bool operator<(const ft::list<T> &lhs, const ft::list<T> &rhs)
 	{
 		if (*l_it < *r_it)
 			return true;
-		if (*l_it > *r_it)
+		if (*r_it < *l_it)
 			return false;
 		l_it++;
-		if (l_it == lhs.end())
-			return true;
 		r_it++;
 	}
+	if (r_it != rhs.end())
+		return true;
 	return false;
 }
 template <class T>

@@ -201,7 +201,7 @@ namespace ft
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 		explicit deque() {}
-		explicit deque(size_type n, const value_type &val = value_type()) : arrays_(ARRAY_SIZE % n + 1, 0)
+		explicit deque(size_type n, const value_type &val = value_type()) : arrays_(n ? ARRAY_SIZE % n + 1 : 1, 0)
 		{
 			for (size_type i = 0; i < n; ++i)
 			{
@@ -346,13 +346,16 @@ namespace ft
 		iterator insert(iterator position, const value_type &val)
 		{
 			insert(position, 1, val);
-			if (!position.i_in)
+			if (!position.i_in && position.i_out)
 				--position;
 			return position;
 		}
+		// TODO: fix this monster function :-) 
 		void insert(iterator position, size_type n2, const value_type &val)
 		{
 			int n = n2;
+			if (!n2)
+				return ;
 			if (!position.i_in) { // position == end()
 				for (int i = 0; i < n; ++i) 
 					push_back(val);
@@ -372,9 +375,7 @@ namespace ft
 					tmp =  deque_array<T>(ARRAY_SIZE, &(*position) + startPos, &(*position) + afterPos);
 				}// N_TO_ARR, ELEMENTS THAT NOW FIT IN CURRENT ARRAY, 
 				n -= n_to_arr;
-				// std::cout << "sizeeeeee " << arrays_[position.i_out].size_ << std::endl;
 				arrays_[position.i_out].insert(position.i_in, n_to_arr, val);
-				// std::cout << "sizeeeeee " << arrays_[position.i_out].size_ << std::endl;
 				// UNTIL ALL ELEMENTS ARE ADDED NEW ARRAYS WILL BE FILLED WITH MAX ARRAY_SIZE VAL
 				while (n) {
 					n_to_arr = (n < ARRAY_SIZE) ? n : ARRAY_SIZE;
@@ -654,7 +655,9 @@ namespace ft
 			l_it++;
 			r_it++;
 		}
-		return true; // ?????
+		if (r_it != rhs.end())
+			return true;
+		return false;
 	}
 	template <class T>
 	bool operator<=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)

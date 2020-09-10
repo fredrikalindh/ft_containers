@@ -81,7 +81,6 @@ TEST(StackTest, RelOp)
   bob.push(30);
   bob.push(20);
   bob.push(10);
-
   bar.push(0);
 
   EXPECT_FALSE(bob == bar);

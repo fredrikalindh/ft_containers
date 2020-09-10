@@ -1,11 +1,12 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
-#include "list.hpp"
+#include "vector.hpp"
+
 namespace ft
 {
 
-	template <class T, class Container = list<T> >
+	template <class T, class Container = vector<T> >
 	class stack
 	{
 		Container d_ctnr;
@@ -23,6 +24,10 @@ namespace ft
 		void push(const value_type &val) { d_ctnr.push_back(val); }
 		void pop() { d_ctnr.pop_back(); }
 
+		friend void swap(stack &lhs, stack &rhs)
+		{
+			return lhs.d_ctnr.swap(rhs.d_ctnr);
+		}
 		friend bool operator==(const stack &lhs, const stack &rhs)
 		{
 			return lhs.d_ctnr == rhs.d_ctnr;
@@ -50,5 +55,42 @@ namespace ft
 	};
 
 } //namespace ft
+
+// template <class T, class Container>
+// bool operator==(const ft::stack<T, Container> &lhs, const ft::stack<T, Container> &rhs)
+// {
+// 	return lhs == rhs;
+// }
+// template <class T, class Container>
+// bool operator!=(const ft::stack<T, Container> &lhs, const ft::stack<T, Container> &rhs)
+// {
+// 	return lhs != rhs;
+// }
+// template <class T, class Container>
+// bool operator<(const ft::stack<T, Container> &lhs, const ft::stack<T, Container> &rhs)
+// {
+// 	return lhs < rhs;
+// }
+// template <class T, class Container>
+// bool operator<=(const ft::stack<T, Container> &lhs, const ft::stack<T, Container> &rhs)
+// {
+// 	return lhs <= rhs;
+// }
+// template <class T, class Container>
+// bool operator>(const ft::stack<T, Container> &lhs, const ft::stack<T, Container> &rhs)
+// {
+// 	return lhs > rhs;
+// }
+// template <class T, class Container>
+// bool operator>=(const ft::stack<T, Container> &lhs, const ft::stack<T, Container> &rhs)
+// {
+// 	return lhs >= rhs;
+// }
+
+// template <class T, class Container>
+// void swap(const ft::stack<T, Container> &lhs, const ft::stack<T, Container> &rhs)
+// {
+// 	return ft::swap(lhs, rhs);
+// }
 
 #endif

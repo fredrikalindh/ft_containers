@@ -2,6 +2,7 @@
 # define QUEUE_HPP
 
 # include "list.hpp"
+
 namespace ft
 {
 template <class T, class Container = ft::list<T> >
@@ -24,32 +25,38 @@ public:
 	void				push (const value_type& val) {d_ctnr.push_back(val);}
 	void				pop() {d_ctnr.pop_front();}
 
-	friend
-	bool operator== (const queue& lhs, const queue& rhs){
+
+	friend void swap(queue &lhs, queue &rhs)
+	{
+		return lhs.d_ctnr.swap(rhs.d_ctnr);
+	}
+	friend bool operator== (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr == rhs.d_ctnr;
 	}
-	friend
-	bool operator!= (const queue& lhs, const queue& rhs){
+	friend bool operator!= (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr != rhs.d_ctnr;
 	}
-	friend
-	bool operator<  (const queue& lhs, const queue& rhs){
+	friend bool operator<  (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr < rhs.d_ctnr;
 	}
-	friend
-	bool operator<= (const queue& lhs, const queue& rhs){
+	friend bool operator<= (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr <= rhs.d_ctnr;
 	}
-	friend
-	bool operator>  (const queue& lhs, const queue& rhs){
+	friend bool operator>  (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr > rhs.d_ctnr;
 	}
-	friend
-	bool operator>= (const queue& lhs, const queue& rhs){
+	friend bool operator>= (const queue& lhs, const queue& rhs){
 		return lhs.d_ctnr >= rhs.d_ctnr;
 	}
 };
 
 } //namespace ft
+
+// template <class T, class Container>
+// void swap(const ft::queue<T, Container> &lhs, const ft::queue<T, Container> &rhs)
+// {
+// 	return ft::swap(lhs, rhs);
+// }
+
 
 #endif

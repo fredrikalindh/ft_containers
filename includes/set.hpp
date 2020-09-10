@@ -132,11 +132,11 @@ namespace ft
 		}
 		iterator lower_bound(const value_type &val) const
 		{
-			return iterator(tree_.find(val), &tree_);
+			return iterator(tree_.lower_bound(val), &tree_);
 		}
 		iterator upper_bound(const value_type &val) const
 		{
-			return ++(iterator(tree_.find(val), &tree_));
+			return iterator(tree_.upper_bound(val), &tree_);
 		}
 		ft::pair<iterator, iterator> equal_range(const value_type &val) const
 		{
@@ -145,7 +145,7 @@ namespace ft
 
 		friend bool operator==(const set &lhs, const set &rhs)
 		{
-			return lhs.tree_.equal(rhs.tree_, key_compare());
+			return lhs.tree_ == rhs.tree_;
 		}
 		friend bool operator!=(const set &lhs, const set &rhs)
 		{
@@ -153,7 +153,7 @@ namespace ft
 		}
 		friend bool operator<(const set &lhs, const set &rhs)
 		{
-			return lhs.tree_.lesser(rhs.tree_, key_compare());
+			return lhs.tree_ < rhs.tree_;
 		}
 		friend bool operator>=(const set &lhs, const set &rhs)
 		{

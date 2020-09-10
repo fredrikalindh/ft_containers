@@ -9,95 +9,116 @@
 namespace ft
 {
 
-template <class T, bool isconst = false>
-class vector_iterator
-{
-	friend class vector_iterator<T, false>;
-	friend class vector_iterator<T, true>;
+	template <class T, bool isconst = false>
+	class vector_iterator
+	{
+		friend class vector_iterator<T, false>;
+		friend class vector_iterator<T, true>;
 
-public:
-	typedef ft::random_access_iterator_tag iterator_category;
-	typedef T value_type;
-	typedef typename choose<isconst, const T &, T &>::type reference;
-	typedef typename choose<isconst, const T *, T *>::type pointer;
-    typedef std::ptrdiff_t difference_type;
-protected:
-	pointer p;
-public:
-	vector_iterator(): p(nullptr) {}
-	vector_iterator(pointer p): p(p) {}
-	vector_iterator(vector_iterator<T, false> const &x): p(x.p) {}
-	virtual ~vector_iterator() {}
+	public:
+		typedef ft::random_access_iterator_tag iterator_category;
+		typedef T value_type;
+		typedef typename choose<isconst, const T &, T &>::type reference;
+		typedef typename choose<isconst, const T *, T *>::type pointer;
+		typedef std::ptrdiff_t difference_type;
 
-	vector_iterator &operator=(vector_iterator<T, false> const &x) {
-		p = x.p;
-		return *this;
-	}
-	reference operator*() const {
-		return *p;
-	}
-	pointer operator->() const {
-		return p;
-	}
-    reference operator[](int val) const {
-		return *(p + val);
-	}
-	vector_iterator operator++(int) {
-		vector_iterator tmp(*this);
-		++p;
-		return tmp;
-	}
-	vector_iterator &operator++() {
-		++p;
-		return *this;
-	}
-	vector_iterator operator--(int) {
-		vector_iterator tmp(*this);
-		--p;
-		return tmp;
-	}
-	vector_iterator &operator--() {
-		--p;
-		return *this;
-	}
-	vector_iterator &operator+=(int value) {
-		p += value;
-		return *this;
-	}
-	vector_iterator operator+(int value) const {
-		vector_iterator tmp(*this);
-		return tmp += value;
-	}
-	vector_iterator &operator-=(int value) {
-		p -= value;
-		return *this;
-	}
-	vector_iterator operator-(int value) const {
-		vector_iterator tmp(*this);
-		return tmp -= value;
-	}
-	difference_type operator-(vector_iterator const &x) const {
-		return p - x.p;
-	}
-	bool operator==(vector_iterator const &x) const {
-		return p == x.p;
-	}
-	bool operator!=(vector_iterator const &x) const {
-		return p != x.p;
-	}
-	bool operator<(vector_iterator const &x) const {
-		return p < x.p;
-	}
-	bool operator<=(vector_iterator const &x) const {
-		return p <= x.p;
-	}
-	bool operator>(vector_iterator const &x) const {
-		return p > x.p;
-	}
-	bool operator>=(vector_iterator const &x) const {
-		return p >= x.p;
-	}
-};
+	protected:
+		pointer p;
+
+	public:
+		vector_iterator() : p(nullptr) {}
+		vector_iterator(pointer p) : p(p) {}
+		vector_iterator(vector_iterator<T, false> const &x) : p(x.p) {}
+		virtual ~vector_iterator() {}
+
+		vector_iterator &operator=(vector_iterator<T, false> const &x)
+		{
+			p = x.p;
+			return *this;
+		}
+		reference operator*() const
+		{
+			return *p;
+		}
+		pointer operator->() const
+		{
+			return p;
+		}
+		reference operator[](int val) const
+		{
+			return *(p + val);
+		}
+		vector_iterator operator++(int)
+		{
+			vector_iterator tmp(*this);
+			++p;
+			return tmp;
+		}
+		vector_iterator &operator++()
+		{
+			++p;
+			return *this;
+		}
+		vector_iterator operator--(int)
+		{
+			vector_iterator tmp(*this);
+			--p;
+			return tmp;
+		}
+		vector_iterator &operator--()
+		{
+			--p;
+			return *this;
+		}
+		vector_iterator &operator+=(int value)
+		{
+			p += value;
+			return *this;
+		}
+		vector_iterator operator+(int value) const
+		{
+			vector_iterator tmp(*this);
+			return tmp += value;
+		}
+		vector_iterator &operator-=(int value)
+		{
+			p -= value;
+			return *this;
+		}
+		vector_iterator operator-(int value) const
+		{
+			vector_iterator tmp(*this);
+			return tmp -= value;
+		}
+		difference_type operator-(vector_iterator const &x) const
+		{
+			return p - x.p;
+		}
+		bool operator==(vector_iterator const &x) const
+		{
+			return p == x.p;
+		}
+		bool operator!=(vector_iterator const &x) const
+		{
+			return p != x.p;
+		}
+		bool operator<(vector_iterator const &x) const
+		{
+			return p < x.p;
+		}
+		bool operator<=(vector_iterator const &x) const
+		{
+			return p <= x.p;
+		}
+		bool operator>(vector_iterator const &x) const
+		{
+			return p > x.p;
+		}
+		bool operator>=(vector_iterator const &x) const
+		{
+			return p >= x.p;
+		}
+	};
 	/*
 	* VECTOR: dynamic array optimized for insertion in the back.
 	*/
@@ -179,7 +200,6 @@ public:
 		reverse_iterator rend() { return reverse_iterator(begin()); }
 		const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 		size_type size() const { return size_; }
-		// size_type max_size() const { return std::numeric_limits<difference_type>::max() / sizeof(T) * 2; }
 		size_type max_size() const
 		{
 			return std::numeric_limits<difference_type>::max() / ((sizeof(T) / 2) < 1 ? 1 : (sizeof(T) / 2));
@@ -304,8 +324,7 @@ public:
 			vector tmp;
 			swap(tmp);
 		}
-	}; // namespace ft
-
+	};
 } //namespace ft
 
 template <class T>
@@ -328,7 +347,9 @@ bool operator==(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
 		l_it++;
 		r_it++;
 	}
-	return true;
+	if (l_it == lhs.end() && r_it == rhs.end())
+		return true;
+	return false;
 }
 template <class T>
 bool operator!=(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
@@ -344,14 +365,14 @@ bool operator<(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
 	{
 		if (*l_it < *r_it)
 			return true;
-		if (*l_it > *r_it)
+		if (*r_it < *l_it)
 			return false;
 		l_it++;
-		if (l_it == lhs.end())
-			return true;
 		r_it++;
 	}
-	return false; // ??
+	if (r_it != rhs.end())
+		return true;
+	return false;
 }
 template <class T>
 bool operator<=(const ft::vector<T> &lhs, const ft::vector<T> &rhs)

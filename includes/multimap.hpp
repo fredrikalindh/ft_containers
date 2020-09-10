@@ -127,16 +127,16 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		return tree_.count(k);
 	}
 	iterator				lower_bound (const key_type& k) {
-		return iterator(tree_.find(k), &tree_);
+		return iterator(tree_.lower_bound(k), &tree_);
 	}
 	const_iterator			lower_bound (const key_type& k) const {
-		return const_iterator(tree_.find(k), &tree_);
+		return const_iterator(tree_.lower_bound(k), &tree_);
 	}
 	iterator				upper_bound (const key_type& k) {
-		return iterator(tree_.find_upper(k), &tree_);
+		return iterator(tree_.upper_bound(k), &tree_);
 	}
 	const_iterator			upper_bound (const key_type& k) const {
-		return const_iterator(tree_.find_upper(k), &tree_);
+		return const_iterator(tree_.upper_bound(k), &tree_);
 	}
 	ft::pair<const_iterator,const_iterator>	equal_range (const key_type& k) const{
 		 return ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k));
@@ -145,13 +145,13 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		 return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));
 	}
 	friend bool operator== (const multimap &lhs, const multimap &rhs) {
-	return lhs.tree_.equal(rhs.tree_, key_compare());
+	return lhs.tree_ == rhs.tree_;
 	}
 	friend bool operator!= (const multimap &lhs, const multimap &rhs) {
 	return !(lhs == rhs);
 	}
 	friend bool operator<  (const multimap &lhs, const multimap &rhs) {
-	return lhs.tree_.lesser(rhs.tree_, key_compare());
+	return lhs.tree_ < rhs.tree_;
 	}
 	friend bool operator>= (const multimap &lhs, const multimap &rhs) {
 	return !(lhs < rhs);
@@ -162,6 +162,24 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	friend bool operator<= (const multimap &lhs, const multimap &rhs) {
 	return !(rhs < lhs);
 	}
+	// friend bool operator== (const multimap &lhs, const multimap &rhs) {
+	// return lhs.tree_.equal(rhs.tree_, key_compare());
+	// }
+	// friend bool operator!= (const multimap &lhs, const multimap &rhs) {
+	// return !(lhs == rhs);
+	// }
+	// friend bool operator<  (const multimap &lhs, const multimap &rhs) {
+	// return lhs.tree_.lesser(rhs.tree_, key_compare());
+	// }
+	// friend bool operator>= (const multimap &lhs, const multimap &rhs) {
+	// return !(lhs < rhs);
+	// }
+	// friend bool operator>  (const multimap &lhs, const multimap &rhs) {
+	// return rhs < lhs;
+	// }
+	// friend bool operator<= (const multimap &lhs, const multimap &rhs) {
+	// return !(rhs < lhs);
+	// }
 };
 
 } // namespace ft
