@@ -157,22 +157,22 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 		 return ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k));
 	}
 
-	friend bool operator== (const map &lhs, const map &rhs) {
+	friend bool operator==(const map &lhs, const map &rhs) {
 	return lhs.tree_ == rhs.tree_;
 	}
-	friend bool operator!= (const map &lhs, const map &rhs) {
+	friend bool operator!=(const map &lhs, const map &rhs) {
 	return !(lhs == rhs);
 	}
-	friend bool operator<  (const map &lhs, const map &rhs) {
+	friend bool operator< (const map &lhs, const map &rhs) {
 	return lhs.tree_ < rhs.tree_;
 	}
-	friend bool operator>= (const map &lhs, const map &rhs) {
+	friend bool operator>=(const map &lhs, const map &rhs) {
 	return !(lhs < rhs);
 	}
-	friend bool operator>  (const map &lhs, const map &rhs) {
+	friend bool operator> (const map &lhs, const map &rhs) {
 	return rhs < lhs;
 	}
-	friend bool operator<= (const map &lhs, const map &rhs) {
+	friend bool operator<=(const map &lhs, const map &rhs) {
 	return !(rhs < lhs);
 	}
 };

@@ -359,6 +359,39 @@ TEST(MapTest, RelOps)
 }
 
 
+TEST(MapTest, RelOpsCchudant)
+{
+    LIBRARY::map<int, int> map;
+    map[0] = 50;
+    map[90] = 5;
+
+    LIBRARY::map<int, int> map2;
+    map2[0] = 50;
+    map2[90] = 5;
+    map2[2] = 80;
+
+    EXPECT_TRUE(map != map2);
+    EXPECT_TRUE(map2 < map);
+    EXPECT_TRUE(map2 <= map);
+    EXPECT_TRUE(!(map2 > map));
+    EXPECT_TRUE(!(map2 >= map));
+
+    map[2] = 80;
+    EXPECT_TRUE(map == map2);
+    EXPECT_TRUE(!(map2 < map));
+    EXPECT_TRUE(map2 <= map);
+    EXPECT_TRUE(!(map2 > map));
+    EXPECT_TRUE(map2 >= map);
+
+    map[1] = 4;
+    EXPECT_TRUE(map != map2);
+    EXPECT_TRUE(map2 > map);
+    EXPECT_TRUE(map2 >= map);
+    EXPECT_TRUE(!(map2 < map));
+    EXPECT_TRUE(!(map2 <= map));
+}
+
+
 TEST(MapTest, Glagan)
 {
   LIBRARY::map<int, int> mp;

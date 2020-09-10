@@ -140,7 +140,7 @@ namespace ft
 		}
 		ft::pair<iterator, iterator> equal_range(const value_type &val) const
 		{
-			return ft::pair<iterator, iterator>(lower_bound(val), upper_bound(val));
+			return ft::pair<iterator, iterator>(tree_.lower_bound(val), tree_.upper_bound(val));
 		}
 
 		friend bool operator==(const set &lhs, const set &rhs)

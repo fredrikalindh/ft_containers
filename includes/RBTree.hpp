@@ -138,50 +138,15 @@ namespace ft
 		}
 		Node *lower_bound(const value_type &k) const
 		{
-			return lower_bound(root_, k);
-		}
-		Node *lower_bound(Node *node, const value_type &k) const
-		{
-			// std::cout << "LOWER BOUND " << k.first << std::endl;
-			if (!node)
-				return node;
-			if (!comp(node->value_, k) && node->left_ && !comp(node->left_->value_, k)) 
-				return lower_bound(node->left_, k);
-			if (comp(node->value_, k)) 
-				return lower_bound(node->right_, k);
-			// std::cout << "return " << node->value_.first << std::endl;
-			return node;
+			iterator it(min(), this);
+			while (it.node_ && comp(*it, k))
+				++it;
+			return it.node_;
 		}
 		Node *upper_bound(const value_type &k) const
 		{
-			return upper_bound(root_, k);
-		}
-		Node *upper_bound(Node *node, const value_type &k) const
-		{
-			if (!node)
-				return node;
-			if (comp(k, node->value_) && node->left_ && comp(k, node->left_->value_)) 
-				return upper_bound(node->left_, k);
-			if (!comp(k, node->value_))
-				return upper_bound(node->right_, k);
-			return node;
-		}
-		// Node *upper_bound(Node *node, const value_type &k) const
-		// {
-		// 	if (!node)
-		// 		return node;
-		// 	if (comp(k, node->value_) && node->left_ && comp(k, node->left_->value_)) 
-		// 		return upper_bound(node->left_, k);
-		// 	if (comp(node->value_, k))
-		// 		return upper_bound(node->right_, k);
-		// 	if (!comp(k, node->value_) && !comp(node->value_, k))
-		// 		return upper_bound(node->right_, k);
-		// 	return node;
-		// }
-		Node *find_upper(const value_type k) const
-		{
-			rb_tree_iterator<T, Compare> it(find(root_, k), this);
-			while (it.node_ && !comp(*it, k) && !comp(k, *it))
+			iterator it(min(), this);
+			while (it.node_ && !comp(k, *it))
 				++it;
 			return it.node_;
 		}
@@ -589,7 +554,7 @@ namespace ft
 			const_iterator r_it(rhs.min(), &rhs);
 			while (l_it.node_ && r_it.node_)
 			{
-				if (*l_it != *r_it)
+				if (!(*l_it == *r_it))
 					return false;
 				l_it++;
 				r_it++;
