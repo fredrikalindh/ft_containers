@@ -422,7 +422,7 @@ TEST(ListTest, EraseRange)
     EXPECT_EQ(*it++, *stdit++);
   }
   mylist.erase(mylist.begin(), mylist.begin());
-  stdlist.erase(mylist.begin(), mylist.begin());
+  stdlist.erase(stdlist.begin(), stdlist.begin());
   EXPECT_EQ(mylist.size(), stdlist.size());
   mylist.erase(mylist.begin(), mylist.end());
   stdlist.erase(stdlist.begin(), stdlist.end());

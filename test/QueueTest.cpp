@@ -69,28 +69,28 @@ TEST(QueueTest, FrontBack)
   EXPECT_EQ(myqueue.back(), 16);
 }
 
-TEST(QueueTest, RelOp)
-{
-  LIBRARY::list<int> a;
-  a.push_back(10);
-  a.push_back(20);
-  a.push_back(30);
+// TEST(QueueTest, RelOp)
+// {
+//   LIBRARY::list<int> a;
+//   a.push_back(10);
+//   a.push_back(20);
+//   a.push_back(30);
 
-  LIBRARY::queue<int, LIBRARY::list<int> > foo(a);
-  LIBRARY::queue<int, LIBRARY::list<int> > bar(a);
-  LIBRARY::queue<int, LIBRARY::list<int> > bob;
-  bob.push(30);
-  bob.push(20);
-  bob.push(10);
+//   LIBRARY::queue<int, LIBRARY::list<int> > foo(a);
+//   LIBRARY::queue<int, LIBRARY::list<int> > bar(a);
+//   LIBRARY::queue<int, LIBRARY::list<int> > bob;
+//   bob.push(30);
+//   bob.push(20);
+//   bob.push(10);
 
-  bar.push(0);
+//   bar.push(0);
 
-  EXPECT_FALSE(bob == bar);
-  EXPECT_TRUE(bar != foo);
-  EXPECT_TRUE(bar != bob);
-  EXPECT_FALSE(foo > bar);
-  EXPECT_TRUE(foo < bar);
-  EXPECT_FALSE(foo >= bar);
-  EXPECT_TRUE(foo <= bar);
-}
+//   EXPECT_FALSE(bob == bar);
+//   EXPECT_TRUE(bar != foo);
+//   EXPECT_TRUE(bar != bob);
+//   EXPECT_FALSE(foo > bar);
+//   EXPECT_TRUE(foo < bar);
+//   EXPECT_FALSE(foo >= bar);
+//   EXPECT_TRUE(foo <= bar);
+// }
 

@@ -28,32 +28,43 @@ namespace ft
 		{
 			return lhs.d_ctnr.swap(rhs.d_ctnr);
 		}
-		friend bool operator==(const stack &lhs, const stack &rhs)
+		template <typename _T, typename _Container>
+		friend bool operator==(const stack<_T, _Container> &lhs, const stack<_T, _Container> &rhs);
+
+		template <typename _T, typename _Container>
+		friend bool operator<(const stack<_T, _Container> &lhs, const stack<_T, _Container> &rhs);
+	};
+
+		template <class T, class Container>
+		bool operator==(const stack<T, Container> &lhs, const stack<T, Container> &rhs)
 		{
-			return lhs.d_ctnr == rhs.d_ctnr;
+			return (lhs.d_ctnr == rhs.d_ctnr);
 		}
-		friend bool operator!=(const stack &lhs, const stack &rhs)
+		template <class T, class Container>
+		bool operator!=(const stack<T, Container> &lhs, const stack<T, Container> &rhs)
 		{
-			return lhs.d_ctnr != rhs.d_ctnr;
+			return !(lhs == rhs);
 		}
-		friend bool operator<(const stack &lhs, const stack &rhs)
+		template <class T, class Container>
+		bool operator<(const stack<T, Container> &lhs, const stack<T, Container> &rhs)
 		{
 			return lhs.d_ctnr < rhs.d_ctnr;
 		}
-		friend bool operator<=(const stack &lhs, const stack &rhs)
+		template <class T, class Container>
+		bool operator<=(const stack<T, Container> &lhs, const stack<T, Container> &rhs)
 		{
-			return lhs.d_ctnr <= rhs.d_ctnr;
+			return !(rhs < lhs);
 		}
-		friend bool operator>(const stack &lhs, const stack &rhs)
+		template <class T, class Container>
+		bool operator>(const stack<T, Container> &lhs, const stack<T, Container> &rhs)
 		{
-			return lhs.d_ctnr > rhs.d_ctnr;
+			return rhs < lhs;
 		}
-		friend bool operator>=(const stack &lhs, const stack &rhs)
+		template <class T, class Container>
+		bool operator>=(const stack<T, Container> &lhs, const stack<T, Container> &rhs)
 		{
-			return lhs.d_ctnr >= rhs.d_ctnr;
+			return !(lhs < rhs);
 		}
-	};
-
 } //namespace ft
 
 // template <class T, class Container>

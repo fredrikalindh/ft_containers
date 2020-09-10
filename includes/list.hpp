@@ -731,8 +731,6 @@ namespace ft
 		}
 	};
 	
-} // namespace ft
-
 template <class T>
 bool operator==(const ft::list<T> &lhs, const ft::list<T> &rhs)
 {
@@ -794,5 +792,7 @@ void swap(ft::list<T> &a, ft::list<T> &b)
 {
 	a.swap(b);
 }
+} // namespace ft
+
 
 #endif

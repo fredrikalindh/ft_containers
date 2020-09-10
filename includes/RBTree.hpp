@@ -52,6 +52,7 @@ namespace ft
 
 	public:
 		// ########################### TYPEDEFS ########################################
+		typedef	Compare									value_compare;
 		typedef T value_type;
 		typedef size_t size_type;
 		typedef std::ptrdiff_t difference_type;
@@ -588,7 +589,7 @@ namespace ft
 			const_iterator r_it(rhs.min(), &rhs);
 			while (l_it.node_ && r_it.node_)
 			{
-				if (lhs.comp(*l_it, *r_it) || lhs.comp(*r_it, *l_it))
+				if (*l_it != *r_it)
 					return false;
 				l_it++;
 				r_it++;
@@ -601,9 +602,9 @@ namespace ft
 			const_iterator r_it(rhs.min(), &rhs);
 			while (l_it.node_ && r_it.node_)
 			{
-				if (lhs.comp(*l_it, *r_it))
+				if (*l_it < *r_it)
 					return true;
-				if (lhs.comp(*r_it, *l_it))
+				if (*r_it < *l_it)
 					return false;
 				l_it++;
 				r_it++;
@@ -612,6 +613,27 @@ namespace ft
 				return true;
 			return false;
 		}
+		// friend bool operator<(const RB_Tree &lhs, const RB_Tree &rhs)
+		// {
+		// 	// typename ft::RB_Tree::value_compare comp = lhs.comp;
+		// 	const_iterator l_it(lhs.min(), &lhs);
+		// 	const_iterator r_it(rhs.min(), &rhs);
+		// 	while (l_it.node_ && r_it.node_)
+		// 	{
+		// 		std::cout << l_it->first << ", " << r_it->first << std::endl;
+		// 		if (lhs.comp(*l_it, *r_it)){
+		// 			std::cout << "1" << std::endl;
+		// 			return true;
+		// 		}if (lhs.comp(*r_it, *l_it)){
+		// 			std::cout << "2" << std::endl;
+		// 			return false;
+		// 		}l_it++;
+		// 		r_it++;
+		// 	}
+		// 	if (r_it.node_ != 0)
+		// 		return true;
+		// 	return false;
+		// }
 	};
 	// ############################## ITERATOR #####################################
 	template <class T, class Compare, bool isconst>
@@ -706,47 +728,14 @@ namespace ft
 		}
 	};
 
-} //namespace ft
-
-// template <class T, class Compare>
-// bool operator==(const ft::RB_Tree<T, Compare> &lhs, const ft::RB_Tree<T, Compare> &rhs)
-// {
-// 	if (lhs.size() != rhs.size())
-// 		return false;
-// 	const_iterator l_it(min(), this);
-// 	const_iterator r_it(x.min(), &x);
-// 	while (l_it.node_ && r_it.node_)
-// 	{
-// 		if (comp(*l_it, *r_it) || comp(*r_it, *l_it))
-// 			return false;
-// 		l_it++;
-// 		r_it++;
-// 	}
-// 	return true;
-// }
-// template <class T, class Compare>
-// bool lesser(const ft::RB_Tree<T, Compare> &lhs, const ft::RB_Tree<T, Compare> &rhs, Compare comp)
-// {
-// 	const_iterator l_it(min(), this);
-// 	const_iterator r_it(x.min(), &x);
-// 	while (l_it.node_ && r_it.node_)
-// 	{
-// 		if (comp(*l_it, *r_it))
-// 			return true;
-// 		if (comp(*r_it, *l_it))
-// 			return false;
-// 		l_it++;
-// 		r_it++;
-// 	}
-// 	if (r_it != 0)
-// 		return true;
-// 	return false;
-// }
-
 template <class T, class Compare>
 void swap(ft::RB_Tree<T, Compare> &a, ft::RB_Tree<T, Compare> &b)
 {
 	a.swap(b);
 }
+
+} //namespace ft
+
+
 
 #endif

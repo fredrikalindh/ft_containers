@@ -68,26 +68,52 @@ TEST(StackTest, Top)
   EXPECT_EQ(mystack.top(), 15);
 }
 
-TEST(StackTest, RelOp)
+TEST(StackTest, RelOp1)
 {
-  LIBRARY::list<int> a;
+  LIBRARY::vector<int> a;
   a.push_back(10);
   a.push_back(20);
   a.push_back(30);
 
-  LIBRARY::stack<int, LIBRARY::list<int> > foo(a);
-  LIBRARY::stack<int, LIBRARY::list<int> > bar(a);
-  LIBRARY::stack<int, LIBRARY::list<int> > bob;
+  LIBRARY::stack<int, LIBRARY::vector<int> > foo(a);
+  LIBRARY::stack<int, LIBRARY::vector<int> > bar(a);
+  LIBRARY::stack<int, LIBRARY::vector<int> > bob;
   bob.push(30);
   bob.push(20);
   bob.push(10);
   bar.push(0);
 
   EXPECT_FALSE(bob == bar);
-  EXPECT_TRUE(bar != foo);
-  EXPECT_TRUE(bar != bob);
-  EXPECT_FALSE(foo > bar);
-  EXPECT_TRUE(foo < bar);
-  EXPECT_FALSE(foo >= bar);
-  EXPECT_TRUE(foo <= bar);
+  // EXPECT_TRUE(bar != foo);
+  // EXPECT_TRUE(bar != bob);
+  // EXPECT_FALSE(foo > bar);
+  // EXPECT_TRUE(foo < bar);
+  // EXPECT_FALSE(foo >= bar);
+  // EXPECT_TRUE(foo <= bar);
 }
+
+TEST(StackTest, RelOp2)
+{
+  int array[5] = {0, 1, 2, 3, 4};
+	LIBRARY::stack<int, LIBRARY::vector<int> > stack(LIBRARY::vector<int>(array, array + 5));
+	LIBRARY::stack<int, LIBRARY::vector<int> > stack2(stack);
+
+	EXPECT_EQ(stack, stack2);
+	EXPECT_TRUE(stack >= stack2);
+	EXPECT_TRUE(stack <= stack2);
+
+	stack2.push(50);
+	EXPECT_TRUE(stack != stack2);
+	EXPECT_TRUE(stack < stack2);
+	EXPECT_TRUE(stack <= stack2);
+	EXPECT_TRUE(stack2 > stack);
+	EXPECT_TRUE(stack2 >= stack);
+
+	stack.push(200);
+	EXPECT_TRUE(stack != stack2);
+	EXPECT_TRUE(stack > stack2);
+	EXPECT_TRUE(stack >= stack2);
+	EXPECT_TRUE(stack2 < stack);
+	EXPECT_TRUE(stack2 <= stack);
+}
+

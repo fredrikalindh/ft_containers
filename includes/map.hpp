@@ -177,11 +177,13 @@ typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 	}
 };
 
-} //namespace ft
-
 template <class Key, class T, class Compare>
 void swap(ft::map<Key, T, Compare> &a, ft::map<Key, T, Compare> &b){
 	a.swap(b);
 }
+
+} //namespace ft
+
+
 
 #endif

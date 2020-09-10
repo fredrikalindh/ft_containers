@@ -17,7 +17,7 @@ public:
 	typedef	T										mapped_type;
 	typedef ft::pair<Key, T>						value_type;
 	typedef	size_t									size_type;
-	typedef	std::ptrdiff_t								difference_type;
+	typedef	std::ptrdiff_t							difference_type;
 	typedef	Compare									key_compare;
 	typedef	value_type&								reference;
 	typedef	const value_type&						const_reference;

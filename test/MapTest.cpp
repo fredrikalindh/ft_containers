@@ -332,10 +332,22 @@ TEST(MapTest, EqualRange)
 TEST(MapTest, RelOps)
 {
   LIBRARY::map<char,int> foo,bar;
+  std::map<char,int> foo2,bar2;
   foo['a']=100;
   foo['b']=200;
   bar['a']=10;
   bar['z']=1000;
+
+  foo2['a']=100;
+  foo2['b']=200;
+  bar2['a']=10;
+  bar2['z']=1000;
+  // for (LIBRARY::map<char,int>::iterator it = bar.begin(); it != bar.end(); ++it)
+  //   std::cout << it->first << "=>" << it->second << " , ";
+  // std::cout << std::endl;
+  // for (std::map<char,int>::iterator it = bar2.begin(); it != bar2.end(); ++it)
+  //   std::cout << it->first << "=>" << it->second << " , ";
+  // std::cout << std::endl;
 
   // foo ({{a,100},{b,200}}) vs bar ({a,10},{z,1000}}):
   EXPECT_FALSE(foo == bar);

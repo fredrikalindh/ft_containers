@@ -325,7 +325,6 @@ namespace ft
 			swap(tmp);
 		}
 	};
-} //namespace ft
 
 template <class T>
 void swap(ft::vector<T> &a, ft::vector<T> &b)
@@ -389,5 +388,8 @@ bool operator>=(const ft::vector<T> &lhs, const ft::vector<T> &rhs)
 {
 	return !(lhs < rhs);
 }
+} //namespace ft
+
+
 
 #endif
