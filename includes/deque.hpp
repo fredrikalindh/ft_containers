@@ -1,6 +1,7 @@
 #ifndef DEQUE_HPP
 #define DEQUE_HPP
 
+#include <limits>
 namespace ft
 {
 	template <class T, bool isconst = false>
