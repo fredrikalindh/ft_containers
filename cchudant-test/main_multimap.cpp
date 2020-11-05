@@ -393,7 +393,7 @@ static void test_range()
 
     range = map.equal_range(8);
     ite = map.begin();
-    advance(ite, 2);
+    ft::advance(ite, 2);
 
     assert(range.first == map.begin() && range.second == ite);
 

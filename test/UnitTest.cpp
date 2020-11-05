@@ -30,7 +30,7 @@ struct classcomp
 #include <ft.hpp>
 
 #ifndef FLAGS 
-#define FLAGS 31 
+#define FLAGS 1 
 #endif
 
 #if (FLAGS & 1)

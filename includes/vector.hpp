@@ -1,8 +1,11 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include <iostream>
 #include <stdexcept>
+#include <limits>
+#include <string.h>
+#include <type_traits>
+#include <cstddef>
 
 #include "iterator.hpp"
 
@@ -155,10 +158,10 @@ namespace ft
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 		typedef std::ptrdiff_t difference_type;
 
-		explicit vector() : array_(0),
+		vector() : array_(0),
 							size_(0),
 							capacity_(0) {}
-		explicit vector(size_type n, const value_type &val = value_type()) : array_(new T[n]),
+		vector(size_type n, const value_type &val = value_type()) : array_(new T[n]),
 																			 size_(n),
 																			 capacity_(n)
 		{

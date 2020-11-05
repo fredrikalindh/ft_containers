@@ -2,6 +2,7 @@
 #define RBTREE_HPP
 
 #include "iterator.hpp"
+#include <limits>
 
 namespace ft
 {
@@ -408,7 +409,7 @@ namespace ft
 		}
 		Node *rotateLeft(Node *h)
 		{
-			assert(isRed(h->right_));
+		//	assert(isRed(h->right_));
 
 			Node *x = h->right_;
 			h->right_ = x->left_;
@@ -428,7 +429,7 @@ namespace ft
 		}
 		Node *rotateRight(Node *h)
 		{
-			assert(isRed(h->left_));
+		//	assert(isRed(h->left_));
 
 			Node *x = h->left_;
 			h->left_ = x->right_;
