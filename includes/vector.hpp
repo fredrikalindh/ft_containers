@@ -1,6 +1,7 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#include <cstring>
 #include <limits>
 #include <stdexcept>
 
@@ -314,7 +315,7 @@ public:
     void swap(vector &x)
     {
         char buffer[sizeof(vector)];
-        memcpy(buffer, &x, sizeof(vector));
+        memcpy(buffer, reinterpret_cast<char *>(&x), sizeof(vector));
         memcpy(reinterpret_cast<char *>(&x), this, sizeof(vector));
         memcpy(reinterpret_cast<char *>(this), buffer, sizeof(vector));
     }

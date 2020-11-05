@@ -1,26 +1,28 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
+#include <cctype>
+#include <cmath>
 #include <deque>
-#include <vector>
 #include <iostream>
 #include <list>
-#include <cmath>
-#include <string>
-#include <cctype>
 #include <map>
-#include <stack>
 #include <queue>
 #include <set>
+#include <stack>
+#include <string>
+#include <vector>
+
+// #include "gtest/gtest.h"
 
 bool fncomp(char lhs, char rhs) { return lhs < rhs; }
 bool fncomp(int lhs, int rhs) { return lhs < rhs; }
 
 struct classcomp
 {
-  bool operator()(const char &lhs, const char &rhs) const
-  {
-    return lhs < rhs;
-  }
+	bool operator()(const char &lhs, const char &rhs) const
+	{
+		return lhs < rhs;
+	}
 };
 
 #ifndef LIBRARY
@@ -29,8 +31,8 @@ struct classcomp
 
 #include <ft.hpp>
 
-#ifndef FLAGS 
-#define FLAGS 31 
+#ifndef FLAGS
+#define FLAGS 31
 #endif
 
 #if (FLAGS & 1)
@@ -48,7 +50,7 @@ struct classcomp
 #if (FLAGS & 16)
 #include "MapTest.cpp"
 #endif
-// BONUS: 
+// BONUS:
 #if (FLAGS & 32)
 #include "DequeTest.cpp"
 #endif
@@ -57,13 +59,13 @@ struct classcomp
 #endif
 #if (FLAGS & 128)
 #include "MultisetTest.cpp"
-#endif 
+#endif
 #if (FLAGS & 256)
 #include "MultimapTest.cpp"
 #endif
 
 int main(int argc, char **argv)
 {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }
