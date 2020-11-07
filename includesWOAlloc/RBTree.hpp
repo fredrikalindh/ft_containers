@@ -534,17 +534,48 @@ public:
 			return left + 1;
 		return right + 1;
 	}
-	int blackNodes(Node *node)
+	// int blackNodes(Node *node){
+	// 	if (node == 0)
+	// 		return 1;
+	// 	int left = blackNodes(node->left_);
+	// 	int right = blackNodes(node->right_);
+	// 	if (left < right)
+	// 		fixUnevenBlack(node);
+	// 	if (node->color_)
+	// 		return left + right;
+	// 	return left + right + 1;
+	// }
+	friend bool operator==(const RB_Tree &lhs, const RB_Tree &rhs)
 	{
-		if (node == 0)
-			return 1;
-		int left = blackNodes(node->left_);
-		int right = blackNodes(node->right_);
-		if (left < right)
-			fixUnevenBlack(node);
-		if (node->color_)
-			return left + right;
-		return left + right + 1;
+		if (lhs.size() != rhs.size())
+			return false;
+		const_iterator l_it(lhs.min(), &lhs);
+		const_iterator r_it(rhs.min(), &rhs);
+		while (l_it.node_ && r_it.node_)
+		{
+			if (!(*l_it == *r_it))
+				return false;
+			l_it++;
+			r_it++;
+		}
+		return true;
+	}
+	friend bool operator<(const RB_Tree &lhs, const RB_Tree &rhs)
+	{
+		const_iterator l_it(lhs.min(), &lhs);
+		const_iterator r_it(rhs.min(), &rhs);
+		while (l_it.node_ && r_it.node_)
+		{
+			if (*l_it < *r_it)
+				return true;
+			if (*r_it < *l_it)
+				return false;
+			l_it++;
+			r_it++;
+		}
+		if (r_it.node_ != 0)
+			return true;
+		return false;
 	}
 };
 // ############################## ITERATOR #####################################

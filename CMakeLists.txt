@@ -7,7 +7,7 @@ project(${This} C CXX)
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# enable_testing()
+enable_testing()
 
 # Locate GTest
 find_package(GTest REQUIRED)
@@ -39,7 +39,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
 
 add_compile_options(-w)
 
-set(Sources test/UnitTest.cpp)
+set(Sources test/main.cpp)
 
 add_executable(${This} ${Sources})
 

@@ -8,60 +8,55 @@ namespace ft
 template <class T, class Container = ft::list<T> >
 class queue
 {
-    Container d_ctnr;
-
 public:
-    typedef T value_type;
-    typedef Container container_type;
-    typedef size_t size_type;
+	typedef T value_type;
+	typedef Container container_type;
+	typedef size_t size_type;
 
-    explicit queue(const container_type& ctnr = container_type()) : d_ctnr(ctnr) {}
+	explicit queue(const container_type& ctnr = container_type()) : c(ctnr) {}
 
-    bool empty() const { return d_ctnr.empty(); }
-    size_type size() const { return d_ctnr.size(); }
-    value_type& front() { return d_ctnr.front(); }
-    const value_type& front() const { return d_ctnr.front(); }
-    value_type& back() { return d_ctnr.back(); }
-    const value_type& back() const { return d_ctnr.back(); }
-    void push(const value_type& val) { d_ctnr.push_back(val); }
-    void pop() { d_ctnr.pop_front(); }
+	bool empty() const { return c.empty(); }
+	size_type size() const { return c.size(); }
+	value_type& front() { return c.front(); }
+	const value_type& front() const { return c.front(); }
+	value_type& back() { return c.back(); }
+	const value_type& back() const { return c.back(); }
+	void push(const value_type& val) { c.push_back(val); }
+	void pop() { c.pop_front(); }
 
-    friend void swap(queue& lhs, queue& rhs)
-    {
-        return lhs.d_ctnr.swap(rhs.d_ctnr);
-    }
-    friend bool operator==(const queue& lhs, const queue& rhs)
-    {
-        return lhs.d_ctnr == rhs.d_ctnr;
-    }
-    friend bool operator!=(const queue& lhs, const queue& rhs)
-    {
-        return lhs.d_ctnr != rhs.d_ctnr;
-    }
-    friend bool operator<(const queue& lhs, const queue& rhs)
-    {
-        return lhs.d_ctnr < rhs.d_ctnr;
-    }
-    friend bool operator<=(const queue& lhs, const queue& rhs)
-    {
-        return lhs.d_ctnr <= rhs.d_ctnr;
-    }
-    friend bool operator>(const queue& lhs, const queue& rhs)
-    {
-        return lhs.d_ctnr > rhs.d_ctnr;
-    }
-    friend bool operator>=(const queue& lhs, const queue& rhs)
-    {
-        return lhs.d_ctnr >= rhs.d_ctnr;
-    }
+	friend bool operator==(const queue& lhs, const queue& rhs)
+	{
+		return lhs.c == rhs.c;
+	}
+	friend bool operator<(const queue& lhs, const queue& rhs)
+	{
+		return lhs.c < rhs.c;
+	}
+
+protected:
+	container_type c;
 };
 
+template <class T, class Container>
+bool operator!=(const queue<T, Container>& lhs, const queue<T, Container>& rhs)
+{
+	return !(lhs == rhs);
+}
+template <class T, class Container>
+bool operator<=(const queue<T, Container>& lhs, const queue<T, Container>& rhs)
+{
+	return !(rhs < lhs);
+}
+template <class T, class Container>
+bool operator>(const queue<T, Container>& lhs, const queue<T, Container>& rhs)
+{
+	return rhs < lhs;
+}
+template <class T, class Container>
+bool operator>=(const queue<T, Container>& lhs, const queue<T, Container>& rhs)
+{
+	return !(lhs < rhs);
+}
 }  //namespace ft
-
-// template <class T, class Container>
-// void swap(const ft::queue<T, Container> &lhs, const ft::queue<T, Container> &rhs)
-// {
-// 	return ft::swap(lhs, rhs);
-// }
 
 #endif

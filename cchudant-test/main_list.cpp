@@ -10,8 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Test.hpp"
 #include <list>
+
+#include "Test.hpp"
 
 #define LIBRARY ft
 
@@ -927,9 +928,9 @@ static void test_unique()
 	ConstrCounter array[10] = {43, 11, 20, 20, 43, 43, 43, 20, 91, 91};
 	LIBRARY::list<ConstrCounter> lst(array, array + 10);
 
-	std::cout << "size = " << lst.size() << std::endl;
+	// std::cout << "size = " << lst.size() << std::endl;
 	lst.unique();
-	std::cout << "size = " << lst.size() << std::endl;
+	// std::cout << "size = " << lst.size() << std::endl;
 	assert(lst.size() == 6);
 
 	{

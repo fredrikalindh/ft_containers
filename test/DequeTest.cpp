@@ -181,8 +181,8 @@ TEST(DequeTest, At)
 
 	for (unsigned i = 0; i < mydeque.size(); i++)
 		EXPECT_EQ(mydeque.at(i), i);
-	EXPECT_ANY_THROW(mydeque.at(20));
-	EXPECT_ANY_THROW(mydeque.at(-1));
+	EXPECT_THROW(mydeque.at(20), std::out_of_range);
+	EXPECT_THROW(mydeque.at(-1), std::out_of_range);
 }
 
 TEST(DequeTest, Front)

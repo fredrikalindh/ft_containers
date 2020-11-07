@@ -5,325 +5,10 @@
 #include <limits>
 
 #include "iterator.hpp"
-#include "utility.hpp"
 namespace ft
 {
 template <class T, bool isconst = false>
 class deque_iterator;
-
-template <class T>
-class deque_array;
-
-/**
- * DEQUE - double ended queue with a structure similar to a vector 
- * but optimised for pushing and popping both ends. Unlike a vector
- * it therefore doesn't guarantee that the data will be stored 
- * continously. 
- *  [ ]
- *  [x] ---> [ ][ ][ ][x][x][x]
- *  [x] ---> [x][x][x][x][x][x]
- *  [x] ---> [x][x][x][x][ ][ ]
- *  [ ]
- */
-template <class T, class Alloc = std::allocator<T> >
-class deque
-{
-	template <class U, bool isconst>
-	friend class deque_iterator;
-
-	static const int ARRAY_SIZE = 1024;
-
-	deque_array<deque_array<T> > arrays_;
-
-public:
-	typedef T value_type;
-	typedef Alloc allocator_type;
-	typedef typename allocator_type::reference reference;
-	typedef typename allocator_type::const_reference const_reference;
-	typedef typename allocator_type::pointer pointer;
-	typedef typename allocator_type::const_pointer const_pointer;
-	// typedef value_type &reference;
-	// typedef const value_type &const_reference;
-	// typedef value_type *pointer;
-	// typedef const value_type *const_pointer;
-	typedef ft::deque_iterator<T> iterator;
-	typedef ft::deque_iterator<T, true> const_iterator;
-	typedef ft::reverse_iterator<iterator> reverse_iterator;
-	typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
-	typedef typename iterator_traits<iterator>::difference_type difference_type;
-	typedef size_t size_type;
-
-	explicit deque(const allocator_type & = allocator_type()) {}
-	explicit deque(size_type n, const value_type &val = value_type(),
-				   const allocator_type & = allocator_type()) : arrays_(n ? ARRAY_SIZE % n + 1 : 1, 0)
-	{
-		for (size_type i = 0; i < n; ++i)
-		{
-			if (arrays_.size_ <= 0 || !arrays_.back().space_back())
-				arrays_.push_back(deque_array<T>(ARRAY_SIZE, 0));
-			arrays_.back().push_back(val);
-		}
-	}
-	template <class InputIterator>
-	deque(InputIterator first, InputIterator last,
-		  const allocator_type & = allocator_type(),
-		  typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
-	{
-		while (first != last)
-		{
-			if (arrays_.size_ <= 0 || !arrays_.back().space_back())
-				arrays_.push_back(deque_array<T>(ARRAY_SIZE, 0));
-			arrays_.back().push_back(*first++);
-		}
-	}
-	deque(const deque &x) : arrays_(x.arrays_) {}
-	~deque() {}
-	deque &operator=(const deque &x)
-	{
-		arrays_ = x.arrays_;
-		return *this;
-	}
-	iterator begin() { return iterator(0, 0, &arrays_); }
-	const_iterator begin() const { return const_iterator(0, 0, &arrays_); }
-	iterator end() { return iterator(arrays_.size_, 0, &arrays_); }
-	const_iterator end() const { return const_iterator(arrays_.size_, 0, &arrays_); }
-	reverse_iterator rbegin() { return reverse_iterator(end()); }
-	const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
-	reverse_iterator rend() { return reverse_iterator(begin()); }
-	const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
-
-	size_type size() const
-	{
-		size_type size = 0;
-		for (int i = 0; i < arrays_.size_; ++i)
-			size += arrays_[i].size_;
-		return size;
-	}
-	size_type max_size() const
-	{
-		return std::numeric_limits<difference_type>::max() / ((sizeof(T) / 2) < 1 ? 1 : (sizeof(T) / 2));
-	}
-	void resize(size_type n, value_type val = value_type())
-	{
-		size_type sz = size();
-		if (n < sz)
-			erase(begin() + n, end());
-		else if (n > sz)
-			insert(end(), size_t(n - sz), val);
-	}
-	bool empty() const { return !size(); }
-	void swap(deque &x)
-	{
-		char buffer[sizeof(deque)];
-		memcpy(buffer, &x, sizeof(deque));
-		memcpy(reinterpret_cast<char *>(&x), this, sizeof(deque));
-		memcpy(reinterpret_cast<char *>(this), buffer, sizeof(deque));
-	}
-	void clear()
-	{
-		deque tmp;
-		swap(tmp);
-	}
-	reference operator[](size_type n)
-	{
-		return *get_position(n);
-	}
-	const_reference operator[](size_type n) const
-	{
-		return *get_position(n);
-	}
-	reference at(size_type n)
-	{
-		pointer p = get_position(n);
-		if (!p)
-			throw std::out_of_range("deque");
-		return *p;
-	}
-	const_reference at(size_type n) const
-	{
-		pointer p = get_position(n);
-		if (!p)
-			throw std::out_of_range("deque");
-		return *p;
-	}
-	reference front()
-	{
-		return arrays_.front().front();
-	}
-	const_reference front() const
-	{
-		return arrays_.front().front();
-	}
-	reference back()
-	{
-		return arrays_.back().back();
-	}
-	const_reference back() const
-	{
-		return arrays_.back().back();
-	}
-	template <class InputIterator>
-	void assign(InputIterator first, InputIterator last)
-	{
-		deque tmp(first, last);
-		swap(tmp);
-	}
-	void assign(size_type n, const value_type &val)
-	{
-		deque tmp(n, val);
-		swap(tmp);
-	}
-	void push_back(const value_type &val)
-	{
-		if (arrays_.size_ <= 0 || !arrays_.back().space_back())
-			arrays_.push_back(deque_array<T>(ARRAY_SIZE, 0));
-		arrays_.back().push_back(val);
-	}
-	void push_front(const value_type &val)
-	{
-		if (arrays_.size_ <= 0 || !arrays_.front().space_front())
-			arrays_.push_front(deque_array<T>(ARRAY_SIZE, ARRAY_SIZE - 1));
-		arrays_.front().push_front(val);
-	}
-	void pop_back()
-	{
-		arrays_.back().pop_back();
-		if (!arrays_.back().size_)
-			--arrays_.size_;
-	}
-	void pop_front()
-	{
-		arrays_.front().pop_front();
-		if (!arrays_.front().size_)
-		{
-			++arrays_.index_first;
-			--arrays_.size_;
-		}
-	}
-	iterator insert(iterator position, const value_type &val)
-	{
-		insert(position, 1, val);
-		if (!position.i_in && position.i_out)
-			--position;
-		return position;
-	}
-	void insert(iterator position, size_type n2, const value_type &val)
-	{
-		int n = n2;
-		if (!n2)
-			return;
-		if (!position.i_in)
-		{  // position == end()
-			for (int i = 0; i < n; ++i)
-				push_back(val);
-			return;
-		}
-		// if there is space for insertion in current array
-		if (arrays_[position.i_out].size_ + n < arrays_[position.i_out].capacity_)
-			arrays_[position.i_out].insert(position.i_in, n, val);
-		else
-		{
-			// N_TO_ARR, ELEMENTS AFTER POSITION THAT WILL BE COPIED TO A NEW ARRAY TMP
-			deque_array<T> tmp;
-			int n_to_arr = (ARRAY_SIZE - position.i_in < n) ? ARRAY_SIZE - position.i_in : n;
-			if (int afterPos = arrays_[position.i_out].size_ - position.i_in)
-			{
-				int startPos = ARRAY_SIZE - position.i_in - n;
-				startPos < 0 ? startPos = 0 : 0;
-				tmp = deque_array<T>(ARRAY_SIZE, &(*position) + startPos, &(*position) + afterPos);
-			}  // N_TO_ARR, ELEMENTS THAT NOW FIT IN CURRENT ARRAY,
-			n -= n_to_arr;
-			arrays_[position.i_out].insert(position.i_in, n_to_arr, val);
-			// UNTIL ALL ELEMENTS ARE ADDED NEW ARRAYS WILL BE FILLED WITH MAX ARRAY_SIZE VAL
-			while (n)
-			{
-				n_to_arr = (n < ARRAY_SIZE) ? n : ARRAY_SIZE;
-				if (!arrays_.space_back())
-					arrays_ = deque_array<deque_array<T> >(arrays_, arrays_.capacity_ + 2);
-				arrays_.insert(++position.i_out + 1, 1, deque_array<T>(ARRAY_SIZE, n_to_arr, val));
-				n -= n_to_arr;
-			}
-			int spaceInLast = ARRAY_SIZE - arrays_[position.i_out].size_;
-			if (tmp.size_)
-			{
-				int elementsToInsert = (spaceInLast < tmp.size_) ? spaceInLast : tmp.size_;
-				for (int i = 0; i < elementsToInsert; ++i)
-					arrays_[position.i_out].push_back(tmp[i]);
-				if (elementsToInsert != tmp.size_)
-				{
-					tmp.erase(0, elementsToInsert);
-					if (!arrays_.space_back())
-						arrays_ = deque_array<deque_array<T> >(arrays_, arrays_.capacity_ + 2);
-					arrays_.insert(++position.i_out + 1, 1, tmp);
-				}
-			}
-		}
-	}
-	template <class InputIterator>
-	void insert(iterator position, InputIterator first, InputIterator last,
-				typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
-	{
-		while (first != last)
-		{
-			position = insert(position, *first++);
-			++position;
-		}
-	}
-	iterator erase(iterator position)
-	{
-		if (position == end() - 1)
-			pop_back();
-		else if (position == begin())
-			pop_front();
-		else
-			arrays_[position.i_out].erase(position.i_in);
-		return position;
-	}
-	iterator erase(iterator first, iterator last)
-	{
-		if (last == end())
-		{
-			arrays_.size_ = first.i_out + 1;
-			arrays_[first.i_out].size_ = first.i_in;
-		}
-		else if (first == begin())
-		{
-			arrays_.size_ -= (last.i_out - arrays_.index_first);
-			arrays_.index_first = last.i_out;
-			arrays_[0].size_ -= (last.i_in - arrays_[0].index_first);
-			arrays_[0].index_first = last.i_in;
-		}
-		else if (first.i_out == last.i_out)
-		{
-			arrays_[first.i_out].erase(first.i_in, last.i_in);
-		}
-		else
-		{
-			arrays_[first.i_out].erase(first.i_in, arrays_[first.i_out].size_);
-			arrays_[last.i_out].erase(0, last.i_in);
-			if (last.i_out - first.i_out > 0)
-				arrays_.erase(first.i_out + 1, last.i_out);
-			first.i_in = 0;
-			first.i_out++;
-		}
-		return first;
-	}
-
-private:
-	pointer get_position(int n) const
-	{
-		for (int i = 0; n >= 0 && i < arrays_.size_; ++i)
-		{
-			if (n < arrays_[i].size_)
-				return &arrays_[i][n];
-			n -= arrays_[i].size_;
-		}
-		return nullptr;
-	}
-};
-
-template <class T>
-class deque_array;
 
 /**
  * DEQUE_ARRAY is what recursively builds up the deque by using the class 
@@ -336,7 +21,7 @@ class deque_array;
 template <class T>
 class deque_array
 {
-	template <class U, class Alloc>
+	template <class U>
 	friend class deque;
 	template <class U, bool isconst>
 	friend class deque_iterator;
@@ -487,6 +172,308 @@ public:
 	}
 };
 
+/**
+ * DEQUE - double ended queue with a structure similar to a vector 
+ * but optimised for pushing and popping both ends. Unlike a vector
+ * it therefore doesn't guarantee that the data will be stored 
+ * continously. 
+ *  [ ]
+ *  [x] ---> [ ][ ][ ][x][x][x]
+ *  [x] ---> [ ][x][x][x][x][x]
+ *  [x] ---> [x][x][x][x][ ][ ]
+ *  [ ]
+ */
+template <class T>
+class deque
+{
+	template <class U, bool isconst>
+	friend class deque_iterator;
+
+	static const int ARRAY_SIZE = 1024;
+
+	deque_array<deque_array<T> > arrays_;
+
+public:
+	typedef size_t size_type;
+	typedef T value_type;
+	typedef std::ptrdiff_t difference_type;
+	typedef value_type &reference;
+	typedef const value_type &const_reference;
+	typedef value_type *pointer;
+	typedef const value_type *const_pointer;
+	typedef ft::deque_iterator<T> iterator;
+	typedef ft::deque_iterator<T, true> const_iterator;
+	typedef ft::reverse_iterator<iterator> reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+
+	explicit deque() {}
+	explicit deque(size_type n, const value_type &val = value_type()) : arrays_(n ? ARRAY_SIZE % n + 1 : 1, 0)
+	{
+		for (size_type i = 0; i < n; ++i)
+		{
+			if (arrays_.size_ <= 0 || !arrays_.back().space_back())
+				arrays_.push_back(deque_array<T>(ARRAY_SIZE, 0));
+			arrays_.back().push_back(val);
+		}
+	}
+	template <class InputIterator>
+	deque(InputIterator first, InputIterator last,
+		  typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
+	{
+		while (first != last)
+		{
+			if (arrays_.size_ <= 0 || !arrays_.back().space_back())
+				arrays_.push_back(deque_array<T>(ARRAY_SIZE, 0));
+			arrays_.back().push_back(*first++);
+		}
+	}
+	deque(const deque &x) : arrays_(x.arrays_) {}
+	~deque() {}
+	deque &operator=(const deque &x)
+	{
+		arrays_ = x.arrays_;
+		return *this;
+	}
+	iterator begin() { return iterator(0, 0, &arrays_); }
+	const_iterator begin() const { return const_iterator(0, 0, &arrays_); }
+	iterator end() { return iterator(arrays_.size_, 0, &arrays_); }
+	const_iterator end() const { return const_iterator(arrays_.size_, 0, &arrays_); }
+	reverse_iterator rbegin() { return reverse_iterator(end()); }
+	const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+	reverse_iterator rend() { return reverse_iterator(begin()); }
+	const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+
+	size_type size() const
+	{
+		size_type size = 0;
+		for (int i = 0; i < arrays_.size_; ++i)
+			size += arrays_[i].size_;
+		return size;
+	}
+	size_type max_size() const
+	{
+		return std::numeric_limits<difference_type>::max() / ((sizeof(T) / 2) < 1 ? 1 : (sizeof(T) / 2));
+	}
+	void resize(size_type n, value_type val = value_type())
+	{
+		size_type sz = size();
+		if (n < sz)
+			erase(begin() + n, end());
+		else if (n > sz)
+			insert(end(), size_t(n - sz), val);
+	}
+	bool empty() const { return !size(); }
+	void swap(deque &x)
+	{
+		char buffer[sizeof(deque)];
+		memcpy(buffer, &x, sizeof(deque));
+		memcpy(reinterpret_cast<char *>(&x), this, sizeof(deque));
+		memcpy(reinterpret_cast<char *>(this), buffer, sizeof(deque));
+	}
+	void clear()
+	{
+		deque tmp;
+		swap(tmp);
+	}
+	reference operator[](size_type n)
+	{
+		return *get_position(n);
+	}
+	const_reference operator[](size_type n) const
+	{
+		return *get_position(n);
+	}
+	reference at(size_type n)
+	{
+		pointer p = get_position(n);
+		if (!p)
+			throw std::out_of_range("deque");
+		return *p;
+	}
+	const_reference at(size_type n) const
+	{
+		pointer p = get_position(n);
+		if (!p)
+			throw std::out_of_range("deque");
+		return *p;
+	}
+	reference front()
+	{
+		return arrays_.front().front();
+	}
+	const_reference front() const
+	{
+		return arrays_.front().front();
+	}
+	reference back()
+	{
+		return arrays_.back().back();
+	}
+	const_reference back() const
+	{
+		return arrays_.back().back();
+	}
+	template <class InputIterator>
+	void assign(InputIterator first, InputIterator last)
+	{
+		deque tmp(first, last);
+		swap(tmp);
+	}
+	void assign(size_type n, const value_type &val)
+	{
+		deque tmp(n, val);
+		swap(tmp);
+	}
+	void push_back(const value_type &val)
+	{
+		if (arrays_.size_ <= 0 || !arrays_.back().space_back())
+			arrays_.push_back(deque_array<T>(ARRAY_SIZE, 0));
+		arrays_.back().push_back(val);
+	}
+	void push_front(const value_type &val)
+	{
+		if (arrays_.size_ <= 0 || !arrays_.front().space_front())
+			arrays_.push_front(deque_array<T>(ARRAY_SIZE, ARRAY_SIZE - 1));
+		arrays_.front().push_front(val);
+	}
+	void pop_back()
+	{
+		arrays_.back().pop_back();
+		if (!arrays_.back().size_)
+			--arrays_.size_;
+	}
+	void pop_front()
+	{
+		arrays_.front().pop_front();
+		if (!arrays_.front().size_)
+		{
+			++arrays_.index_first;
+			--arrays_.size_;
+		}
+	}
+	iterator insert(iterator position, const value_type &val)
+	{
+		insert(position, 1, val);
+		if (!position.i_in && position.i_out)
+			--position;
+		return position;
+	}
+	// TODO: fix this monster function :-)
+	void insert(iterator position, size_type n2, const value_type &val)
+	{
+		int n = n2;
+		if (!n2)
+			return;
+		if (!position.i_in)
+		{  // position == end()
+			for (int i = 0; i < n; ++i)
+				push_back(val);
+			return;
+		}
+		// if there is space for insertion in current array
+		if (arrays_[position.i_out].size_ + n < arrays_[position.i_out].capacity_)
+			arrays_[position.i_out].insert(position.i_in, n, val);
+		else
+		{
+			// N_TO_ARR, ELEMENTS AFTER POSITION THAT WILL BE COPIED TO A NEW ARRAY TMP
+			deque_array<T> tmp;
+			int n_to_arr = (ARRAY_SIZE - position.i_in < n) ? ARRAY_SIZE - position.i_in : n;
+			if (int afterPos = arrays_[position.i_out].size_ - position.i_in)
+			{
+				int startPos = ARRAY_SIZE - position.i_in - n;
+				startPos < 0 ? startPos = 0 : 0;
+				tmp = deque_array<T>(ARRAY_SIZE, &(*position) + startPos, &(*position) + afterPos);
+			}  // N_TO_ARR, ELEMENTS THAT NOW FIT IN CURRENT ARRAY,
+			n -= n_to_arr;
+			arrays_[position.i_out].insert(position.i_in, n_to_arr, val);
+			// UNTIL ALL ELEMENTS ARE ADDED NEW ARRAYS WILL BE FILLED WITH MAX ARRAY_SIZE VAL
+			while (n)
+			{
+				n_to_arr = (n < ARRAY_SIZE) ? n : ARRAY_SIZE;
+				if (!arrays_.space_back())
+					arrays_ = deque_array<deque_array<T> >(arrays_, arrays_.capacity_ + 2);
+				arrays_.insert(++position.i_out + 1, 1, deque_array<T>(ARRAY_SIZE, n_to_arr, val));
+				n -= n_to_arr;
+			}
+			int spaceInLast = ARRAY_SIZE - arrays_[position.i_out].size_;
+			if (tmp.size_)
+			{
+				int elementsToInsert = (spaceInLast < tmp.size_) ? spaceInLast : tmp.size_;
+				for (int i = 0; i < elementsToInsert; ++i)
+					arrays_[position.i_out].push_back(tmp[i]);
+				// arrays_[position.i_out].insert(arrays_[position.i_out].size_, &tmp.front(), &tmp.front() + elementsToInsert);
+				if (elementsToInsert != tmp.size_)
+				{
+					tmp.erase(0, elementsToInsert);
+					if (!arrays_.space_back())
+						arrays_ = deque_array<deque_array<T> >(arrays_, arrays_.capacity_ + 2);
+					arrays_.insert(++position.i_out + 1, 1, tmp);
+				}
+			}
+		}
+	}
+	template <class InputIterator>
+	void insert(iterator position, InputIterator first, InputIterator last, typename std::enable_if<!std::is_integral<InputIterator>::value>::type * = 0)
+	{
+		while (first != last)
+		{
+			position = insert(position, *first++);
+			++position;
+		}
+	}
+	iterator erase(iterator position)
+	{
+		if (position == end() - 1)
+			pop_back();
+		else if (position == begin())
+			pop_front();
+		else
+			arrays_[position.i_out].erase(position.i_in);
+		return position;
+	}
+	iterator erase(iterator first, iterator last)
+	{
+		if (last == end())
+		{
+			arrays_.size_ = first.i_out + 1;
+			arrays_[first.i_out].size_ = first.i_in;
+		}
+		else if (first == begin())
+		{
+			arrays_.size_ -= (last.i_out - arrays_.index_first);
+			arrays_.index_first = last.i_out;
+			arrays_[0].size_ -= (last.i_in - arrays_[0].index_first);
+			arrays_[0].index_first = last.i_in;
+		}
+		else if (first.i_out == last.i_out)
+		{
+			arrays_[first.i_out].erase(first.i_in, last.i_in);
+		}
+		else
+		{
+			arrays_[first.i_out].erase(first.i_in, arrays_[first.i_out].size_);
+			arrays_[last.i_out].erase(0, last.i_in);
+			if (last.i_out - first.i_out > 0)
+				arrays_.erase(first.i_out + 1, last.i_out);
+			first.i_in = 0;
+			first.i_out++;
+		}
+		return first;
+		// return last; /// DON'T REMEMBER
+	}
+
+private:
+	pointer get_position(int n) const
+	{
+		for (int i = 0; n >= 0 && i < arrays_.size_; ++i)
+		{
+			if (n < arrays_[i].size_)
+				return &arrays_[i][n];
+			n -= arrays_[i].size_;
+		}
+		return nullptr;
+	}
+};
 /*
 	* DEQUE_ITERATOR: a double layered array_, index for the outer array and 
 	* index for the inner. It will try to do all operations on the inner index
@@ -641,45 +628,66 @@ public:
 	}
 };
 
-template <class T, class Alloc>
-void swap(ft::deque<T, Alloc> &a, ft::deque<T, Alloc> &b)
+}  //namespace ft
+
+template <class T>
+void swap(ft::deque<T> &a, ft::deque<T> &b)
 {
 	a.swap(b);
 }
-template <class T, class Alloc>
-bool operator==(ft::deque<T, Alloc> const &lhs, ft::deque<T, Alloc> const &rhs)
+template <class T>
+bool operator==(ft::deque<T> const &lhs, ft::deque<T> const &rhs)
 {
 	if (lhs.size() != rhs.size())
 		return false;
-	return equal(lhs.begin(), lhs.end(), rhs.begin());
+	typename ft::deque<T>::const_iterator l_it = lhs.begin();
+	typename ft::deque<T>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end())
+	{
+		if (*l_it != *r_it)
+			return false;
+		l_it++;
+		r_it++;
+	}
+	return true;
 }
-template <class T, class Alloc>
-bool operator!=(const ft::deque<Alloc, T> &lhs, const ft::deque<Alloc, T> &rhs)
+template <class T>
+bool operator!=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
 {
 	return !(lhs == rhs);
 }
-template <class T, class Alloc>
-bool operator<(const ft::deque<T, Alloc> &lhs, const ft::deque<T, Alloc> &rhs)
+template <class T>
+bool operator<(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
 {
-	ft::less<T> less;
-	return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), less);
+	typename ft::deque<T>::const_iterator l_it = lhs.begin();
+	typename ft::deque<T>::const_iterator r_it = rhs.begin();
+	while (l_it != lhs.end() && r_it != rhs.end())
+	{
+		if (*l_it < *r_it)
+			return true;
+		if (*l_it > *r_it)
+			return false;
+		l_it++;
+		r_it++;
+	}
+	if (r_it != rhs.end())
+		return true;
+	return false;
 }
-template <class T, class Alloc>
-bool operator<=(const ft::deque<T, Alloc> &lhs, const ft::deque<T, Alloc> &rhs)
+template <class T>
+bool operator<=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
 {
 	return !(rhs < lhs);
 }
-template <class T, class Alloc>
-bool operator>(const ft::deque<T, Alloc> &lhs, const ft::deque<T, Alloc> &rhs)
+template <class T>
+bool operator>(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
 {
 	return rhs < lhs;
 }
-template <class T, class Alloc>
-bool operator>=(const ft::deque<T, Alloc> &lhs, const ft::deque<T, Alloc> &rhs)
+template <class T>
+bool operator>=(const ft::deque<T> &lhs, const ft::deque<T> &rhs)
 {
 	return !(lhs < rhs);
 }
-
-}  //namespace ft
 
 #endif

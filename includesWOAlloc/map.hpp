@@ -9,27 +9,21 @@ namespace ft
 template <
 	class Key,
 	class T,
-	class Compare = less<Key>,
-	class Alloc = std::allocator<pair<const Key, T> > >
+	class Compare = std::less<Key> >
 class map
 {
 public:
-	// ########################### TYPEDEFS ########################################
 	typedef Key key_type;
 	typedef T mapped_type;
-	typedef Alloc allocator_type;
-	typedef pair<const key_type, mapped_type> value_type;
+	typedef ft::pair<Key, T> value_type;
 	typedef size_t size_type;
+	typedef std::ptrdiff_t difference_type;
 	typedef Compare key_compare;
-	typedef typename allocator_type::reference reference;
-	typedef typename allocator_type::const_reference const_reference;
-	typedef typename allocator_type::pointer pointer;
-	typedef typename allocator_type::const_pointer const_pointer;
-	// typedef value_type& reference;
-	// typedef const value_type& const_reference;
-	// typedef value_type* pointer;
-	// typedef const value_type* const_pointer;
-	class value_compare : public std::binary_function<value_type, value_type, bool>
+	typedef value_type& reference;
+	typedef const value_type& const_reference;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
+	class value_compare : public std::binary_function<value_type, value_type, bool>	 // REMOVE INHERITANCE ?
 	{
 	protected:
 		Compare comp;
@@ -45,21 +39,23 @@ public:
 			return comp(x.first, y.first);
 		}
 	};
-	typedef typename RB_Tree<pair<Key, T>, value_compare>::iterator iterator;
-	typedef typename RB_Tree<pair<Key, T>, value_compare>::const_iterator const_iterator;
+
+private:
+	typedef ft::RB_Tree<ft::pair<Key, T>, value_compare> RBT;
+
+	RBT tree_;
+	Compare comp;
+
+public:
+	// ########################### TYPEDEFS ########################################
+	typedef typename RBT::iterator iterator;
+	typedef typename RBT::const_iterator const_iterator;
 	typedef ft::reverse_iterator<iterator> reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
-	typedef typename iterator_traits<iterator>::difference_type difference_type;
-
 	//######################### CONSTRUCTORS #######################################
-	explicit map(const key_compare& comp = key_compare(),
-				 const allocator_type& = allocator_type()) : tree_(value_compare(comp)),
-															 comp(comp) {}
+	explicit map(const key_compare& comp = key_compare()) : tree_(value_compare(comp)), comp(comp) {}
 	template <class InputIterator>
-	map(InputIterator first, InputIterator last,
-		const key_compare& comp = key_compare(),
-		const allocator_type& = allocator_type()) : tree_(value_compare(comp)),
-													comp(comp)
+	map(InputIterator first, InputIterator last, const key_compare& comp = key_compare()) : tree_(value_compare(comp)), comp(comp)
 	{
 		for (; first != last; first++)
 			tree_.add(*first);
@@ -74,7 +70,6 @@ public:
 	}
 	mapped_type& operator[](const key_type& k)
 	{  // find node or parent to where it should be?
-		// return (*((insert(ft::make_pair(k,mapped_type()))).first)).second;
 		return (tree_.add(k))->value_.second;
 	}
 	//########################## ITERATORS #######################################
@@ -91,31 +86,14 @@ public:
 	size_type size() const { return tree_.size(); }
 	size_type max_size() const { return tree_.max_size(); }
 	//########################### INSERT #######################################
-	/**
-	 * Extends the container by inserting new elements, effectively increasing
-	 * the container size by the number of elements inserted.
-	 * Because element keys in a map are unique, the insertion operation checks 
-	 * whether each inserted element has a key equivalent to the one of an element 
-	 * already in the container, and if so, the element is not inserted, returning 
-	 * an iterator to this existing element (if the function returns a value).
-	 * 
-	 * @return a pair, with its member pair::first set to an iterator pointing to 
-	 * either the newly inserted element or to the element with an equivalent key 
-	 * in the map. The pair::second element in the pair is set to true if a new 
-	 * element was inserted or false if an equivalent key already existed.
-	 */
-	pair<iterator, bool> insert(const value_type& val)
+	ft::pair<iterator, bool> insert(const value_type& val)
 	{
 		iterator ret(tree_.add(val), &tree_);
-		return pair<iterator, bool>(ret, (ret->second == val.second));
+		return ft::pair<iterator, bool>(ret, (ret->second == val.second));
 	}
-	/**
-	 * @param[in] position
-	 * 		Hint for the position where the element can be inserted.
-	 */
-	iterator insert(iterator position, const value_type& val)
+	iterator insert(iterator, const value_type& val)
 	{
-		return iterator(tree_.add(position, val), &tree_);
+		return iterator(tree_.add(val), &tree_);
 	}
 	template <class InputIterator>
 	void insert(InputIterator first, InputIterator last)
@@ -129,15 +107,25 @@ public:
 		tree_.deleteKey(position->first);
 	}
 	size_type erase(const key_type& k)
-	{
+	{  // TRY CATCH ?
 		return tree_.deleteKey(k);
 	}
 	void erase(iterator first, iterator last)
-	{
-		// ? can make more efficient
-		while (first != end() && first != last &&
-			   (last == end() || !comp(last->first, first->first)))
-			first = tree_.deleteKey(first);
+	{  // CAN MAKE MORE EFFICIENT
+		size_t size = 0;
+		for (iterator trav = first; trav != last; trav++)
+			size++;
+		Key* keys = new Key[size];
+		for (size_t i = 0; i < size; i++)
+		{
+			keys[i] = first->first;
+			++first;
+		}
+		for (size_t i = 0; i < size; i++)
+		{
+			tree_.deleteKey(keys[i]);
+		}
+		delete[] keys;
 	}
 	//########################### MODIFIERS #######################################
 	void swap(map& x)
@@ -192,50 +180,32 @@ public:
 		return ft::pair<iterator, iterator>(lower_bound(k), upper_bound(k));
 	}
 
-private:
-	ft::RB_Tree<ft::pair<Key, T>, value_compare> tree_;
-	Compare comp;
+	friend bool operator==(const map& lhs, const map& rhs)
+	{
+		return lhs.tree_ == rhs.tree_;
+	}
+	friend bool operator!=(const map& lhs, const map& rhs)
+	{
+		return !(lhs == rhs);
+	}
+	friend bool operator<(const map& lhs, const map& rhs)
+	{
+		return lhs.tree_ < rhs.tree_;
+	}
+	friend bool operator>=(const map& lhs, const map& rhs)
+	{
+		return !(lhs < rhs);
+	}
+	friend bool operator>(const map& lhs, const map& rhs)
+	{
+		return rhs < lhs;
+	}
+	friend bool operator<=(const map& lhs, const map& rhs)
+	{
+		return !(rhs < lhs);
+	}
 };
 
-template <class Key, class T, class Compare, class Alloc>
-bool operator==(const map<Key, T, Compare, Alloc>& lhs,
-				const map<Key, T, Compare, Alloc>& rhs)
-{
-	if (lhs.size() != rhs.size())
-		return false;
-	return equal(lhs.begin(), lhs.end(), rhs.begin());
-}
-template <class Key, class T, class Compare, class Alloc>
-bool operator!=(const map<Key, T, Compare, Alloc>& lhs,
-				const map<Key, T, Compare, Alloc>& rhs)
-{
-	return !(lhs == rhs);
-}
-template <class Key, class T, class Compare, class Alloc>
-bool operator<(const map<Key, T, Compare, Alloc>& lhs,
-			   const map<Key, T, Compare, Alloc>& rhs)
-{
-	ft::less<ft::pair<Key, T> > less;
-	return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), less);
-}
-template <class Key, class T, class Compare, class Alloc>
-bool operator>=(const map<Key, T, Compare, Alloc>& lhs,
-				const map<Key, T, Compare, Alloc>& rhs)
-{
-	return !(lhs < rhs);
-}
-template <class Key, class T, class Compare, class Alloc>
-bool operator>(const map<Key, T, Compare, Alloc>& lhs,
-			   const map<Key, T, Compare, Alloc>& rhs)
-{
-	return rhs < lhs;
-}
-template <class Key, class T, class Compare, class Alloc>
-bool operator<=(const map<Key, T, Compare, Alloc>& lhs,
-				const map<Key, T, Compare, Alloc>& rhs)
-{
-	return !(rhs < lhs);
-}
 template <class Key, class T, class Compare>
 void swap(ft::map<Key, T, Compare>& a, ft::map<Key, T, Compare>& b)
 {

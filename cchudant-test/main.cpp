@@ -11,27 +11,31 @@
 /* ************************************************************************** */
 
 #include "Test.hpp"
-
+#define RESET "\x1B[0m"
+#define BOLD "\x1B[1m"
+#define RED "\x1B[31m"
+#define GREEN "\x1B[32m"
+#define BLUE "\x1B[34m"
 int main()
 {
-	std::cout << ":: Vector ::" << std::endl;
+	std::cout << GREEN << ":: Vector ::" << RESET << std::endl;
 	test_vector();
-	std::cout << ":: List ::" << std::endl;
+	std::cout << GREEN << ":: List ::" << RESET << std::endl;
 	test_list();
-	std::cout << ":: Stack ::" << std::endl;
+	std::cout << GREEN << ":: Stack ::" << RESET << std::endl;
 	test_stack();
-	std::cout << ":: Queue ::" << std::endl;
+	std::cout << GREEN << ":: Queue ::" << RESET << std::endl;
 	test_queue();
-	std::cout << ":: Map ::" << std::endl;
+	std::cout << GREEN << ":: Map ::" << RESET << std::endl;
 	test_map();
-	std::cout << ":: Set ::" << std::endl;
+	std::cout << GREEN << ":: Set ::" << RESET << std::endl;
 	test_set();
-	std::cout << ":: MultiMap ::" << std::endl;
+	std::cout << GREEN << ":: MultiMap ::" << RESET << std::endl;
 	test_multimap();
-	std::cout << ":: MultiSet ::" << std::endl;
+	std::cout << GREEN << ":: MultiSet ::" << RESET << std::endl;
 	test_multiset();
-	std::cout << ":: Deque ::" << std::endl;
+	std::cout << GREEN << ":: Deque ::" << RESET << std::endl;
 	test_deque();
-	std::cout << ":: Everything is ok! ::" << std::endl;
+	std::cout << GREEN << ":: Everything is ok! ::" << RESET << std::endl;
 	return 0;
 }
