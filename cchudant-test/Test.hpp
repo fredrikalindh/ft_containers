@@ -13,33 +13,35 @@
 #ifndef TEST_HPP
 #define TEST_HPP
 
-#include "../includes/vector.hpp"
+#include <assert.h>
+
+#include <iostream>
+#include <sstream>
+
+#include "../includes/deque.hpp"
 #include "../includes/list.hpp"
-#include "../includes/stack.hpp"
-#include "../includes/queue.hpp"
 #include "../includes/map.hpp"
-#include "../includes/set.hpp"
 #include "../includes/multimap.hpp"
 #include "../includes/multiset.hpp"
-#include "../includes/deque.hpp"
-#include <iostream>
-#include <assert.h>
-#include <sstream>
+#include "../includes/queue.hpp"
+#include "../includes/set.hpp"
+#include "../includes/stack.hpp"
+#include "../includes/vector.hpp"
 
 class ConstrCounter
 {
 public:
-    static int g_constr;
-    static int g_destr;
+	static int g_constr;
+	static int g_destr;
 
-    int val;
+	int val;
 
-    ConstrCounter();
-    ConstrCounter(int val);
-    ConstrCounter(const ConstrCounter &o);
-    ~ConstrCounter();
+	ConstrCounter();
+	ConstrCounter(int val);
+	ConstrCounter(const ConstrCounter &o);
+	~ConstrCounter();
 
-    static void reset_counters();
+	static void reset_counters();
 };
 
 bool operator==(const ConstrCounter &lhs, const ConstrCounter &rhs);

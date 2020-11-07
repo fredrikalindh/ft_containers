@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/Users/fredrikalindh/42/ft_containers/build",
-  "command": "/usr/bin/clang++  -I/usr/local/include -I/Users/fredrikalindh/42/ft_containers/includes  -std=c++11 -std=c++98 -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -fPIE -Wall -Werror -Wextra -w -std=gnu++98 -o CMakeFiles/myTester.dir/test/main.cpp.o -c /Users/fredrikalindh/42/ft_containers/test/main.cpp",
-  "file": "/Users/fredrikalindh/42/ft_containers/test/main.cpp"
-}
-]

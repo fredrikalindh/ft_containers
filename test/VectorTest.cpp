@@ -279,7 +279,6 @@ TEST(VectorTest, InsertRange)
 	LIBRARY::vector<int> myvector, myvector2;
 	LIBRARY::vector<int>::iterator it;
 	std::vector<int> stdvector, stdvector2;
-	std::vector<int>::iterator sit;
 
 	for (int i = 0; i < 100; ++i)
 	{
