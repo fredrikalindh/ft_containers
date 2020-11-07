@@ -1,13 +1,13 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include <string.h>
+// #include <string.h>
 
-#include <cstddef>
-#include <cstring>
+// #include <cstddef>
+// #include <cstring>
 #include <limits>
 #include <stdexcept>
-#include <type_traits>
+// #include <type_traits>
 
 #include "iterator.hpp"
 #include "utility.hpp"
