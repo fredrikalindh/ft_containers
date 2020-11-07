@@ -2,6 +2,7 @@
 #define MAP_HPP
 
 #include "RBTree.hpp"
+#include "iterator.hpp"
 #include "utility.hpp"
 
 namespace ft

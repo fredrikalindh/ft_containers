@@ -1,9 +1,6 @@
 #ifndef DEQUE_HPP
 #define DEQUE_HPP
 
-// #include <functional>
-#include <limits>
-
 #include "iterator.hpp"
 #include "utility.hpp"
 namespace ft

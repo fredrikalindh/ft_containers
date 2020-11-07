@@ -1,6 +1,9 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 
+#include <cstring>
+#include <limits>
+#include <memory>
 // #include <functional>
 namespace ft
 {
