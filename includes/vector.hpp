@@ -2,7 +2,6 @@
 #define VECTOR_HPP
 
 #include <stdexcept>
-// #include <type_traits>
 
 #include "iterator.hpp"
 #include "utility.hpp"
@@ -103,7 +102,7 @@ public:
 	void resize(size_type n, value_type val = value_type())
 	{
 		if (n > max_size())
-			throw std::length_error("max_size(size_t n) 'n' exceeds maximum supported size");  //allocator<T>::allocate(size_t n) 'n' exceeds maximum supported size
+			throw std::length_error("max_size(size_t n) 'n' exceeds maximum supported size");
 		vector tmp(*this, n);
 		swap(tmp);
 		for (size_type i = size_; i < capacity_; ++i)

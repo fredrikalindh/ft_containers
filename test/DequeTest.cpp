@@ -292,43 +292,42 @@ TEST(DequeTest, PopFront)
 	EXPECT_EQ(mydeque.size(), size_t(0));
 }
 
-// TEST(DequeTest, InsertIterator)
-// {
+TEST(DequeTest, InsertIterator2)
+{
+	LIBRARY::deque<int> mydeque;
 
-//   LIBRARY::deque<int> mydeque;
+	// set some initial values:
+	for (int i = 1; i < 6; i++)
+		mydeque.push_back(i);  // 1 2 3 4 5
 
-//   // set some initial values:
-//   for (int i = 1; i < 6; i++)
-//     mydeque.push_back(i); // 1 2 3 4 5
+	LIBRARY::deque<int>::iterator it;
+	it = mydeque.begin();
+	++it;
 
-//   LIBRARY::deque<int>::iterator it;
-//   it = mydeque.begin();
-//   ++it;
+	it = mydeque.insert(it, 10);  // 1 10 2 3 4 5
+	// "it" now points to the newly inserted 10
 
-//   it = mydeque.insert(it, 10); // 1 10 2 3 4 5
-//   // "it" now points to the newly inserted 10
+	mydeque.insert(it, 2, 20);	// 1 20 20 10 2 3 4 5
+	// "it" no longer valid!
 
-//   mydeque.insert(it, 2, 20); // 1 20 20 10 2 3 4 5
-//   // "it" no longer valid!
+	it = mydeque.begin() + 2;
 
-//   it = mydeque.begin() + 2;
+	std::vector<int> myvector(2, 30);
+	mydeque.insert(it, myvector.begin(), myvector.end());
+	// 1 20 30 30 20 10 2 3 4 5
 
-//   std::vector<int> myvector(2, 30);
-//   mydeque.insert(it, myvector.begin(), myvector.end());
-//   // 1 20 30 30 20 10 2 3 4 5
+	int result[] = {1, 20, 30, 30, 20, 10, 2, 3, 4, 5};
+	int i = 0;
+	for (it = mydeque.begin(); it != mydeque.end(); ++it)
+		EXPECT_EQ(*it, result[i++]);
 
-//   int result[] = {1, 20, 30, 30, 20, 10, 2, 3, 4, 5};
-//   int i = 0;
-//   for (it = mydeque.begin(); it != mydeque.end(); ++it)
-//     EXPECT_EQ(*it, result[i++]);
-
-//   it = mydeque.begin() + 5;
-//   mydeque.insert(it, 1030, 100);
-//   EXPECT_EQ(mydeque.size(),size_t( )1040);
-//   EXPECT_EQ(mydeque.front(), 1);
-//   EXPECT_EQ(mydeque.back(), 5);
-//   EXPECT_EQ(*(mydeque.begin() + 6), 100);
-// }
+	it = mydeque.begin() + 5;
+	mydeque.insert(it, 1030, 100);
+	EXPECT_EQ(mydeque.size(), size_t(1040));
+	EXPECT_EQ(mydeque.front(), 1);
+	EXPECT_EQ(mydeque.back(), 5);
+	EXPECT_EQ(*(mydeque.begin() + 6), 100);
+}
 
 TEST(DequeTest, InsertIterator)
 {

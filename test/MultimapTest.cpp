@@ -769,24 +769,3 @@ TEST(MultimapTest, RelOps)
 	EXPECT_FALSE(foo <= bar);
 	EXPECT_TRUE(foo >= bar);
 }
-
-// TEST(MultimapTest, Glagan)
-// {
-//   LIBRARY::multimap<int, int> mp;
-//   std::multimap<int, int> stdmp;
-//   LIBRARY::multimap<int, int>::iterator it;
-//   std::multimap<int, int>::iterator sit;
-// 	mp[5] = 42;
-// 	mp[7] = 28;
-// 	mp[9] = 44;
-
-// 	EXPECT_EQ(mp.size(), size_t(3));
-// 	it = mp.begin();
-//   EXPECT_EQ((*it).first, 5);
-//   EXPECT_EQ(it->second, 42);
-// 	// std::cout << "[5:42, 7:28, 9:44].[5] = " << mp[int(5)] << " (it: first: " << (*it).first << ", second: " << (*it).second << ")" << '\n';
-// 	EXPECT_EQ(mp[5], 42);
-// 	it = --mp.end();
-// 	// std::cout << "[5:42, 7:28, 9:44].[9] = " << mp[9] << " (it: first: " << (*it).first << ", second: " << (*it).second << ")" << '\n';
-// 	EXPECT_EQ(mp[9], 44);
-// }

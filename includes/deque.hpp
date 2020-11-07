@@ -542,7 +542,7 @@ public:
 				i_in += n;
 				break;
 			}
-			n -= ((*array_)[i_out++].size_ - i_in);	 //????
+			n -= ((*array_)[i_out++].size_ - i_in);
 			i_in = 0;
 		}
 		return *this;

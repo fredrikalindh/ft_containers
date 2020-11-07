@@ -1,7 +1,5 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-// #include <functional>
-// #include <type_traits>
 
 #include "iterator.hpp"
 #include "utility.hpp"
