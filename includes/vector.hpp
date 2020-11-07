@@ -231,7 +231,6 @@ public:
 		swap(tmp);
 	}
 };
-
 template <class T, bool isconst>
 class vector_iterator
 {
@@ -269,7 +268,8 @@ public:
 	}
 	reference operator[](int val) const
 	{
-		return *(p + val);
+		return p[val];
+		// return *(p + val);
 	}
 	vector_iterator operator++(int)
 	{

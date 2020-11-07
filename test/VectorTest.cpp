@@ -1,5 +1,38 @@
 #include <gtest/gtest.h>
 
+TEST(VectorTest, ReverseIterator)
+{
+	LIBRARY::vector<int> vector;  // three ints with a value of 100
+	std::vector<int> svector;	  // three ints with a value of 100
+	for (int i = 0; i < 10000; ++i)
+	{
+		vector.push_back(i);
+		svector.push_back(i);
+		vector.push_back(i);
+		svector.push_back(i);
+	}
+	LIBRARY::vector<int>::reverse_iterator rit = vector.rbegin();
+	std::vector<int>::reverse_iterator srit = svector.rbegin();
+	EXPECT_EQ(rit[10], srit[10]);
+
+	EXPECT_EQ(*(rit - 5), *(srit - 5));
+	EXPECT_EQ(*(rit + 205), *(srit + 205));
+	while (rit != vector.rend())
+		EXPECT_EQ(*srit++, *rit++);
+	EXPECT_EQ(rit[-10], srit[-10]);
+	EXPECT_EQ(rit.base(), vector.begin());
+
+	EXPECT_EQ(*(rit -= 5), *(srit -= 5));
+	EXPECT_EQ(*rit--, *srit--);
+	EXPECT_EQ(*--rit, *--srit);
+	EXPECT_EQ(rit, rit);
+	EXPECT_FALSE(rit < rit);
+	EXPECT_TRUE(rit <= ++rit);
+	EXPECT_TRUE(rit < (rit + 1));
+	EXPECT_TRUE(rit > (rit - 1));
+	EXPECT_FALSE(rit != rit);
+	EXPECT_TRUE(rit != (rit + 1));
+}
 TEST(VectorTest, ReverseConstIterator)
 {
 	LIBRARY::vector<int> vector;  // three ints with a value of 100

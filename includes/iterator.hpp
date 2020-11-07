@@ -125,9 +125,12 @@ distance(InputIterator first, InputIterator last)
 template <class Iterator>
 class reverse_iterator
 {
-public:
 	Iterator base_;
 
+	template <class It2>
+	friend class reverse_iterator;
+
+public:
 	typedef Iterator iterator_type;
 	typedef typename iterator_traits<Iterator>::iterator_category iterator_category;
 	typedef typename iterator_traits<Iterator>::value_type value_type;
@@ -145,7 +148,8 @@ public:
 	template <class Iter>
 	reverse_iterator& operator=(const reverse_iterator<Iter>& rev_it)
 	{
-		base_ = --rev_it.base();
+		base_ = rev_it.base_;
+		// base_ = --rev_it.base();
 		return *this;
 	}
 
@@ -158,7 +162,7 @@ public:
 
 	reference operator*() const { return *base_; }
 	pointer operator->() const { return &(operator*()); }
-	reference operator[](difference_type n) const { return base_[-n - 1]; }
+	reference operator[](difference_type n) const { return base_[-1 - n]; }
 
 	reverse_iterator operator+(difference_type n) const
 	{
