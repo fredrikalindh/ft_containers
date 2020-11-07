@@ -17,14 +17,10 @@ public:
 	typedef Compare key_compare;
 	typedef Compare value_compare;
 	typedef Alloc allocator_type;
-	typedef typename allocator_type::reference reference;
-	typedef typename allocator_type::const_reference const_reference;
-	typedef typename allocator_type::pointer pointer;
-	typedef typename allocator_type::const_pointer const_pointer;
-	// typedef value_type &reference;
-	// typedef const value_type &const_reference;
-	// typedef value_type *pointer;
-	// typedef const value_type *const_pointer;
+	typedef value_type &reference;
+	typedef const value_type &const_reference;
+	typedef value_type *pointer;
+	typedef const value_type *const_pointer;
 	typedef typename RB_Tree<T, value_compare>::iterator iterator;
 	typedef typename RB_Tree<T, value_compare>::const_iterator const_iterator;
 	typedef ft::reverse_iterator<iterator> reverse_iterator;
