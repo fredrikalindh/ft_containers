@@ -962,12 +962,16 @@ public:
 			node_ = container_->last_;
 		return old;
 	}
-	reference operator*(void) { return node_->value; }
-	pointer operator->(void) { return &(node_->value); }
 	reference operator*(void) const { return node_->value; }
 	pointer operator->(void) const { return &(node_->value); }
-	bool operator!=(list_iterator const &other) const { return node_ != other.node_; }
-	bool operator==(list_iterator const &other) const { return node_ == other.node_; }
+	friend bool operator==(const list_iterator &lhs, const list_iterator &rhs)
+	{
+		return lhs.node_ == rhs.node_;
+	}
+	friend bool operator!=(const list_iterator &lhs, const list_iterator &rhs)
+	{
+		return lhs.node_ != rhs.node_;
+	}
 
 	void swap(list_iterator &x)
 	{

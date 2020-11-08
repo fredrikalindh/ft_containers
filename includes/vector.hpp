@@ -306,29 +306,34 @@ public:
 	{
 		return p - x.p;
 	}
-	bool operator==(vector_iterator const &x) const
+	friend vector_iterator operator+(difference_type value, const vector_iterator &x)
 	{
-		return p == x.p;
+		vector_iterator tmp(x);
+		return tmp += value;
 	}
-	bool operator!=(vector_iterator const &x) const
+	friend bool operator==(const vector_iterator &lhs, const vector_iterator &rhs)
 	{
-		return p != x.p;
+		return lhs.p == rhs.p;
 	}
-	bool operator<(vector_iterator const &x) const
+	friend bool operator!=(const vector_iterator &lhs, const vector_iterator &rhs)
 	{
-		return p < x.p;
+		return lhs.p != rhs.p;
 	}
-	bool operator<=(vector_iterator const &x) const
+	friend bool operator<(const vector_iterator &lhs, const vector_iterator &rhs)
 	{
-		return p <= x.p;
+		return lhs.p < rhs.p;
 	}
-	bool operator>(vector_iterator const &x) const
+	friend bool operator<=(const vector_iterator &lhs, const vector_iterator &rhs)
 	{
-		return p > x.p;
+		return lhs.p <= rhs.p;
 	}
-	bool operator>=(vector_iterator const &x) const
+	friend bool operator>(const vector_iterator &lhs, const vector_iterator &rhs)
 	{
-		return p >= x.p;
+		return lhs.p > rhs.p;
+	}
+	friend bool operator>=(const vector_iterator &lhs, const vector_iterator &rhs)
+	{
+		return lhs.p >= rhs.p;
 	}
 };
 

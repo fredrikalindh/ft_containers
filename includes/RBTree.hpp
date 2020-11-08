@@ -627,10 +627,16 @@ public:
 		operator--();
 		return old;
 	}
-	inline reference operator*(void) const { return node_->value_; }
-	inline pointer operator->(void) const { return &(node_->value_); }
-	inline bool operator!=(rb_tree_iterator const &other) const { return node_ != other.node_; }
-	inline bool operator==(rb_tree_iterator const &other) const { return node_ == other.node_; }
+	reference operator*(void) const { return node_->value_; }
+	pointer operator->(void) const { return &(node_->value_); }
+	friend bool operator==(const rb_tree_iterator &lhs, const rb_tree_iterator &rhs)
+	{
+		return lhs.node_ == rhs.node_;
+	}
+	friend bool operator!=(const rb_tree_iterator &lhs, const rb_tree_iterator &rhs)
+	{
+		return lhs.node_ != rhs.node_;
+	}
 	void swap(rb_tree_iterator &x)
 	{
 		char buffer[sizeof(rb_tree_iterator)];

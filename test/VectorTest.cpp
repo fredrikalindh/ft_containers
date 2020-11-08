@@ -141,6 +141,29 @@ TEST(VectorTest, IteratorOP2)
 	EXPECT_EQ(it2->first, stdit2->first);
 	EXPECT_EQ(it2->second, stdit2->second);
 }
+TEST(VectorTest, IteratorOP3)
+{
+	LIBRARY::vector<int> myvector;
+	LIBRARY::vector<int>::iterator it;
+	LIBRARY::vector<int>::const_iterator cit;
+	std::vector<int> stdvector;
+	std::vector<int>::iterator stdit;
+	std::vector<int>::const_iterator cstdit;
+
+	for (int i = 0; i < 10; ++i)
+	{
+		myvector.push_back(i);
+		stdvector.push_back(i);
+	}
+	it = myvector.begin();
+	stdit = stdvector.begin();
+	cit = myvector.begin();
+	cstdit = stdvector.begin();
+	EXPECT_EQ(*(5 + it), *(5 + stdit));
+	EXPECT_EQ(*(5 + cit), *(5 + cstdit));
+	EXPECT_EQ(cit, it);
+	EXPECT_EQ(it, cit);
+}
 
 TEST(VectorTest, RelationalOperators)
 {

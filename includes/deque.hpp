@@ -608,6 +608,22 @@ public:
 		memcpy(reinterpret_cast<char *>(&x), this, sizeof(deque_iterator));
 		memcpy(reinterpret_cast<char *>(this), buffer, sizeof(deque_iterator));
 	}
+	difference_type operator-(deque_iterator const &x) const
+	{
+		if (i_out == x.i_out)
+			return i_in - x.i_in;
+		if (i_out > x.i_out)
+			return -(x - *this);
+		difference_type ret = (*array_)[i_out].size_ - i_in + x.i_in;
+		for (int i = i_out + 1; i < x.i_out; ++i)
+			ret += (*array_)[i].size_;
+		return -ret;
+	}
+	friend deque_iterator operator+(difference_type value, const deque_iterator &x)
+	{
+		deque_iterator tmp(x);
+		return tmp += value;
+	}
 	friend bool operator==(deque_iterator const &lhs, deque_iterator const &rhs)
 	{
 		return lhs.i_out == rhs.i_out && lhs.i_in == rhs.i_in && lhs.array_ == rhs.array_;

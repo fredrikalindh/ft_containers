@@ -646,6 +646,15 @@ TEST(DequeTest, IteratorOP3)
 		mydeque.push_front(i);
 		stddeque.push_front(i);
 	}
+	it = mydeque.begin();
+	stdit = stddeque.begin();
+	EXPECT_EQ(*(5 + it), *(5 + stdit));
+	EXPECT_EQ(*(2000 + it), *(2000 + stdit));
+	EXPECT_EQ(*(it += 10), *(stdit += 10));
+	EXPECT_EQ(it - mydeque.begin(), stdit - stddeque.begin());
+	EXPECT_EQ(it - mydeque.end(), stdit - stddeque.end());
+	EXPECT_EQ(mydeque.end() - it, stddeque.end() - stdit);
+	EXPECT_EQ(*(it - 5), *(stdit - 5));
 	int i = 3000;
 	LIBRARY::deque<int>::iterator it2 = mydeque.end() - 1;
 	for (it = mydeque.begin(); it < mydeque.end(); ++it)
