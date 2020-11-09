@@ -1,3 +1,0 @@
-/home/user42/Desktop/containers/CMakeFiles/rebuild_cache.dir
-/home/user42/Desktop/containers/CMakeFiles/myTester.dir
-/home/user42/Desktop/containers/CMakeFiles/edit_cache.dir
